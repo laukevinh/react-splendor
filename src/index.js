@@ -1,6 +1,65 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+import decks from './cards';
+
+function Color(props) {
+  let icons = {
+    white: "^",
+    blue: "{}",
+    green: "<>",
+    red: "<3",
+    black: "+"
+  };
+  return (
+    <div className={"color"}>
+      {icons[props.value]}
+    </div>
+  );
+}
+
+function Point(props) {
+  return (
+    <div classname={"point"}>
+      {props.value}
+    </div>
+  )
+}
+
+function Price(props) {
+  let colorMap = ['white', 'blue', 'green', 'red', 'black'];
+  let price = [];
+  for (let k = 0; k < props.value.length; k++) {
+    if (props.value[k] !== 0) {
+      let disp = (
+        <div>
+          <div style={{float: "left"}}>{props.value[k]}</div>
+          <Color value={colorMap[k]}/>
+        </div>
+      );
+      price.push(disp);
+    }
+  }
+  return (
+    <div className="price">
+      <div>Price:</div>
+      {price}
+    </div>
+  );
+}
+
+function Card(props) {
+  return (
+    <button 
+      className={"card " + props.color}
+      onClick={() => alert('hold or buy')}
+    >
+      <Color value={props.color} />
+      <Point value={props.points} />
+      <Price value={props.price} />
+    </button>
+  );
+}
 
 function Square(props) {
   return (
@@ -37,10 +96,13 @@ function calculateWinner(squares) {
 }
 
 class Board extends React.Component {  
-  renderSquare(i, bold) {
+  renderCard(i, bold, color, points, price) {
     return (
-      <Square 
+      <Card 
         value={this.props.squares[i]}
+        color={color}
+        points={points}
+        price={price}
         bold={bold}
         onClick={() => this.props.onClick(i)}
       />
@@ -54,6 +116,8 @@ class Board extends React.Component {
     } else {
       line = Array(3).fill(null);
     }
+
+    let decks = this.props.decks;
     
     let rows = [];
     for (let i = 0; i < 3; i++) {
@@ -61,10 +125,14 @@ class Board extends React.Component {
       for (let j = 0; j < 3; j++) {
         let index = i * 3 + j;
         let bold = (index === line[0] || index === line[1] || index === line[2]);
-        cols.push(this.renderSquare(index, bold))
+        let card = decks[0].pop();
+        let color = card[0];
+        let points = card[1];
+        let price = card.slice(2,);
+        cols.push(this.renderCard(index, bold, color, points, price));
       }
-      let row = <div className="board-row">{cols}</div>
-      rows.push(row)
+      let row = <div className="board-row">{cols}</div>;
+      rows.push(row);
     }
     return (
       <div>{rows}</div>
@@ -83,7 +151,28 @@ class Game extends React.Component {
       moveHistory: [null],
       historyReversed: false,
       xIsNext: true,
+      decks: [
+        this.shuffle(decks[0]),
+        this.shuffle(decks[1]),
+        this.shuffle(decks[2]),
+      ],
     };
+  }
+
+  shuffle(A) {
+    function randInt(i, j) {
+      return Math.floor(Math.random() * (j - i) + i);
+    }
+    function swap(A, i, j) {
+      let temp = A[i];
+      A[i] = A[j];
+      A[j] = temp;
+    }
+    let n = A.length;
+    for (let k = 0; k < n; k++) {
+      swap(A, k, randInt(0, n - 1));
+    }
+    return A;
   }
 
   handleClick(i) {
@@ -159,6 +248,7 @@ class Game extends React.Component {
           <Board 
             squares={current.squares}
             winner={winner}
+            decks={this.state.decks}
             onClick={(i) => this.handleClick(i)}
           />
         </div>

@@ -40,6 +40,78 @@ ol, ul {
   outline: none;
 }
 
+.card {
+  background: #fff;
+  border: 5px solid #999;
+  float: left;
+  font-size: 24px;
+  font-weight: normal;
+  line-height: 34px;
+  height: 306px;
+  padding: 0;
+  text-align: center;
+  width: 204px;
+}
+
+.color {
+
+}
+
+.white {
+  background:rgb(170, 170, 170);
+  border-color: #fff;
+  float: left;
+}
+
+.blue {
+  background-color: rgb(140, 160, 210);
+  border-color: rgb(30, 70, 180)
+}
+
+.green {
+  background-color: rgb(130, 200, 170);
+  border-color: rgb(10, 130, 80);
+}
+
+.red {
+  background-color: rgb(240, 160, 170);
+  border-color: rgb(220, 70, 70);
+}
+
+.black {
+  background-color: rgb(150, 150, 150);
+  border-color: rgb(50, 50, 50);
+}
+
+.yellow {
+  background-color: rgb(230, 220, 10);
+}
+
+.price .white {
+  float: left;
+}
+
+.price .blue {
+  float: left;
+}
+
+.price .green {
+  float: left;
+}
+
+.price .red {
+  float: left;
+}
+
+.price .black {
+  float: left;
+}
+
+.point {
+  font-size: 24px;
+  font-weight: bold;
+}
+
 .kbd-navigation .square:focus {
   background: #ddd;
 }
