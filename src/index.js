@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import decks from './cards';
+import Bank from './bank';
 
 function Color(props) {
   let icons = {
@@ -61,75 +62,43 @@ function Card(props) {
   );
 }
 
-function Square(props) {
-  return (
-    <button 
-      className={"square" + (props.bold ? " bold" : "")}
-      onClick={props.onClick}
-    >
-      {props.value}
-    </button>
-  );
-}
-
-function calculateWinner(squares) {
-  const lines = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-  ];
-  for (let i = 0; i < lines.length; i++) {
-    const [a, b, c] = lines[i];
-    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return {
-        token: squares[a],
-        line: lines[i]
-      };
+function calculateWinner(players) {
+  let hiscore = 0;
+  let winner = null;
+  for (let i = 0; i < players.length; i++) {
+    if (21 < players[i].score && hiscore <= players[i].score) {
+      hiscore = players[i].score;
+      winner = players[i];
     }
   }
-  return null;
+  return winner;
 }
 
 class Board extends React.Component {  
-  renderCard(i, bold, color, points, price) {
+  renderCard(i, color, points, price) {
     return (
       <Card 
-        value={this.props.squares[i]}
         color={color}
         points={points}
         price={price}
-        bold={bold}
         onClick={() => this.props.onClick(i)}
       />
     );
   }
 
   render() {
-    let line;
-    if (this.props.winner) {
-      line = this.props.winner.line;
-    } else {
-      line = Array(3).fill(null);
-    }
-
     let decks = this.props.decks;
     
     let rows = [];
     for (let i = 0; i < 3; i++) {
       let cols = [];
-      for (let j = 0; j < 3; j++) {
-        let index = i * 3 + j;
-        let bold = (index === line[0] || index === line[1] || index === line[2]);
-        let card = decks[0].pop();
+      for (let j = 0; j < 4; j++) {
+        let index = i * 4 + j;
+        let card = decks[i].pop();
         let color = card[0];
         let points = card[1];
         let price = card.slice(2,);
-        cols.push(this.renderCard(index, bold, color, points, price));
+        cols.push(this.renderCard(index, color, points, price));
       }
       let row = <div className="board-row">{cols}</div>;
       rows.push(row);
@@ -145,12 +114,14 @@ class Game extends React.Component {
     super(props);
     this.state = {
       history: [{
-        squares: Array(9).fill(null),
+        cards: [Array(4), Array(4), Array(4)],
+        players: [],
       }],
       stepNumber: 0,
       moveHistory: [null],
       historyReversed: false,
       xIsNext: true,
+      cards: [Array(4), Array(4), Array(4)],
       decks: [
         this.shuffle(decks[0]),
         this.shuffle(decks[1]),
@@ -180,7 +151,8 @@ class Game extends React.Component {
     const moveHistory = this.state.moveHistory.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
     const squares = current.squares.slice();
-    if (calculateWinner(squares) || squares[i]) {
+    const players = [];
+    if (calculateWinner(players)) {
       return;
     }
     squares[i] = this.state.xIsNext ? 'X' : 'O';
@@ -194,24 +166,12 @@ class Game extends React.Component {
     });
   }
 
-  jumpTo(step) {
-    this.setState({
-      stepNumber: step,
-      xIsNext: (step % 2) === 0,
-    });
-  }
-
-  handleReverse() {
-    this.setState({
-      historyReversed: !this.state.historyReversed,
-    })
-  }
-
   render() {
     const history = this.state.history;
     const moveHistory = this.state.moveHistory;
     const current = history[this.state.stepNumber];
-    const winner = calculateWinner(current.squares);
+    const players = [];
+    const winner = calculateWinner(players);
 
     let moves = history.map((step, move) => { //move is the index
       const col = moveHistory[move] % 3;
@@ -223,15 +183,12 @@ class Game extends React.Component {
         <li key={move}>
           <button 
             className={(move === this.state.stepNumber) ? "bold" : ""}
-            onClick={() => this.jumpTo(move)}>{desc}
+          >
+            {desc}
           </button>
         </li>
       );
     });
-
-    if (this.state.historyReversed) {
-      moves = moves.reverse();
-    }
 
     let status;
     if (winner) {
@@ -244,9 +201,13 @@ class Game extends React.Component {
 
     return (
       <div className="game">
+        <div className="bank">
+          <Bank />
+        </div>
         <div className="game-board">
           <Board 
             squares={current.squares}
+            cards={current.cards}
             winner={winner}
             decks={this.state.decks}
             onClick={(i) => this.handleClick(i)}
@@ -254,9 +215,6 @@ class Game extends React.Component {
         </div>
         <div className="game-info">
           <div>{status}</div>
-          <button onClick={() => this.handleReverse()}>
-            Toggle order
-          </button>
           <ol>{moves}</ol>
         </div>
       </div>
