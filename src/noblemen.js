@@ -6,6 +6,6 @@ export default class Noblemen extends React.Component {
     super(props);
   }
   render() {
-    return "NOBLES";
+    return "TEST";
   }
 }
