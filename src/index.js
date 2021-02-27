@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import decks from './cards';
 import Bank from './bank';
+import Noblemen from './noblemen';
+import 'semantic-ui-css/semantic.min.css';
+import { Grid } from 'semantic-ui-react';
 
 function Color(props) {
   let icons = {
@@ -200,24 +203,29 @@ class Game extends React.Component {
     }
 
     return (
-      <div className="game">
-        <div className="bank">
-          <Bank />
-        </div>
-        <div className="game-board">
-          <Board 
-            squares={current.squares}
-            cards={current.cards}
-            winner={winner}
-            decks={this.state.decks}
-            onClick={(i) => this.handleClick(i)}
-          />
-        </div>
-        <div className="game-info">
-          <div>{status}</div>
-          <ol>{moves}</ol>
-        </div>
-      </div>
+      <Grid>
+          <Grid.Column width={2} className="bank">
+            <Bank />
+          </Grid.Column>
+          <Grid.Column width={7} className="game-board">
+            <Grid.Row>
+              <Noblemen />
+            </Grid.Row>
+            <Grid.Row>
+              <Board 
+                squares={current.squares}
+                cards={current.cards}
+                winner={winner}
+                decks={this.state.decks}
+                onClick={(i) => this.handleClick(i)}
+              />
+            </Grid.Row>
+          </Grid.Column>
+          <Grid.Column width={5} className="game-info">
+            <div>{status}</div>
+            <ol>{moves}</ol>
+          </Grid.Column>
+      </Grid>
     ); // is the entire ordered list of moves getting re-rendered? or only what has changed?
   }
 }
