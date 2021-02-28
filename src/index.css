@@ -57,34 +57,41 @@ ol, ul {
 
 }
 
-.white {
-  background:rgb(170, 170, 170);
+.ui.card > .content, .ui.cards > .card > .content.white {
+  background:rgb(220, 220, 220);
   border-color: #fff;
-  float: left;
 }
 
-.blue {
+.ui.card > .content, .ui.cards > .card > .content.blue {
   background-color: rgb(140, 160, 210);
   border-color: rgb(30, 70, 180)
 }
 
-.green {
+.ui.card > .content, .ui.cards > .card > .content.green {
   background-color: rgb(130, 200, 170);
   border-color: rgb(10, 130, 80);
 }
 
-.red {
+.ui.card > .content, .ui.cards > .card > .content.red {
   background-color: rgb(240, 160, 170);
   border-color: rgb(220, 70, 70);
 }
 
-.black {
+.ui.card > .content, .ui.cards > .card > .content.black {
   background-color: rgb(150, 150, 150);
   border-color: rgb(50, 50, 50);
 }
 
-.yellow {
+.ui.card > .content, .ui.cards > .card > .content.yellow {
   background-color: rgb(230, 220, 10);
+}
+
+.leftHeader {
+  float: left;
+}
+
+.rightHeader {
+  float: right;
 }
 
 .price .white {

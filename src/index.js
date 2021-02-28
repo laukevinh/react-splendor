@@ -5,7 +5,7 @@ import decks from './cards';
 import Bank from './bank';
 import Noblemen from './noblemen';
 import 'semantic-ui-css/semantic.min.css';
-import { Grid } from 'semantic-ui-react';
+import { Grid, Card } from 'semantic-ui-react';
 
 function Color(props) {
   let icons = {
@@ -52,18 +52,18 @@ function Price(props) {
   );
 }
 
-function Card(props) {
-  return (
-    <button 
-      className={"card " + props.color}
-      onClick={() => alert('hold or buy')}
-    >
-      <Color value={props.color} />
-      <Point value={props.points} />
-      <Price value={props.price} />
-    </button>
-  );
-}
+// function Card(props) {
+//   return (
+//     <button 
+//       className={"card " + props.color}
+//       onClick={() => alert('hold or buy')}
+//     >
+//       <Color value={props.color} />
+//       <Point value={props.points} />
+//       <Price value={props.price} />
+//     </button>
+//   );
+// }
 
 function calculateWinner(players) {
   let hiscore = 0;
@@ -77,15 +77,35 @@ function calculateWinner(players) {
   return winner;
 }
 
-class Board extends React.Component {  
+class Board extends React.Component {
+  renderPrice(price) {
+    let colorMap = ['white', 'blue', 'green', 'red', 'black'];
+    let prices = [];
+    for (let i = 0; i < price.length; i++) {
+      if (price[i] > 0) {
+        prices.push(
+          <Grid.Row>
+            <span >{colorMap[i]}</span>
+            <span >{price[i]}</span>
+          </Grid.Row>
+        );
+      }
+    }
+    return (prices);
+  }
+  
   renderCard(i, color, points, price) {
+    const prices = this.renderPrice(price);
     return (
-      <Card 
-        color={color}
-        points={points}
-        price={price}
-        onClick={() => this.props.onClick(i)}
-      />
+      <Card onClick={() => this.props.onClick(i)}>
+        <Card.Content className={color}>
+          <Card.Header>
+            <span className="leftHeader">{color}</span>
+            <span className="rightHeader">{points}</span>
+          </Card.Header>
+          <Card.Description>{prices}</Card.Description>
+        </Card.Content>
+      </Card>
     );
   }
 
@@ -103,8 +123,9 @@ class Board extends React.Component {
         let price = card.slice(2,);
         cols.push(this.renderCard(index, color, points, price));
       }
-      let row = <div className="board-row">{cols}</div>;
-      rows.push(row);
+      rows.push(
+        <Card.Group itemsPerRow={4}>{cols}</Card.Group>
+      );
     }
     return (
       <div>{rows}</div>
