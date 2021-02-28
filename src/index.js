@@ -130,6 +130,7 @@ class Game extends React.Component {
         this.shuffle(decks[1]),
         this.shuffle(decks[2]),
       ],
+      numPlayers: props.numPlayers,
     };
   }
 
@@ -202,10 +203,16 @@ class Game extends React.Component {
       status = "Next player: " + (this.state.xIsNext ? "X" : "O");
     }
 
+    const maxCoins = {
+      2: 4,
+      3: 5,
+      4: 7,
+    };
+
     return (
       <Grid>
           <Grid.Column width={2} className="bank">
-            <Bank />
+            <Bank maxCoins={maxCoins[this.state.numPlayers]}/>
           </Grid.Column>
           <Grid.Column width={7} className="game-board">
             <Grid.Row>
@@ -233,6 +240,6 @@ class Game extends React.Component {
 // ========================================
 
 ReactDOM.render(
-  <Game />,
+  <Game numPlayers={2}/>,
   document.getElementById('root')
 );

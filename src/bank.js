@@ -2,51 +2,40 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Button } from 'semantic-ui-react'
 
-
-
 export default class Bank extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      coins: [
-        {
-          count: 4,
-          color: 'white',
-        },
-        {
-          count: 4,
-          color: 'blue',
-        },
-        {
-          count: 4,
-          color: 'green',
-        },
-        {
-          count: 4,
-          color: 'red',
-        },
-        {
-          count: 4,
-          color: 'black',
-        },
-        {
-          count: 4,
-          color: 'wild',
-        },
-      ]
+      coins: {
+        'white': props.maxCoins,
+        'blue': props.maxCoins,
+        'green': props.maxCoins,
+        'red': props.maxCoins,
+        'black': props.maxCoins,
+        'wild': 5,
+      },
     };
   }
 
+  handleClick = (color, count) => {
+    this.state.coins[color]--;
+    this.setState((state) => {
+      return {coins: this.state.coins}
+    });
+  }
   
   render() {
-    const coins = this.state.coins.map((coin) => { //move is the index
+    const coins = Object.entries(this.state.coins).map(([color, count], idx) => {
       return (
-        <Button
-          content={coin.color}
-          color={coin.color}
-          label={coin.count}
-          labelPosition='right'
-        />
+        <li key={idx}>
+          <Button
+            content={color}
+            color={color}
+            label={count}
+            labelPosition='right'
+            onClick={() => this.handleClick(color, count)}
+          />
+        </li>
       );
     });
     return (coins);
