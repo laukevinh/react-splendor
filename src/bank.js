@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Button } from 'semantic-ui-react'
+import { Button, Image, Modal } from 'semantic-ui-react'
 
 export default class Bank extends React.Component {
   constructor(props) {
@@ -14,6 +14,7 @@ export default class Bank extends React.Component {
         'black': props.maxCoins,
         'wild': 5,
       },
+      isOpen: false
     };
   }
 
@@ -25,19 +26,54 @@ export default class Bank extends React.Component {
   }
   
   render() {
-    const coins = Object.entries(this.state.coins).map(([color, count], idx) => {
-      return (
-        <li key={idx}>
-          <Button
-            content={color}
-            color={color}
-            label={count}
-            labelPosition='right'
-            onClick={() => this.handleClick(color, count)}
-          />
-        </li>
-      );
-    });
-    return (coins);
+    return (
+      <ModalExampleModal 
+        coins={this.state.coins} 
+        handleClick={this.handleClick}
+      />
+    );
   }
+}
+
+function ModalExampleModal(props) {
+  const [open, setOpen] = React.useState(false)
+
+  const coins = Object.entries(props.coins).map(([color, count], idx) => {
+    return (
+      <li key={idx}>
+        <Button
+          content={color}
+          color={color}
+          label={count}
+          labelPosition='right'
+          onClick={() => props.handleClick(color)}
+        />
+      </li>
+    );
+  })
+
+  return (
+    <Modal
+      onClose={() => setOpen(false)}
+      onOpen={() => setOpen(true)}
+      open={open}
+      trigger={<Button>Show Modal</Button>}
+    >
+      <Modal.Content>
+        {coins}
+      </Modal.Content>
+      <Modal.Actions>
+        <Button color='black' onClick={() => setOpen(false)}>
+          Nope
+        </Button>
+        <Button
+          content="Yep, that's me"
+          labelPosition='right'
+          icon='checkmark'
+          onClick={() => setOpen(false)}
+          positive
+        />
+      </Modal.Actions>
+    </Modal>
+  )
 }
