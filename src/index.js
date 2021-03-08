@@ -233,7 +233,9 @@ class Game extends React.Component {
     return (
       <Grid>
           <Grid.Column width={2} className="bank">
-            <Bank maxCoins={maxCoins[this.state.numPlayers]}/>
+            <Bank 
+              maxCoins={maxCoins[this.state.numPlayers]}
+            />
           </Grid.Column>
           <Grid.Column width={7} className="game-board">
             <Grid.Row>
