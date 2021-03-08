@@ -25,7 +25,7 @@ export default class Bank extends React.Component {
   
   render() {
     return (
-      <ModalExampleModal 
+      <ModalPickCoins 
         coins={this.state.coins}
         updateBankBal={this.updateBankBal}
       />
@@ -33,107 +33,89 @@ export default class Bank extends React.Component {
   }
 }
 
-const emptyWallet = {
-  'white': 0,
-  'blue': 0,
-  'green': 0,
-  'red': 0,
-  'black': 0,
-  'wild': 0,
-}
-
-function ModalExampleModal(props) {
-  const [playerCoins, setPlayerCoins] = React.useState(emptyWallet);
-  const [bankCoins, setBankCoins] = React.useState(Object.assign({}, props.coins));
-  const [open, setOpen] = React.useState(false)
-
-  const handleClick = (color, count) => {
-    alert("handleClickModal")
+class ModalPickCoins extends React.Component {
+  constructor(props) {
+    super(props);
+    const emtpyWalletArray = Object.keys(props.coins).map(key => [key, 0]);
+    this.state = {
+      open: false,
+      bankCoins: props.coins,
+      tempCoins: Object.fromEntries(emtpyWalletArray),
+    };
+  }
+  
+  setOpen(open) {
+    this.setState({
+      open: open
+    });
+    console.log(this.state);
   }
 
-  const takeCoinClick = (color) => {
-    let copyBankCoins = Object.assign({}, bankCoins);
-    copyBankCoins[color]--;
-    setBankCoins(copyBankCoins);
-    let copyPlayerCoins = Object.assign({}, playerCoins);
-    copyPlayerCoins[color]++;
-    setPlayerCoins(copyPlayerCoins);
+  handleCoinTake(color) {
+    let bankCoins = Object.assign({}, this.state.bankCoins);
+    let tempCoins = Object.assign({}, this.state.tempCoins);
+    bankCoins[color]--;
+    tempCoins[color]++;
+    this.setState({
+      bankCoins: bankCoins,
+      tempCoins: tempCoins,
+    });
   }
 
-  const returnCoinClick = (color) => {
-    let copyBankCoins = Object.assign({}, bankCoins);
-    copyBankCoins[color]++;
-    setBankCoins(copyBankCoins);
-    let copyPlayerCoins = Object.assign({}, playerCoins);
-    copyPlayerCoins[color]--;
-    setPlayerCoins(copyPlayerCoins);
+  handleCoinReturn(color) {
+    let bankCoins = Object.assign({}, this.state.bankCoins);
+    let tempCoins = Object.assign({}, this.state.tempCoins);
+    bankCoins[color]++;
+    tempCoins[color]--;
+    this.setState({
+      bankCoins: bankCoins,
+      tempCoins: tempCoins,
+    });
   }
 
-  // const coins = Object.entries(bankCoins).map(([color, count], idx) => {
-  //   playerCoins[color] = 0;
-  //   return (
-  //     <li key={idx}>
-  //       <Button
-  //         content={color}
-  //         color={color}
-  //         label={count}
-  //         labelPosition='right'
-  //       />
-  //       <Button
-  //         content="+"
-  //         onClick={() => takeCoinClick(color, bankCoins, playerCoins)}
-  //       />
-  //       <Button
-  //         content="-"
-  //         onClick={() => returnCoinClick(color, bankCoins, playerCoins)}
-  //       />
-  //       <span>{playerCoins[color]}</span>
-  //     </li>
-  //   );
-  // })
+  render() {
+    const open = this.state.open;
+    const coins = Object.entries(this.state.bankCoins).map(([color, count], idx) => {
+      return (
+        <li key={idx}>
+          <Button
+            content={color}
+            color={color}
+            label={count}
+            labelPosition='right'
+          />
+          <Button
+            content="+"
+            onClick={() => this.handleCoinTake(color)}
+          />
+          <Button
+            content="-"
+            onClick={() => this.handleCoinReturn(color)}
+          />
+          <span>{this.state.tempCoins[color]}</span>
+        </li>
+      );
+    });
 
-  return (
-    <Modal
-      onClose={() => setOpen(false)}
-      onOpen={() => setOpen(true)}
-      open={open}
-      trigger={<Button>Show Modal</Button>}
-    >
-      <Modal.Content>
-        {
-          Object.entries(bankCoins).map(([color, count], idx) => {
-            return (
-              <li key={idx}>
-                <Button
-                  content={color}
-                  color={color}
-                  label={count}
-                  labelPosition='right'
-                />
-                <Button
-                  content="+"
-                  onClick={() => takeCoinClick(color)}
-                />
-                <Button
-                  content="-"
-                  onClick={() => returnCoinClick(color)}
-                />
-                <span>{playerCoins[color]}</span>
-              </li>
-            );
-          })
-        }
-      </Modal.Content>
-      <Modal.Actions>
-        <Button color='black' onClick={() => setOpen(false)}>
-          Cancel
-        </Button>
-        <Button
-          content="confirm"
-          onClick={() => setOpen(false)}
-          positive
-        />
-      </Modal.Actions>
-    </Modal>
-  )
+    return (
+      <Modal
+        onClose={() => this.setOpen(false)}
+        onOpen={() => this.setOpen(true)}
+        open={open}
+        trigger={<Button>Show Modal</Button>}
+      >
+        <Modal.Content>{coins}</Modal.Content>
+        <Modal.Actions>
+          <Button color='black' onClick={() => this.setOpen(false)}>
+            Cancel
+          </Button>
+          <Button
+            content="confirm"
+            onClick={() => this.setOpen(false)}
+            positive
+          />
+        </Modal.Actions>
+      </Modal>
+    );
+  }
 }
