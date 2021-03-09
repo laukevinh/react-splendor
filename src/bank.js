@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Button, Image, Modal } from 'semantic-ui-react'
+import { Button, Grid, Icon, Modal } from 'semantic-ui-react'
 
 export default class Bank extends React.Component {
   constructor(props) {
@@ -18,17 +18,29 @@ export default class Bank extends React.Component {
   }
 
   updateBankBal = (coins) => {
-    this.setState((state) => {
-      return {coins: coins}
+    this.setState({
+      coins: coins,
     });
   }
   
   render() {
+    const coins = Object.entries(this.state.coins).map(([color, count], idx) => {
+      return (
+        <Button color={color}>{count}</Button>
+      );
+    });
     return (
-      <ModalPickCoins 
-        coins={this.state.coins}
-        updateBankBal={this.updateBankBal}
-      />
+      <Grid.Column>
+        <Button.Group vertical>
+          {coins}
+        </Button.Group>
+        <Grid.Row>
+          <ModalPickCoins 
+            coins={this.state.coins}
+            updateBankBal={this.updateBankBal}
+          />        
+        </Grid.Row>
+      </Grid.Column>
     );
   }
 }
@@ -41,6 +53,7 @@ class ModalPickCoins extends React.Component {
       open: false,
       bankCoins: props.coins,
       tempCoins: Object.fromEntries(emtpyWalletArray),
+      updateBankBal: props.updateBankBal,
     };
   }
   
@@ -48,7 +61,6 @@ class ModalPickCoins extends React.Component {
     this.setState({
       open: open
     });
-    console.log(this.state);
   }
 
   handleCoinTake(color) {
@@ -73,26 +85,35 @@ class ModalPickCoins extends React.Component {
     });
   }
 
+  handleConfirm(coins) {
+    this.state.updateBankBal(coins);
+    this.setOpen(false);
+  }
+
   render() {
     const open = this.state.open;
     const coins = Object.entries(this.state.bankCoins).map(([color, count], idx) => {
+      let bankCoinButton = (
+        <Button
+          color={color}
+          content={count}
+          onClick={() => this.handleCoinTake(color)}
+          disabled={this.state.bankCoins[color] === 0}
+        />
+      );
+      
+      let tempCoinButton = (
+        <Button
+          color={color}
+          content={this.state.tempCoins[color]}
+          onClick={() => this.handleCoinReturn(color)}
+        />
+      );
+      
       return (
         <li key={idx}>
-          <Button
-            content={color}
-            color={color}
-            label={count}
-            labelPosition='right'
-          />
-          <Button
-            content="+"
-            onClick={() => this.handleCoinTake(color)}
-          />
-          <Button
-            content="-"
-            onClick={() => this.handleCoinReturn(color)}
-          />
-          <span>{this.state.tempCoins[color]}</span>
+          {bankCoinButton}
+          {this.state.tempCoins[color] > 0 && tempCoinButton}
         </li>
       );
     });
@@ -102,8 +123,9 @@ class ModalPickCoins extends React.Component {
         onClose={() => this.setOpen(false)}
         onOpen={() => this.setOpen(true)}
         open={open}
-        trigger={<Button>Show Modal</Button>}
+        trigger={<Button>Collect Coins</Button>}
       >
+        <Modal.Header>Select Coins</Modal.Header>
         <Modal.Content>{coins}</Modal.Content>
         <Modal.Actions>
           <Button color='black' onClick={() => this.setOpen(false)}>
@@ -111,7 +133,7 @@ class ModalPickCoins extends React.Component {
           </Button>
           <Button
             content="confirm"
-            onClick={() => this.setOpen(false)}
+            onClick={() => this.handleConfirm(this.state.bankCoins)}
             positive
           />
         </Modal.Actions>
