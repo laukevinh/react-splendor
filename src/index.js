@@ -4,66 +4,9 @@ import './index.css';
 import decks from './cards';
 import Bank from './bank';
 import Noblemen from './noblemen';
+import Player from './player';
 import 'semantic-ui-css/semantic.min.css';
 import { Grid, Card } from 'semantic-ui-react';
-
-function Color(props) {
-  let icons = {
-    white: "^",
-    blue: "{}",
-    green: "<>",
-    red: "<3",
-    black: "+"
-  };
-  return (
-    <div className={"color"}>
-      {icons[props.value]}
-    </div>
-  );
-}
-
-function Point(props) {
-  return (
-    <div classname={"point"}>
-      {props.value}
-    </div>
-  )
-}
-
-function Price(props) {
-  let colorMap = ['white', 'blue', 'green', 'red', 'black'];
-  let price = [];
-  for (let k = 0; k < props.value.length; k++) {
-    if (props.value[k] !== 0) {
-      let disp = (
-        <div>
-          <div style={{float: "left"}}>{props.value[k]}</div>
-          <Color value={colorMap[k]}/>
-        </div>
-      );
-      price.push(disp);
-    }
-  }
-  return (
-    <div className="price">
-      <div>Price:</div>
-      {price}
-    </div>
-  );
-}
-
-// function Card(props) {
-//   return (
-//     <button 
-//       className={"card " + props.color}
-//       onClick={() => alert('hold or buy')}
-//     >
-//       <Color value={props.color} />
-//       <Point value={props.points} />
-//       <Price value={props.price} />
-//     </button>
-//   );
-// }
 
 function calculateWinner(players) {
   let hiscore = 0;
@@ -139,8 +82,9 @@ class Game extends React.Component {
     this.state = {
       history: [{
         cards: [Array(4), Array(4), Array(4)],
-        players: [],
+        players: this.initPlayers(props.numPlayers),
       }],
+      players: this.initPlayers(props.numPlayers),
       stepNumber: 0,
       moveHistory: [null],
       historyReversed: false,
@@ -152,7 +96,37 @@ class Game extends React.Component {
         this.shuffle(decks[2]),
       ],
       numPlayers: props.numPlayers,
+      maxCoins: {
+        2: 4,
+        3: 5,
+        4: 7,
+      },
     };
+  }
+
+  initPlayers(n) {
+    const coins = {
+      'white': 0,
+      'blue': 0,
+      'green': 0,
+      'red': 0,
+      'black': 0,
+      'wild': 0,
+    };
+    let players = Array(n);
+    for (let i=0; i<n; i++) {
+      players[i] = (
+        <Player
+          coins={Object.assign({}, coins)}
+          cards={[]}
+          reserved={[]}
+          points={0}
+          noblemen={[]}
+          playerName={"player" + i}
+        />
+      );
+    }
+    return players;
   }
 
   shuffle(A) {
@@ -232,7 +206,10 @@ class Game extends React.Component {
 
     return (
       <Grid>
-          <Grid.Column width={2} className="bank">
+          <Grid.Column width={3} className="players">
+            {this.state.players}
+          </Grid.Column>
+          <Grid.Column width={1} className="bank">
             <Bank 
               maxCoins={maxCoins[this.state.numPlayers]}
             />
@@ -251,7 +228,7 @@ class Game extends React.Component {
               />
             </Grid.Row>
           </Grid.Column>
-          <Grid.Column width={5} className="game-info">
+          <Grid.Column width={3} className="game-info">
             <div>{status}</div>
             <ol>{moves}</ol>
           </Grid.Column>
