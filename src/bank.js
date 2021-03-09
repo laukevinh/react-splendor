@@ -6,14 +6,7 @@ export default class Bank extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      coins: {
-        'white': props.maxCoins,
-        'blue': props.maxCoins,
-        'green': props.maxCoins,
-        'red': props.maxCoins,
-        'black': props.maxCoins,
-        'wild': 5,
-      }
+      coins: props.coins,
     };
   }
 

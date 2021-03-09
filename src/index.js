@@ -5,6 +5,7 @@ import decks from './cards';
 import Bank from './bank';
 import Noblemen from './noblemen';
 import Player from './player';
+import Wallet from './wallet';
 import 'semantic-ui-css/semantic.min.css';
 import { Grid, Card } from 'semantic-ui-react';
 
@@ -96,28 +97,15 @@ class Game extends React.Component {
         this.shuffle(decks[2]),
       ],
       numPlayers: props.numPlayers,
-      maxCoins: {
-        2: 4,
-        3: 5,
-        4: 7,
-      },
     };
   }
 
-  initPlayers(n) {
-    const coins = {
-      'white': 0,
-      'blue': 0,
-      'green': 0,
-      'red': 0,
-      'black': 0,
-      'wild': 0,
-    };
-    let players = Array(n);
-    for (let i=0; i<n; i++) {
+  initPlayers(numPlayers) {
+    let players = Array(numPlayers);
+    for (let i=0; i < numPlayers; i++) {
       players[i] = (
         <Player
-          coins={Object.assign({}, coins)}
+          coins={Wallet(false, numPlayers)}
           cards={[]}
           reserved={[]}
           points={0}
@@ -198,21 +186,13 @@ class Game extends React.Component {
       status = "Next player: " + (this.state.xIsNext ? "X" : "O");
     }
 
-    const maxCoins = {
-      2: 4,
-      3: 5,
-      4: 7,
-    };
-
     return (
       <Grid>
           <Grid.Column width={3} className="players">
             {this.state.players}
           </Grid.Column>
           <Grid.Column width={1} className="bank">
-            <Bank 
-              maxCoins={maxCoins[this.state.numPlayers]}
-            />
+            <Bank coins={Wallet(true, this.state.numPlayers)} />
           </Grid.Column>
           <Grid.Column width={7} className="game-board">
             <Grid.Row>

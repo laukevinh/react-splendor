@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Button, Grid, Icon, Modal } from 'semantic-ui-react'
+import { Button, Grid} from 'semantic-ui-react'
 
 export default class Player extends React.Component {
   constructor(props) {
