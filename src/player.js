@@ -14,25 +14,21 @@ export default class Player extends React.Component {
     };
   }
 
-  coins() {
-    return this.state.coins;
-  }
-
   render() {
-    const coins = Object.entries(this.state.coins).map(([color, count], idx) => {
-      return (
-        <Button color={color}>{count}</Button>
-      );
+    const coins = Object.entries(this.props.coins).map(([color, count], idx) => {
+      return <Button color={color} content={count} />;
     });
     return (
-      <Grid.Column>
-        <Grid.Row>
-          {this.state.playerName}
-        </Grid.Row>
+      <Grid columns={2} padded='vertically'>
+        <Grid.Column>{this.props.points}</Grid.Column>
+        <Grid.Column>{this.props.playerName}</Grid.Column>
         <Button.Group>
           {coins}
         </Button.Group>
-      </Grid.Column>
+        <Grid.Row>
+          {this.props.cards}
+        </Grid.Row>
+      </Grid>
     );
   }
 }
