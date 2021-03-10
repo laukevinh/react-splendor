@@ -1,16 +1,13 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import './index.css';
-import decks from './cards';
-import Bank from './bank';
-import Noblemen from './noblemen';
-import Player from './player';
-import Wallet from './wallet';
 import 'semantic-ui-css/semantic.min.css';
 import { Grid, Card } from 'semantic-ui-react';
 
 
 export default class Board extends React.Component {
+    constructor(props) {
+      super(props);
+    }
     renderPrice(price) {
       let colorMap = ['white', 'blue', 'green', 'red', 'black'];
       let prices = [];
@@ -43,14 +40,13 @@ export default class Board extends React.Component {
     }
   
     render() {
-      let decks = this.props.decks;
-      
+      let cards = this.props.cards;
       let rows = [];
       for (let i = 0; i < 3; i++) {
         let cols = [];
         for (let j = 0; j < 4; j++) {
           let index = i * 4 + j;
-          let card = decks[i].pop();
+          let card = cards[i][j];
           let color = card[0];
           let points = card[1];
           let price = card.slice(2,);

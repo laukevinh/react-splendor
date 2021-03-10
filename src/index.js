@@ -26,6 +26,13 @@ class Game extends React.Component {
   constructor(props) {
     super(props);
     this.handleCollectCoins = this.handleCollectCoins.bind(this);
+    let shuffledDecks = [
+      this.shuffle(decks[0]),
+      this.shuffle(decks[1]),
+      this.shuffle(decks[2]),
+    ];
+    let cards = this.initCards(shuffledDecks);
+    
     this.state = {
       history: [{
         cards: [Array(4), Array(4), Array(4)],
@@ -38,12 +45,8 @@ class Game extends React.Component {
       moveHistory: [null],
       historyReversed: false,
       xIsNext: true,
-      cards: [Array(4), Array(4), Array(4)],
-      decks: [
-        this.shuffle(decks[0]),
-        this.shuffle(decks[1]),
-        this.shuffle(decks[2]),
-      ],
+      cards: cards,
+      decks: shuffledDecks,
       numPlayers: props.numPlayers,
     };
   }
@@ -61,6 +64,18 @@ class Game extends React.Component {
       };
     }
     return players;
+  }
+
+  initCards(decks) {
+    let cards = Array(3);
+    for (let i=0; i < cards.length; i++) {
+      let row = Array(4);
+      for (let j=0; j < row.length; j++) {
+        row[j] = decks[i].pop();
+      }
+      cards[i] = row;
+    }
+    return cards;
   }
 
   shuffle(A) {
@@ -102,6 +117,8 @@ class Game extends React.Component {
     const history = this.state.history;
     const moveHistory = this.state.moveHistory;
     const current = history[this.state.stepNumber];
+    const cards = this.state.cards;
+    const decks = this.state.decks;
     const players = Object.values(this.state.players).map((player) => {
       return <Player {...player} />;
     });
@@ -150,10 +167,9 @@ class Game extends React.Component {
             </Grid.Row>
             <Grid.Row>
               <Board 
-                squares={current.squares}
-                cards={current.cards}
+                cards={cards}
                 winner={winner}
-                decks={this.state.decks}
+                decks={decks}
                 onClick={(i) => this.handleCardClick(i)}
               />
             </Grid.Row>
