@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { Button, Grid} from 'semantic-ui-react'
 
 export default class Player extends React.Component {
@@ -13,6 +12,10 @@ export default class Player extends React.Component {
       noblemen: props.noblemen,
       playerName: props.playerName,
     };
+  }
+
+  coins() {
+    return this.state.coins;
   }
 
   render() {

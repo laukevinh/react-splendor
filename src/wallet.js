@@ -5,8 +5,8 @@ export default function Wallet(isBank, numPlayers) {
     4:7,
   };
   const startingBalance = isBank ? maxCoins[numPlayers] : 0;
-  const numWilds = isBank ? 5 : 0;
-  
+  const numWilds = isBank ? 5 : 0;  // max 5 wild coins for all games
+
   return {
     'white': startingBalance,
     'blue': startingBalance,

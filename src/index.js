@@ -80,12 +80,15 @@ class Board extends React.Component {
 class Game extends React.Component {
   constructor(props) {
     super(props);
+    this.handleCollectCoins = this.handleCollectCoins.bind(this);
     this.state = {
       history: [{
         cards: [Array(4), Array(4), Array(4)],
         players: this.initPlayers(props.numPlayers),
       }],
       players: this.initPlayers(props.numPlayers),
+      currentPlayerIdx: 0,
+      bankCoins: Wallet(true, props.numPlayers),
       stepNumber: 0,
       moveHistory: [null],
       historyReversed: false,
@@ -103,16 +106,14 @@ class Game extends React.Component {
   initPlayers(numPlayers) {
     let players = Array(numPlayers);
     for (let i=0; i < numPlayers; i++) {
-      players[i] = (
-        <Player
-          coins={Wallet(false, numPlayers)}
-          cards={[]}
-          reserved={[]}
-          points={0}
-          noblemen={[]}
-          playerName={"player" + i}
-        />
-      );
+      players[i] = {
+        coins: Wallet(false, numPlayers),
+        cards: [],
+        reserved: [],
+        points: 0,
+        noblemen: [],
+        playerName: "player" + i,
+      };
     }
     return players;
   }
@@ -133,31 +134,32 @@ class Game extends React.Component {
     return A;
   }
 
-  handleClick(i) {
-    const history = this.state.history.slice(0, this.state.stepNumber + 1);
-    const moveHistory = this.state.moveHistory.slice(0, this.state.stepNumber + 1);
-    const current = history[history.length - 1];
-    const squares = current.squares.slice();
-    const players = [];
-    if (calculateWinner(players)) {
-      return;
+  handleCollectCoins(coins) {
+    let players = this.state.players.slice(0, this.state.numPlayers + 1);
+    let bankCoins = Object.assign({}, this.state.bankCoins);
+    let playerCoins = players[this.state.currentPlayerIdx].coins;
+    for (let color of Object.keys(coins)) {
+      bankCoins[color] -= coins[color];
+      playerCoins[color] += coins[color];
     }
-    squares[i] = this.state.xIsNext ? 'X' : 'O';
     this.setState({
-      history: history.concat([{
-        squares: squares,
-      }]),
-      stepNumber: history.length,
-      moveHistory: moveHistory.concat(i),
-      xIsNext: !this.state.xIsNext,
+      players: players,
+      bankCoins: bankCoins,
+      currentPlayerIdx: (this.state.currentPlayerIdx + 1) % this.state.numPlayers,
     });
+  }
+
+  handleCardClick(i) {
+    alert(i);
   }
 
   render() {
     const history = this.state.history;
     const moveHistory = this.state.moveHistory;
     const current = history[this.state.stepNumber];
-    const players = [];
+    const players = Object.values(this.state.players).map((player) => {
+      return <Player {...player} />;
+    });
     const winner = calculateWinner(players);
 
     let moves = history.map((step, move) => { //move is the index
@@ -189,10 +191,13 @@ class Game extends React.Component {
     return (
       <Grid>
           <Grid.Column width={3} className="players">
-            {this.state.players}
+            {players}
           </Grid.Column>
           <Grid.Column width={1} className="bank">
-            <Bank coins={Wallet(true, this.state.numPlayers)} />
+            <Bank 
+              coins={this.state.bankCoins}
+              handleCollectCoins={this.handleCollectCoins}
+            />
           </Grid.Column>
           <Grid.Column width={7} className="game-board">
             <Grid.Row>
@@ -204,7 +209,7 @@ class Game extends React.Component {
                 cards={current.cards}
                 winner={winner}
                 decks={this.state.decks}
-                onClick={(i) => this.handleClick(i)}
+                onClick={(i) => this.handleCardClick(i)}
               />
             </Grid.Row>
           </Grid.Column>
