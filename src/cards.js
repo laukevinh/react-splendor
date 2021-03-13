@@ -97,6 +97,24 @@ var level2 = [
     ['red',5,0,0,7,3,0],
 ];
 
-var decks = [level0, level1, level2];
+function convertToObj(array) {
+  return {
+    'color': array[0],
+    'points': array[1],
+    'price': {
+      'white': array[2],
+      'blue': array[3],
+      'green': array[4],
+      'red': array[5],
+      'black': array[6]
+    },
+  }
+}
+
+function convertLevel(level) {
+  return level.map(cardArray => convertToObj(cardArray));
+}
+
+var decks = [convertLevel(level0), convertLevel(level1), convertLevel(level2)];
 
 export default decks;

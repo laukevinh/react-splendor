@@ -182,7 +182,7 @@ class Game extends React.Component {
     } else {
       status = "Next player: " + (this.state.xIsNext ? "X" : "O");
     }
-
+    console.log(this.state.decks);
     return (
       <Grid>
           <Grid.Column width={3} className="players">

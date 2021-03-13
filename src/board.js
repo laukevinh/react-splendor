@@ -16,10 +16,14 @@ export default class Board extends React.Component {
         let cols = [];
         for (let j = 0; j < 4; j++) {
           let index = i * 4 + j;
+          // let card = cards[i][j];
+          // let color = card[0];
+          // let points = card[1];
+          // let price = card.slice(2,);
           let card = cards[i][j];
-          let color = card[0];
-          let points = card[1];
-          let price = card.slice(2,);
+          let color = card.color;
+          let points = card.points;
+          let price = card.price;
           cols.push(<CardModal index={index} color={color} points={points} price={price}/>);
         }
         rows.push(
@@ -45,14 +49,13 @@ class CardModal extends React.Component {
   }
   
   renderPrice(price) {
-    let colorMap = ['white', 'blue', 'green', 'red', 'black'];
     let prices = [];
-    for (let i = 0; i < price.length; i++) {
-      if (price[i] > 0) {
+    for (let [color, colorPrice] of Object.entries(price)) {
+      if (colorPrice > 0) {
         prices.push(
           <Grid.Row>
-            <span >{colorMap[i]}</span>
-            <span >{price[i]}</span>
+            <span >{color}</span>
+            <span >{colorPrice}</span>
           </Grid.Row>
         );
       }
