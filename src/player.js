@@ -26,7 +26,7 @@ export default class Player extends React.Component {
           {coins}
         </Button.Group>
         <Grid.Row>
-          {this.props.cards}
+          PLAYER CARDS
         </Grid.Row>
       </Grid>
     );

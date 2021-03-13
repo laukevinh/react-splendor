@@ -12,19 +12,11 @@ export default class Board extends React.Component {
     render() {
       let cards = this.props.cards;
       let rows = [];
-      for (let i = 0; i < 3; i++) {
+      for (let level = 0; level < 3; level++) {
         let cols = [];
-        for (let j = 0; j < 4; j++) {
-          let index = i * 4 + j;
-          // let card = cards[i][j];
-          // let color = card[0];
-          // let points = card[1];
-          // let price = card.slice(2,);
-          let card = cards[i][j];
-          let color = card.color;
-          let points = card.points;
-          let price = card.price;
-          cols.push(<CardModal index={index} color={color} points={points} price={price}/>);
+        for (let col = 0; col < 4; col++) {
+          let card = cards[level][col];
+          cols.push(<CardModal level={level} column={col} card={card} handleBuy={this.props.handleBuy}/>);
         }
         rows.push(
           <Card.Group itemsPerRow={4}>{cols}</Card.Group>
@@ -63,10 +55,16 @@ class CardModal extends React.Component {
     return (prices);
   }
   
+  handleConfirm(level, column, card) {
+    this.props.handleBuy(level, column, card);
+    this.setState({open: false});
+  }
+  
   render() {
-    const {index, color, points, price} = this.props;
+    const { level, column, card } = this.props;
+    const { color, points, price } = card;
     const prices = this.renderPrice(price);
-    const card = (
+    const cardComponent = (
       <Card>
         <Card.Content className={color}>
           <Card.Header>
@@ -82,7 +80,7 @@ class CardModal extends React.Component {
         onClose={() => this.setOpen(false)}
         onOpen={() => this.setOpen(true)}
         open={this.state.open}
-        trigger={card}
+        trigger={cardComponent}
       >
         <Modal.Header>
           <span className="leftHeader">{color}</span>
@@ -96,8 +94,8 @@ class CardModal extends React.Component {
             onClick={() => this.setOpen(false)}
           />
           <Button
-            content="confirm"
-            onClick={() => alert("CONFIRM")}
+            content="Buy"
+            onClick={() => this.handleConfirm(level, column, card)}
             positive
           />
         </Modal.Actions>

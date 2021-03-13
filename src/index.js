@@ -26,6 +26,7 @@ class Game extends React.Component {
   constructor(props) {
     super(props);
     this.handleCollectCoins = this.handleCollectCoins.bind(this);
+    this.handleBuy = this.handleBuy.bind(this);
     let shuffledDecks = [
       this.shuffle(decks[0]),
       this.shuffle(decks[1]),
@@ -56,8 +57,20 @@ class Game extends React.Component {
     for (let i=0; i < numPlayers; i++) {
       players[i] = {
         coins: Wallet(false, numPlayers),
-        cards: [],
-        reserved: [],
+        cards: {
+          'white': [],
+          'blue': [],
+          'green': [],
+          'red': [],
+          'black': [],
+        },
+        reserved: {
+          'white': [],
+          'blue': [],
+          'green': [],
+          'red': [],
+          'black': [],
+        },
         points: 0,
         noblemen: [],
         playerName: "player" + i,
@@ -109,37 +122,50 @@ class Game extends React.Component {
     });
   }
 
-  handleBuy(card, price) {
+  handleBuy(level, column, card) {
     // price is a 5 element array
     // player.cards will be [[], [], ..., []]
     // todo upgrade: add sidebar where you can choose which coins to spend
-    const players = this.state.players.slice(0, this.state.numPlayers + 1);
-    const player = players[this.state.currentPlayerIdx];
+    let players = this.state.players.slice(0, this.state.numPlayers + 1);
+    let player = players[this.state.currentPlayerIdx];
     let playerWallet = player.coins;
     let playerCards = player.cards;
-    let charge = Array(5).fill(0);
-    for (let i=0; i<price.length; i++) {
-      let remainder = price[i] - player.cards[i].length;
-      if (playerWallet[i] + playerWallet[5] < remainder) {
+    let bankCoins = Object.assign({}, this.state.bankCoins);
+    let charge = Wallet(false);
+    for (let [color, colorPrice] of Object.entries(card.price)) {
+      let remainder = colorPrice - player.cards[color].length;
+      if (playerWallet[color] + playerWallet['wild'] < remainder) {
         alert("insufficient funds");
         return;
-      } else if (playerWallet[i] < remainder) {
-        charge[i] = playerWallet[i];
-        charge[5] += remainder - playerWallet[i];
+      } else if (playerWallet[color] < remainder) {
+        charge[color] = playerWallet[color];
+        charge['wild'] += remainder - playerWallet[color];
       } else {
-        charge[i] = remainder;
+        charge[color] = remainder;
       }
-      if (playerWallet[5] - charge[5] < 0) {
+      if (playerWallet['wild'] - charge['wild'] < 0) {
         return;
       }
     }
     // remove coins from player wallet
-    for (let i=0; i < charge.length; i++) {
-      playerWallet[i] -= charge[i];
+    // put coins back into bank
+    for (let [color, colorPrice] of Object.entries(charge)) {
+      playerWallet[color] -= colorPrice;
+      bankCoins[color] += colorPrice;
     }
     // add card to player cards
     playerCards[card.color].push(card);
     // replace card on the board
+    let cards = this.state.cards.slice();
+    let decks = this.state.decks.slice();
+    cards[level][column] = decks[level].pop();
+    this.setState({
+      players: players,
+      bankCoins: bankCoins,
+      cards: cards,
+      decks: decks,
+      currentPlayerIdx: (this.state.currentPlayerIdx + 1) % this.state.numPlayers,
+    })
   }
 
   handleCardClick(i) {
@@ -182,7 +208,7 @@ class Game extends React.Component {
     } else {
       status = "Next player: " + (this.state.xIsNext ? "X" : "O");
     }
-    console.log(this.state.decks);
+    
     return (
       <Grid>
           <Grid.Column width={3} className="players">
@@ -203,7 +229,8 @@ class Game extends React.Component {
                 cards={cards}
                 winner={winner}
                 decks={decks}
-                onClick={(i) => this.handleCardClick(i)}
+                // onClick={(i) => this.handleCardClick(i)}
+                handleBuy={this.handleBuy}
               />
             </Grid.Row>
           </Grid.Column>
