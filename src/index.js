@@ -123,8 +123,6 @@ class Game extends React.Component {
   }
 
   handleBuy(level, column, card) {
-    // price is a 5 element array
-    // player.cards will be [[], [], ..., []]
     // todo upgrade: add sidebar where you can choose which coins to spend
     let players = this.state.players.slice(0, this.state.numPlayers + 1);
     let player = players[this.state.currentPlayerIdx];
@@ -147,14 +145,14 @@ class Game extends React.Component {
         return;
       }
     }
-    // remove coins from player wallet
-    // put coins back into bank
+    // remove coins from player wallet and put coins back into bank
     for (let [color, colorPrice] of Object.entries(charge)) {
       playerWallet[color] -= colorPrice;
       bankCoins[color] += colorPrice;
     }
-    // add card to player cards
+    // add card and points to player
     playerCards[card.color].push(card);
+    player.points += card.points;
     // replace card on the board
     let cards = this.state.cards.slice();
     let decks = this.state.decks.slice();
@@ -166,10 +164,6 @@ class Game extends React.Component {
       decks: decks,
       currentPlayerIdx: (this.state.currentPlayerIdx + 1) % this.state.numPlayers,
     })
-  }
-
-  handleCardClick(i) {
-    alert(i);
   }
 
   render() {
@@ -229,7 +223,6 @@ class Game extends React.Component {
                 cards={cards}
                 winner={winner}
                 decks={decks}
-                // onClick={(i) => this.handleCardClick(i)}
                 handleBuy={this.handleBuy}
               />
             </Grid.Row>

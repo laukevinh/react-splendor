@@ -37,6 +37,14 @@ class ModalPickCoins extends React.Component {
       handleCollectCoins: props.handleCollectCoins,
     };
   }
+
+  componentDidMount() {
+    this.setState({
+      open: false,
+      bankCoins: this.props.coins,
+      tempCoins: Wallet(false),
+    });
+  }
   
   setOpen(open) {
     this.setState({open: open});
@@ -63,11 +71,25 @@ class ModalPickCoins extends React.Component {
       tempCoins: tempCoins,
     });
   }
-
+  
   handleConfirm(coins) {
     this.state.handleCollectCoins(coins);
     this.setState({tempCoins: Wallet(false)});  // reset temp coins
     this.setOpen(false);
+  }
+  
+  handleCancel() {
+    let bankCoins = Object.assign({}, this.state.bankCoins);
+    let tempCoins = Object.assign({}, this.state.tempCoins);
+    for (let color of Object.keys(tempCoins)) {
+      bankCoins[color] += tempCoins[color];
+      tempCoins[color] = 0;
+    }
+    this.setState({
+      bankCoins: bankCoins,
+      tempCoins: tempCoins,
+      open: false,
+    });
   }
 
   render() {
@@ -109,7 +131,7 @@ class ModalPickCoins extends React.Component {
           <Button 
             color='black'
             content="Cancel"
-            onClick={() => this.setOpen(false)}
+            onClick={() => this.handleCancel()}
           />
           <Button
             content="confirm"
