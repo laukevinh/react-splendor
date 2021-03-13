@@ -109,6 +109,39 @@ class Game extends React.Component {
     });
   }
 
+  handleBuy(card, price) {
+    // price is a 5 element array
+    // player.cards will be [[], [], ..., []]
+    // todo upgrade: add sidebar where you can choose which coins to spend
+    const players = this.state.players.slice(0, this.state.numPlayers + 1);
+    const player = players[this.state.currentPlayerIdx];
+    let playerWallet = player.coins;
+    let playerCards = player.cards;
+    let charge = Array(5).fill(0);
+    for (let i=0; i<price.length; i++) {
+      let remainder = price[i] - player.cards[i].length;
+      if (playerWallet[i] + playerWallet[5] < remainder) {
+        alert("insufficient funds");
+        return;
+      } else if (playerWallet[i] < remainder) {
+        charge[i] = playerWallet[i];
+        charge[5] += remainder - playerWallet[i];
+      } else {
+        charge[i] = remainder;
+      }
+      if (playerWallet[5] - charge[5] < 0) {
+        return;
+      }
+    }
+    // remove coins from player wallet
+    for (let i=0; i < charge.length; i++) {
+      playerWallet[i] -= charge[i];
+    }
+    // add card to player cards
+    playerCards[card.color].push(card);
+    // replace card on the board
+  }
+
   handleCardClick(i) {
     alert(i);
   }
