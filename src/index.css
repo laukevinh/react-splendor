@@ -40,6 +40,14 @@ ol, ul {
   outline: none;
 }
 
+.game-players {
+  padding-left: 100px;
+}
+
+.active-player {
+  border: 5px solid #000;
+}
+
 .card {
   background: #fff;
   border: 5px solid #999;
@@ -53,8 +61,8 @@ ol, ul {
   width: 204px;
 }
 
-.color {
-
+.mini {
+  height: 56px;
 }
 
 .ui.card > .content, .ui.cards > .card > .content.white {
@@ -84,39 +92,6 @@ ol, ul {
 
 .ui.card > .content, .ui.cards > .card > .content.yellow {
   background-color: rgb(230, 220, 10);
-}
-
-.leftHeader {
-  float: left;
-}
-
-.rightHeader {
-  float: right;
-}
-
-.price .white {
-  float: left;
-}
-
-.price .blue {
-  float: left;
-}
-
-.price .green {
-  float: left;
-}
-
-.price .red {
-  float: left;
-}
-
-.price .black {
-  float: left;
-}
-
-.point {
-  font-size: 24px;
-  font-weight: bold;
 }
 
 .kbd-navigation .square:focus {

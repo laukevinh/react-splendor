@@ -1,17 +1,9 @@
 import React from 'react';
-import { Button, Grid} from 'semantic-ui-react'
+import { Button, Grid, Card } from 'semantic-ui-react'
 
 export default class Player extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      coins: props.coins,
-      cards: props.cards,
-      reserved: props.reserved,
-      points: props.points,
-      noblemen: props.noblemen,
-      playerName: props.playerName,
-    };
   }
 
   render() {
@@ -19,17 +11,29 @@ export default class Player extends React.Component {
       return <Button color={color} content={count} />;
     });
     const cards = Object.entries(this.props.cards).map(([color, cardArray]) => {
-      return <Button color={color} content={cardArray.length} />;
+      return (
+        <Card className="mini">
+          <Card.Content className={color}>
+            {cardArray.length}
+          </Card.Content>
+        </Card>
+      );
     })
     return (
-      <Grid columns={2} padded='vertically'>
-        <Grid.Column>{this.props.points}</Grid.Column>
-        <Grid.Column>{this.props.playerName}</Grid.Column>
-        <Button.Group>
-          Coins: {coins}
-        </Button.Group>
+      <Grid className={this.props.activePlayer ? "active-player" : null}>
+        <Grid.Row columns={2}>
+          <Grid.Column>{this.props.points}</Grid.Column>
+          <Grid.Column>{this.props.playerName}</Grid.Column>
+        </Grid.Row>
         <Grid.Row>
-          Cards: {cards}
+          <Grid.Column>
+            <Button.Group>{coins}</Button.Group>
+          </Grid.Column>
+        </Grid.Row>
+        <Grid.Row>
+          <Grid.Column>
+            <Card.Group itemsPerRow={5}>{cards}</Card.Group>
+          </Grid.Column>
         </Grid.Row>
       </Grid>
     );

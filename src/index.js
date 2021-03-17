@@ -74,6 +74,7 @@ class Game extends React.Component {
         points: 0,
         noblemen: [],
         playerName: "player" + i,
+        position: i,
       };
     }
     return players;
@@ -130,8 +131,8 @@ class Game extends React.Component {
     let playerCards = player.cards;
     let bankCoins = Object.assign({}, this.state.bankCoins);
     let charge = Wallet(false);
-    for (let [color, colorPrice] of Object.entries(card.price)) {
-      let remainder = colorPrice - player.cards[color].length;
+    for (let [color, price] of Object.entries(card.price)) {
+      let remainder = price - player.cards[color].length;
       if (playerWallet[color] + playerWallet['wild'] < remainder) {
         alert("insufficient funds");
         return;
@@ -146,9 +147,9 @@ class Game extends React.Component {
       }
     }
     // remove coins from player wallet and put coins back into bank
-    for (let [color, colorPrice] of Object.entries(charge)) {
-      playerWallet[color] -= colorPrice;
-      bankCoins[color] += colorPrice;
+    for (let [color, price] of Object.entries(charge)) {
+      playerWallet[color] -= price;
+      bankCoins[color] += price;
     }
     // add card and points to player
     playerCards[card.color].push(card);
@@ -173,7 +174,7 @@ class Game extends React.Component {
     const cards = this.state.cards;
     const decks = this.state.decks;
     const players = Object.values(this.state.players).map((player) => {
-      return <Player {...player} />;
+      return <Player {...player} activePlayer={player.position === this.state.currentPlayerIdx} />;
     });
     const winner = calculateWinner(players);
 
@@ -204,11 +205,11 @@ class Game extends React.Component {
     }
     
     return (
-      <Grid>
-          <Grid.Column width={3} className="players">
+      <Grid padded={true}>
+          <Grid.Column width={3} className="game-players">
             {players}
           </Grid.Column>
-          <Grid.Column width={1} className="bank">
+          <Grid.Column width={1} className="game-bank">
             <Bank 
               coins={this.state.bankCoins}
               handleCollectCoins={this.handleCollectCoins}
@@ -227,7 +228,7 @@ class Game extends React.Component {
               />
             </Grid.Row>
           </Grid.Column>
-          <Grid.Column width={3} className="game-info">
+          <Grid.Column width={2} className="game-info">
             <div>{status}</div>
             <ol>{moves}</ol>
           </Grid.Column>

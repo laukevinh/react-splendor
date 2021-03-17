@@ -83,8 +83,12 @@ class CardModal extends React.Component {
         trigger={cardComponent}
       >
         <Modal.Header>
-          <span className="leftHeader">{color}</span>
-          <span className="rightHeader">{points}</span>
+          <Grid>
+            <Grid.Row columns={2}>
+              <Grid.Column>{color}</Grid.Column>
+              <Grid.Column textAlign="right">{points}</Grid.Column>
+            </Grid.Row>
+          </Grid>
         </Modal.Header>
         <Modal.Content>{prices}</Modal.Content>
         <Modal.Actions>
