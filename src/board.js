@@ -46,8 +46,9 @@ class CardModal extends React.Component {
       if (colorPrice > 0) {
         prices.push(
           <Grid.Row>
-            <span >{color}</span>
-            <span >{colorPrice}</span>
+            <div className={"coin " + color}>
+              {colorPrice}
+            </div>
           </Grid.Row>
         );
       }
@@ -68,10 +69,16 @@ class CardModal extends React.Component {
       <Card>
         <Card.Content className={color}>
           <Card.Header>
-            <span className="leftHeader">{color}</span>
-            <span className="rightHeader">{points}</span>
+            <Grid>
+              <Grid.Row columns={2}>
+                <Grid.Column>{color}</Grid.Column>
+                <Grid.Column textAlign="right">{points}</Grid.Column>
+              </Grid.Row>
+            </Grid>
           </Card.Header>
-          <Card.Description>{prices}</Card.Description>
+          <Card.Description>
+            {prices}
+          </Card.Description>
         </Card.Content>
       </Card>
     );
