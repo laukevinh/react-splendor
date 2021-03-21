@@ -42,14 +42,6 @@ class ModalPickCoins extends React.Component {
     };
   }
 
-  componentDidMount() {
-    this.setState({
-      open: false,
-      bankCoins: this.props.coins,
-      tempCoins: Wallet(false),
-    });
-  }
-  
   setOpen(open) {
     this.setState({open: open});
   }
@@ -125,7 +117,7 @@ class ModalPickCoins extends React.Component {
     return (
       <Modal
         onClose={() => this.setOpen(false)}
-        onOpen={() => this.setOpen(true)}
+        onOpen={() => this.setState({ open: true, bankCoins: this.props.coins })}
         open={open}
         trigger={<Button>Collect Coins</Button>}
       >
