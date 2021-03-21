@@ -55,43 +55,50 @@ ol, ul {
   font-size: 24px;
   font-weight: normal;
   line-height: 34px;
-  height: 306px;
+  height: 260px;
   padding: 0;
   text-align: center;
-  width: 204px;
 }
 
 .mini {
-  height: 56px;
+  height: 96px;
 }
 
-.ui.card > .content, .ui.cards > .card > .content.white {
+.white, .ui.cards > .ui.card > .content.white, .ui.card.mini > .content.white{
   background:rgb(220, 220, 220);
   border-color: #fff;
 }
 
-.ui.card > .content, .ui.cards > .card > .content.blue {
+.blue, .ui.cards > .ui.card > .content.blue, .ui.card.mini > .content.blue {
   background-color: rgb(140, 160, 210);
   border-color: rgb(30, 70, 180)
 }
 
-.ui.card > .content, .ui.cards > .card > .content.green {
+.green, .ui.cards > .ui.card > .content.green, .ui.card.mini > .content.green {
   background-color: rgb(130, 200, 170);
   border-color: rgb(10, 130, 80);
 }
 
-.ui.card > .content, .ui.cards > .card > .content.red {
+.red, .ui.cards > .ui.card > .content.red, .ui.card.mini > .content.red {
   background-color: rgb(240, 160, 170);
   border-color: rgb(220, 70, 70);
 }
 
-.ui.card > .content, .ui.cards > .card > .content.black {
+.black, .ui.cards > .ui.card > .content.black, .ui.card.mini > .content.black {
   background-color: rgb(150, 150, 150);
   border-color: rgb(50, 50, 50);
 }
 
-.ui.card > .content, .ui.cards > .card > .content.yellow {
+.wild, .ui.cards > .ui.card > .content.wild, .ui.card.mini > .content.wild {
   background-color: rgb(230, 220, 10);
+}
+
+.coin {
+  border-radius: 50%;
+  height: 36px;
+  width: 36px;
+  text-align: center;
+  font-size: 1.5em;
 }
 
 .kbd-navigation .square:focus {

@@ -206,7 +206,7 @@ class Game extends React.Component {
     
     return (
       <Grid padded={true}>
-          <Grid.Column width={3} className="game-players">
+          <Grid.Column width={4} className="game-players">
             {players}
           </Grid.Column>
           <Grid.Column width={1} className="game-bank">
@@ -215,7 +215,7 @@ class Game extends React.Component {
               handleCollectCoins={this.handleCollectCoins}
             />
           </Grid.Column>
-          <Grid.Column width={7} className="game-board">
+          <Grid.Column width={6} className="game-board">
             <Grid.Row>
               <Noblemen />
             </Grid.Row>
@@ -228,7 +228,7 @@ class Game extends React.Component {
               />
             </Grid.Row>
           </Grid.Column>
-          <Grid.Column width={2} className="game-info">
+          <Grid.Column width={1} className="game-info">
             <div>{status}</div>
             <ol>{moves}</ol>
           </Grid.Column>

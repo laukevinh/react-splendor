@@ -9,13 +9,17 @@ export default class Bank extends React.Component {
 
   render() {
     const coins = Object.entries(this.props.coins).map(([color, count], idx) => {
-      return <Button color={color} content={count} />;
+      return (
+        <Grid.Row>
+          <div className={"coin " + color}>
+            {count}
+          </div>
+        </Grid.Row>
+      );
     });
     return (
       <Grid.Column>
-        <Button.Group vertical>
-          {coins}
-        </Button.Group>
+        {coins}
         <Grid.Row>
           <ModalPickCoins 
             coins={this.props.coins}
