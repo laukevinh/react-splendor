@@ -45,10 +45,11 @@ class Game extends React.Component {
       stepNumber: 0,
       moveHistory: [null],
       historyReversed: false,
-      xIsNext: true,
       cards: cards,
       decks: shuffledDecks,
       numPlayers: props.numPlayers,
+      pointsToWin: props.pointsToWin,
+      finished: false,
     };
   }
 
@@ -119,8 +120,8 @@ class Game extends React.Component {
     this.setState({
       players: players,
       bankCoins: bankCoins,
-      currentPlayerIdx: (this.state.currentPlayerIdx + 1) % this.state.numPlayers,
     });
+    this.handleEndTurn();
   }
 
   handleBuy(level, column, card) {
@@ -163,18 +164,43 @@ class Game extends React.Component {
       bankCoins: bankCoins,
       cards: cards,
       decks: decks,
-      currentPlayerIdx: (this.state.currentPlayerIdx + 1) % this.state.numPlayers,
     })
+    this.handleEndTurn();
+  }
+
+  checkWinner(players) {
+    let playersCopy = players.slice();
+    return playersCopy.sort(function(a, b) {
+      return b.points - a.points;
+    });
+  }
+
+  declareWinner(playersRanked) {
+    this.setState({ finished: true });
+    let msg = playersRanked.map((player, idx) => {
+      return `\n${idx+1}. ${player.playerName} ${player.points}`
+    })
+    alert(msg)
+  }
+
+  handleEndTurn() {
+    const { players, currentPlayerIdx, numPlayers, pointsToWin } = this.state;
+    if (currentPlayerIdx + 1 === numPlayers) {
+      let playersRanked = this.checkWinner(players);
+      if (playersRanked[0].points >= pointsToWin) {
+        this.declareWinner(playersRanked);
+      }
+    }
+    this.setState({
+      currentPlayerIdx: (this.state.currentPlayerIdx + 1) % this.state.numPlayers,
+    });
   }
 
   render() {
-    const history = this.state.history;
-    const moveHistory = this.state.moveHistory;
+    const { history, moveHistory, cards, decks, currentPlayerIdx, finished } = this.state;
     const current = history[this.state.stepNumber];
-    const cards = this.state.cards;
-    const decks = this.state.decks;
     const players = Object.values(this.state.players).map((player) => {
-      return <Player {...player} activePlayer={player.position === this.state.currentPlayerIdx} />;
+      return <Player {...player} activePlayer={player.position === currentPlayerIdx} finished={finished} />;
     });
     const winner = calculateWinner(players);
 
@@ -196,12 +222,10 @@ class Game extends React.Component {
     });
 
     let status;
-    if (winner) {
+    if (finished) {
       status = "Winner: " + winner.token;
-    } else if (this.state.stepNumber > 8) {
-      status = "Cat's game!";
     } else {
-      status = "Next player: " + (this.state.xIsNext ? "X" : "O");
+      status = "Next player: " + this.state.players[currentPlayerIdx].playerName;
     }
     
     return (
@@ -213,6 +237,7 @@ class Game extends React.Component {
             <Bank 
               coins={this.state.bankCoins}
               handleCollectCoins={this.handleCollectCoins}
+              finished={finished}
             />
           </Grid.Column>
           <Grid.Column width={6} className="game-board">
@@ -225,6 +250,7 @@ class Game extends React.Component {
                 winner={winner}
                 decks={decks}
                 handleBuy={this.handleBuy}
+                finished={finished}
               />
             </Grid.Row>
           </Grid.Column>
@@ -240,6 +266,6 @@ class Game extends React.Component {
 // ========================================
 
 ReactDOM.render(
-  <Game numPlayers={2}/>,
+  <Game numPlayers={2} pointsToWin={3} />,
   document.getElementById('root')
 );

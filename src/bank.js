@@ -24,6 +24,7 @@ export default class Bank extends React.Component {
           <ModalPickCoins 
             coins={this.props.coins}
             handleCollectCoins={this.props.handleCollectCoins}
+            finished={this.props.finished}
           />
         </Grid.Row>
       </Grid.Column>
@@ -42,8 +43,13 @@ class ModalPickCoins extends React.Component {
     };
   }
 
-  setOpen(open) {
-    this.setState({open: open});
+  onOpenModal() {
+    if (!this.props.finished) {
+      this.setState({
+        open: true,
+        bankCoins: this.props.coins
+      });
+    }
   }
 
   handleCoinTake(color) {
@@ -69,9 +75,8 @@ class ModalPickCoins extends React.Component {
   }
   
   handleConfirm(coins) {
+    this.setState({tempCoins: Wallet(false), open: false});  // reset temp coins
     this.state.handleCollectCoins(coins);
-    this.setState({tempCoins: Wallet(false)});  // reset temp coins
-    this.setOpen(false);
   }
   
   handleCancel() {
@@ -116,8 +121,8 @@ class ModalPickCoins extends React.Component {
 
     return (
       <Modal
-        onClose={() => this.setOpen(false)}
-        onOpen={() => this.setState({ open: true, bankCoins: this.props.coins })}
+        onClose={() => this.setState({open: false})}
+        onOpen={() => this.onOpenModal()}
         open={open}
         trigger={<Button>Collect Coins</Button>}
       >

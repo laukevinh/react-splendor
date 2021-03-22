@@ -16,7 +16,15 @@ export default class Board extends React.Component {
         let cols = [];
         for (let col = 0; col < 4; col++) {
           let card = cards[level][col];
-          cols.push(<CardModal level={level} column={col} card={card} handleBuy={this.props.handleBuy}/>);
+          cols.push(
+            <CardModal 
+              level={level}
+              column={col}
+              card={card}
+              handleBuy={this.props.handleBuy}
+              finished={this.props.finished}
+            />
+          );
         }
         rows.push(
           <Card.Group itemsPerRow={4}>{cols}</Card.Group>
@@ -37,7 +45,9 @@ class CardModal extends React.Component {
   }
   
   setOpen(open) {
-    this.setState({open: open});
+    if (!this.props.finished) {
+      this.setState({open: open});
+    }
   }
   
   renderPrice(price) {
@@ -57,8 +67,8 @@ class CardModal extends React.Component {
   }
   
   handleConfirm(level, column, card) {
-    this.props.handleBuy(level, column, card);
     this.setState({open: false});
+    this.props.handleBuy(level, column, card); //assume props is okay, don't need to use state
   }
   
   render() {

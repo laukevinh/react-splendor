@@ -27,8 +27,9 @@ export default class Player extends React.Component {
         </Grid.Column>
       );
     })
+    const activePlayer = this.props.activePlayer && !this.props.finished ? "active-player" : null;
     return (
-      <Grid className={this.props.activePlayer ? "active-player" : null}>
+      <Grid className={activePlayer}>
         <Grid.Row columns={2}>
           <Grid.Column>{this.props.points}</Grid.Column>
           <Grid.Column textAlign="right">{this.props.playerName}</Grid.Column>
