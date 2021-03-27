@@ -10,18 +10,6 @@ import Wallet from './wallet';
 import 'semantic-ui-css/semantic.min.css';
 import { Grid, Card } from 'semantic-ui-react';
 
-function calculateWinner(players) {
-  let hiscore = 0;
-  let winner = null;
-  for (let i = 0; i < players.length; i++) {
-    if (21 < players[i].score && hiscore <= players[i].score) {
-      hiscore = players[i].score;
-      winner = players[i];
-    }
-  }
-  return winner;
-}
-
 class Game extends React.Component {
   constructor(props) {
     super(props);
@@ -168,32 +156,38 @@ class Game extends React.Component {
     this.handleEndTurn();
   }
 
-  checkWinner(players) {
-    let playersCopy = players.slice();
-    return playersCopy.sort(function(a, b) {
-      return b.points - a.points;
-    });
+  rank(players) {
+    return players.slice().sort((a, b) => b.points - a.points);
+  }
+
+  calculateWinner(playersRanked) {
+    return this.state.pointsToWin <= playersRanked[0].points ? playersRanked[0] : null;
   }
 
   declareWinner(playersRanked) {
-    this.setState({ finished: true });
     let msg = playersRanked.map((player, idx) => {
-      return `\n${idx+1}. ${player.playerName} ${player.points}`
+      return `\n${idx+1}. ${player.playerName} ${player.points}`;
     })
-    alert(msg)
+    alert("Winner: \n" + msg);
+  }
+
+  displayRank(playersRanked) {
+    return playersRanked.map((player, idx) => `\n${idx+1}. ${player.playerName} : ${player.points}`);
   }
 
   handleEndTurn() {
-    const { players, currentPlayerIdx, numPlayers, pointsToWin } = this.state;
-    if (currentPlayerIdx + 1 === numPlayers) {
-      let playersRanked = this.checkWinner(players);
-      if (playersRanked[0].points >= pointsToWin) {
-        this.declareWinner(playersRanked);
+    const { players, currentPlayerIdx, numPlayers } = this.state;
+    if (currentPlayerIdx + 1 === numPlayers) {  // check for winner at end of round
+      const playersRanked = this.rank(players);
+      const winner = this.calculateWinner(playersRanked);
+      if (winner) {
+        this.setState({ finished: true });
+        alert(this.displayRank(playersRanked));
       }
     }
-    this.setState({
-      currentPlayerIdx: (this.state.currentPlayerIdx + 1) % this.state.numPlayers,
-    });
+    if (!this.state.finished) { // next player if game not finished
+      this.setState({ currentPlayerIdx: (currentPlayerIdx + 1) % numPlayers });
+    }
   }
 
   render() {
@@ -202,7 +196,8 @@ class Game extends React.Component {
     const players = Object.values(this.state.players).map((player) => {
       return <Player {...player} activePlayer={player.position === currentPlayerIdx} finished={finished} />;
     });
-    const winner = calculateWinner(players);
+    const playersRanked = this.rank(this.state.players);
+    const winner = this.calculateWinner(playersRanked);
 
     let moves = history.map((step, move) => { //move is the index
       const col = moveHistory[move] % 3;
@@ -222,8 +217,8 @@ class Game extends React.Component {
     });
 
     let status;
-    if (finished) {
-      status = "Winner: " + winner.token;
+    if (winner) {
+      status = "Game Over:\n" + this.displayRank(playersRanked);
     } else {
       status = "Next player: " + this.state.players[currentPlayerIdx].playerName;
     }
