@@ -15,6 +15,7 @@ class Game extends React.Component {
     super(props);
     this.handleCollectCoins = this.handleCollectCoins.bind(this);
     this.handleBuy = this.handleBuy.bind(this);
+    this.handleReserve = this.handleReserve.bind(this);
     let shuffledDecks = [
       this.shuffle(decks[0]),
       this.shuffle(decks[1]),
@@ -37,6 +38,7 @@ class Game extends React.Component {
       decks: shuffledDecks,
       numPlayers: props.numPlayers,
       pointsToWin: props.pointsToWin,
+      maxReserve: 3,
       finished: false,
     };
   }
@@ -53,13 +55,7 @@ class Game extends React.Component {
           'red': [],
           'black': [],
         },
-        reserved: {
-          'white': [],
-          'blue': [],
-          'green': [],
-          'red': [],
-          'black': [],
-        },
+        reserved: [],
         points: 0,
         noblemen: [],
         playerName: "player" + i,
@@ -112,7 +108,7 @@ class Game extends React.Component {
     this.handleEndTurn();
   }
 
-  handleBuy(level, column, card) {
+  handleBuy(source, level, column, index, card) {
     // todo upgrade: add sidebar where you can choose which coins to spend
     let players = this.state.players.slice(0, this.state.numPlayers + 1);
     let player = players[this.state.currentPlayerIdx];
@@ -146,13 +142,44 @@ class Game extends React.Component {
     // replace card on the board
     let cards = this.state.cards.slice();
     let decks = this.state.decks.slice();
-    cards[level][column] = decks[level].pop();
+    if (source === "board") {
+      cards[level][column] = decks[level].pop();
+    } else if (source === "reserved") {
+      player.reserved.splice(index, 1);
+    }
     this.setState({
       players: players,
       bankCoins: bankCoins,
       cards: cards,
       decks: decks,
     })
+    this.handleEndTurn();
+  }
+
+  handleReserve(level, column, card) {
+    let players = this.state.players.slice(0, this.state.numPlayers + 1);
+    let player = players[this.state.currentPlayerIdx];
+    let reserved = player.reserved;
+    let bankCoins = Object.assign({}, this.state.bankCoins);
+    if (this.state.maxReserve <= reserved.length) {
+      alert("exceeds max allow reservations");
+      return;
+    }
+    player.reserved.push(card);
+    if (0 < bankCoins['wild']) {
+      player.coins['wild']++;
+      bankCoins['wild']--;
+    }
+    // replace card on the board
+    let cards = this.state.cards.slice();
+    let decks = this.state.decks.slice();
+    cards[level][column] = decks[level].pop();
+    this.setState({
+      players: players,
+      bankCoins: bankCoins,
+      cards: cards,
+      decks: decks,
+    });
     this.handleEndTurn();
   }
 
@@ -194,7 +221,14 @@ class Game extends React.Component {
     const { history, moveHistory, cards, decks, currentPlayerIdx, finished } = this.state;
     const current = history[this.state.stepNumber];
     const players = Object.values(this.state.players).map((player) => {
-      return <Player {...player} activePlayer={player.position === currentPlayerIdx} finished={finished} />;
+      return (
+        <Player 
+          {...player}
+          activePlayer={player.position === currentPlayerIdx}
+          finished={finished}
+          handleBuy={this.handleBuy}
+        />
+      );
     });
     const playersRanked = this.rank(this.state.players);
     const winner = this.calculateWinner(playersRanked);
@@ -245,6 +279,7 @@ class Game extends React.Component {
                 winner={winner}
                 decks={decks}
                 handleBuy={this.handleBuy}
+                handleReserve={this.handleReserve}
                 finished={finished}
               />
             </Grid.Row>

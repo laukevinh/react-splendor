@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button, Grid, Card, Modal } from 'semantic-ui-react'
+import CardModal from './cardModal';
 
 export default class Player extends React.Component {
   constructor(props) {
@@ -56,48 +57,64 @@ class ModalPlayerDetails extends React.Component {
     };
   }
 
+  setOpen(open) {
+    if (!this.props.finished) {
+      this.setState({open: open});
+    }
+  }
+
+  renderPrice(price) {
+    let prices = [];
+    for (let [color, colorPrice] of Object.entries(price)) {
+      if (colorPrice > 0) {
+        prices.push(
+          <Grid.Row>
+            <div className={"coin " + color}>
+              {colorPrice}
+            </div>
+          </Grid.Row>
+        );
+      }
+    }
+    return (prices);
+  }
+
   render() {
     const open = this.state.open;
-    const { playerName } = this.props;
+    const playerName = this.props.playerName;
     const cards = Object.entries(this.props.cards).map(([color, cardArray]) => {
+      const cardArrayFormatted = Object.values(cardArray).map(card => {
+        return (
+          <Grid.Row>
+            <div>{card.color} : {card.points}</div>
+            {this.renderPrice(card.price)}
+          </Grid.Row>
+        );
+      });
       return (
         <Grid.Column>
-          <Card className="mini">
-            <Card.Content className={color}>
-              {cardArray.length}
-            </Card.Content>
-          </Card>
+          {cardArrayFormatted}
         </Grid.Column>
       );
     });
-    const reserved = Object.values(this.props.reserved).map(card => {
+    const reserved = this.props.reserved.map((card, idx) => {
       const [color, points, prices] = [card.color, card.points, card.prices];
       return (
         <Grid.Row>
-          <Card className="mini">
-            <Card.Content className={color}>
-              <Card.Header>
-                <Grid>
-                  <Grid.Row columns={2}>
-                    <Grid.Column>{color}</Grid.Column>
-                    <Grid.Column textAlign="right">{points}</Grid.Column>
-                  </Grid.Row>
-                </Grid>
-              </Card.Header>
-              <Card.Description>
-                {prices}
-              </Card.Description>
-            </Card.Content>
-          </Card>
+          <CardModal 
+            source="reserved"
+            index={idx}
+            card={card}
+            handleBuy={this.props.handleBuy}
+          />
         </Grid.Row>
       )
     });
-    console.log("Modal", playerName, cards, reserved);
 
     return (
       <Modal
-        onClose={() => this.setState({open: false})}
-        onOpen={() => this.setState({open: true})}
+        onClose={() => this.setOpen(false)}
+        onOpen={() => this.setOpen(true)}
         open={open}
         trigger={<Card className="mini">...</Card>}
       >
@@ -119,7 +136,7 @@ class ModalPlayerDetails extends React.Component {
           <Button 
             color='black'
             content="Cancel"
-            onClick={() => this.setState({open: false})}
+            onClick={() => this.setOpen(false)}
           />
         </Modal.Actions>
       </Modal>
