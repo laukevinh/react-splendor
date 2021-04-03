@@ -2,6 +2,7 @@ import React from 'react';
 import './index.css';
 import 'semantic-ui-css/semantic.min.css';
 import { Grid, Card, Modal, Button } from 'semantic-ui-react';
+import renderPrice from './utils'
 
 export default class CardModal extends React.Component {
     constructor(props) {
@@ -17,22 +18,6 @@ export default class CardModal extends React.Component {
       }
     }
     
-    renderPrice(price) {
-      let prices = [];
-      for (let [color, colorPrice] of Object.entries(price)) {
-        if (colorPrice > 0) {
-          prices.push(
-            <Grid.Row>
-              <div className={"coin " + color}>
-                {colorPrice}
-              </div>
-            </Grid.Row>
-          );
-        }
-      }
-      return (prices);
-    }
-  
     handleReserve(level, column, card) {
       this.setState({open: false});
       this.props.handleReserve(level, column, card); //assume props is okay, don't need to use state
@@ -46,7 +31,7 @@ export default class CardModal extends React.Component {
     render() {
       const { source, level, column, index, card } = this.props;
       const { color, points, price } = card;
-      const prices = this.renderPrice(price);
+      const prices = renderPrice(price);
       const cardComponent = (
         <Card>
           <Card.Content className={color}>

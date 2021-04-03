@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Grid, Card, Modal } from 'semantic-ui-react'
 import CardModal from './cardModal';
+import renderPrice from './utils';
 
 export default class Player extends React.Component {
   constructor(props) {
@@ -28,7 +29,7 @@ export default class Player extends React.Component {
         </Grid.Column>
       );
     });
-    const activePlayer = this.props.activePlayer && !this.props.finished ? "active-player" : null;
+    const activePlayer = this.props.activePlayer && !this.props.finished ? "active" : null;
     return (
       <Grid className={activePlayer}>
         <Grid.Row columns={2}>
@@ -63,22 +64,6 @@ class ModalPlayerDetails extends React.Component {
     }
   }
 
-  renderPrice(price) {
-    let prices = [];
-    for (let [color, colorPrice] of Object.entries(price)) {
-      if (colorPrice > 0) {
-        prices.push(
-          <Grid.Row>
-            <div className={"coin " + color}>
-              {colorPrice}
-            </div>
-          </Grid.Row>
-        );
-      }
-    }
-    return (prices);
-  }
-
   render() {
     const open = this.state.open;
     const playerName = this.props.playerName;
@@ -87,7 +72,7 @@ class ModalPlayerDetails extends React.Component {
         return (
           <Grid.Row>
             <div>{card.color} : {card.points}</div>
-            {this.renderPrice(card.price)}
+            {renderPrice(card.price)}
           </Grid.Row>
         );
       });

@@ -44,8 +44,18 @@ ol, ul {
   padding-left: 100px;
 }
 
-.active-player {
+.active {
   border: 5px solid #000;
+}
+
+.noble {
+  border: 1px solide #999;
+  box-shadow: 0 0 5px -1px rgba(0,0,0,0.2);
+  cursor:pointer;
+}
+.noble:active {
+  color:red;
+  box-shadow: 0 0 5px -1px rgba(0,0,0,0.6);
 }
 
 .card {

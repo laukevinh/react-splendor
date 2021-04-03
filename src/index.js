@@ -4,7 +4,9 @@ import './index.css';
 import decks from './cards';
 import Board from './board';
 import Bank from './bank';
+import { allNoblemen } from './noblemen';
 import Noblemen from './noblemen';
+import ModalNoblemen from './noblemenModal';
 import Player from './player';
 import Wallet from './wallet';
 import 'semantic-ui-css/semantic.min.css';
@@ -16,6 +18,7 @@ class Game extends React.Component {
     this.handleCollectCoins = this.handleCollectCoins.bind(this);
     this.handleBuy = this.handleBuy.bind(this);
     this.handleReserve = this.handleReserve.bind(this);
+    this.handleNoblemenSelection = this.handleNoblemenSelection.bind(this);
     let shuffledDecks = [
       this.shuffle(decks[0]),
       this.shuffle(decks[1]),
@@ -36,6 +39,9 @@ class Game extends React.Component {
       historyReversed: false,
       cards: cards,
       decks: shuffledDecks,
+      noblemen: this.initNoblemen(props.numPlayers),
+      noblemenSelectionOpen: false,
+      selectableNoblemen: [],
       numPlayers: props.numPlayers,
       pointsToWin: props.pointsToWin,
       maxReserve: 3,
@@ -75,6 +81,10 @@ class Game extends React.Component {
       cards[i] = row;
     }
     return cards;
+  }
+
+  initNoblemen(numPlayers) {
+    return this.shuffle(allNoblemen).slice(0, numPlayers + 1);
   }
 
   shuffle(A) {
@@ -202,8 +212,43 @@ class Game extends React.Component {
     return playersRanked.map((player, idx) => `\n${idx+1}. ${player.playerName} : ${player.points}`);
   }
 
-  handleEndTurn() {
-    const { players, currentPlayerIdx, numPlayers } = this.state;
+  listSelectableNoblemen(player, noblemen) {
+    let selectableNoblemen = [];
+    for (let noble of noblemen) {
+      let qualify = true;
+      for (let color of Object.keys(noble.price)) {
+        if (player.cards[color].length < noble.price[color]) {
+          qualify = false;
+          break;
+        }
+      }
+      if (qualify) {
+        selectableNoblemen.push(noble);
+      }
+    }
+    return selectableNoblemen;
+  }
+
+  handleNoblemenSelection(nobleIndex) {
+    // player adds noblemen
+    const { currentPlayerIdx, numPlayers } = this.state;
+    let players = this.state.players.slice();
+    let player = players[currentPlayerIdx];
+    let noblemen = this.state.noblemen.slice();
+    let [noble] = noblemen.splice(nobleIndex, 1);
+    player.noblemen.push(noble);
+    player.points += noble.points;
+    this.setState({
+      players: players,
+      noblemen: noblemen,
+      selectableNoblemen: [],
+      noblemenSelectionOpen: false,
+    });
+    this.handleWinner(players, currentPlayerIdx, numPlayers);
+    this.handleNextTurn(currentPlayerIdx, numPlayers);
+  }
+
+  handleWinner(players, currentPlayerIdx, numPlayers) {
     if (currentPlayerIdx + 1 === numPlayers) {  // check for winner at end of round
       const playersRanked = this.rank(players);
       const winner = this.calculateWinner(playersRanked);
@@ -212,13 +257,35 @@ class Game extends React.Component {
         alert(this.displayRank(playersRanked));
       }
     }
+  }
+
+  handleNextTurn(currentPlayerIdx, numPlayers) {
     if (!this.state.finished) { // next player if game not finished
       this.setState({ currentPlayerIdx: (currentPlayerIdx + 1) % numPlayers });
     }
   }
+  
+  handleEndTurn() {
+    // qualify for nobleman?
+    // toggle modal open -> let modal handle real end turn
+    // no -> real end turn
+    const { players, noblemen, currentPlayerIdx, numPlayers } = this.state;
+    const player = players[currentPlayerIdx];
+    const selectableNoblemen = this.listSelectableNoblemen(player, noblemen);
+    if (0 < selectableNoblemen.length) {
+      this.setState({
+        noblemenSelectionOpen: true,
+        selectableNoblemen: selectableNoblemen,
+      });
+    } else {
+      this.setState({ selectableNoblemen: [] });
+      this.handleWinner(players, currentPlayerIdx, numPlayers);
+      this.handleNextTurn(currentPlayerIdx, numPlayers);
+    }
+  }
 
   render() {
-    const { history, moveHistory, cards, decks, currentPlayerIdx, finished } = this.state;
+    const { history, moveHistory, cards, decks, noblemen, noblemenSelectionOpen, selectableNoblemen, currentPlayerIdx, numPlayers, finished } = this.state;
     const current = history[this.state.stepNumber];
     const players = Object.values(this.state.players).map((player) => {
       return (
@@ -230,8 +297,13 @@ class Game extends React.Component {
         />
       );
     });
-    const playersRanked = this.rank(this.state.players);
-    const winner = this.calculateWinner(playersRanked);
+    let status;
+    if (finished) {  // check for winner at end of round
+      const playersRanked = this.rank(this.state.players);
+      status = "Game Over:\n" + this.displayRank(playersRanked);
+    } else {
+      status = "Next player: " + this.state.players[currentPlayerIdx].playerName;
+    }
 
     let moves = history.map((step, move) => { //move is the index
       const col = moveHistory[move] % 3;
@@ -250,13 +322,6 @@ class Game extends React.Component {
       );
     });
 
-    let status;
-    if (winner) {
-      status = "Game Over:\n" + this.displayRank(playersRanked);
-    } else {
-      status = "Next player: " + this.state.players[currentPlayerIdx].playerName;
-    }
-    
     return (
       <Grid padded={true}>
           <Grid.Column width={4} className="game-players">
@@ -271,12 +336,18 @@ class Game extends React.Component {
           </Grid.Column>
           <Grid.Column width={6} className="game-board">
             <Grid.Row>
-              <Noblemen />
+              <Noblemen noblemen={noblemen}/>
+            </Grid.Row>
+            <Grid.Row>
+              <ModalNoblemen
+                noblemen={selectableNoblemen}
+                handleNoblemenSelection={this.handleNoblemenSelection}
+                open={noblemenSelectionOpen}
+              />
             </Grid.Row>
             <Grid.Row>
               <Board 
                 cards={cards}
-                winner={winner}
                 decks={decks}
                 handleBuy={this.handleBuy}
                 handleReserve={this.handleReserve}
