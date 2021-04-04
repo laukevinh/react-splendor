@@ -1,5 +1,6 @@
 import React from 'react';
 import Wallet from './wallet';
+import { Coin } from './utils';
 import { Button, Grid, Icon, Modal } from 'semantic-ui-react'
 
 export default class Bank extends React.Component {
@@ -11,9 +12,7 @@ export default class Bank extends React.Component {
     const coins = Object.entries(this.props.coins).map(([color, count], idx) => {
       return (
         <Grid.Row>
-          <div className={"coin " + color}>
-            {count}
-          </div>
+          <Coin color={color} content={count}/>
         </Grid.Row>
       );
     });
@@ -35,6 +34,8 @@ export default class Bank extends React.Component {
 class ModalPickCoins extends React.Component {
   constructor(props) {
     super(props);
+    this.handleCoinTake = this.handleCoinTake.bind(this);
+    this.handleCoinReturn = this.handleCoinReturn.bind(this);
     this.state = {
       open: false,
       bankCoins: props.coins,
@@ -96,31 +97,20 @@ class ModalPickCoins extends React.Component {
   render() {
     const open = this.state.open;
     const coins = Object.entries(this.state.bankCoins).map(([color, count], idx) => {
-      const bankCoinButton = (
-        <Button
-          color={color}
-          content={count}
-          onClick={() => this.handleCoinTake(color)}
-          disabled={this.state.bankCoins[color] === 0}
-        />
-      );
-      const tempCoinButton = (
-        <Button
-          color={color}
-          content={this.state.tempCoins[color]}
-          onClick={() => this.handleCoinReturn(color)}
-        />
-      );
+      const disabled = this.state.bankCoins[color] === 0;
+      const bankCoinButton = <Coin color={color} content={count} disabled={disabled} onClick={this.handleCoinTake}/>;
+      const tempCoinButton = <Coin color={color} content={this.state.tempCoins[color]} onClick={this.handleCoinReturn}/>;
       return (
-        <li key={idx}>
+        <Grid.Row>
           {bankCoinButton}
           {this.state.tempCoins[color] > 0 && tempCoinButton}
-        </li>
+        </Grid.Row>
       );
     });
 
     return (
       <Modal
+        className="bank"
         onClose={() => this.setState({open: false})}
         onOpen={() => this.onOpenModal()}
         open={open}

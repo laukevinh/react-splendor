@@ -39,6 +39,7 @@ function convertToObj(array) {
       'red': array[4],
       'black': array[5]
     },
+    'isDisplayed': true,
   }
 }
 
@@ -50,13 +51,17 @@ export default class Noblemen extends React.Component {
   }
   render() {
     const noblemen = this.props.noblemen.map(noble => {
-      return (
+      return noble.isDisplayed ? (
         <Grid.Column>
-          <Grid.Row>
-            VP: {noble.points}
-          </Grid.Row>
-          {renderPrice(noble.price)}
+          <div className="noble">
+            <Grid.Row>
+              VP: {noble.points}
+            </Grid.Row>
+            {renderPrice(noble.price, "game-card")}
+          </div>
         </Grid.Column>
+      ) : (
+        <></>
       )
     });
     

@@ -3,41 +3,8 @@ body {
   margin: 20px;
 }
 
-ol, ul {
-  padding-left: 30px;
-}
-
-.board-row:after {
-  clear: both;
-  content: "";
-  display: table;
-}
-
 .status {
   margin-bottom: 10px;
-}
-
-.square {
-  background: #fff;
-  border: 1px solid #999;
-  float: left;
-  font-size: 24px;
-  font-weight: normal;
-  line-height: 34px;
-  height: 34px;
-  margin-right: -1px;
-  margin-top: -1px;
-  padding: 0;
-  text-align: center;
-  width: 34px;
-}
-
-.bold {
-  font-weight: bold;
-}
-
-.square:focus {
-  outline: none;
 }
 
 .game-players {
@@ -49,13 +16,29 @@ ol, ul {
 }
 
 .noble {
-  border: 1px solide #999;
+  border: 1px solid #999;
+  margin: 3px;
+  padding: 12px;
+}
+
+.selectable {
   box-shadow: 0 0 5px -1px rgba(0,0,0,0.2);
   cursor:pointer;
 }
-.noble:active {
+.selectable:active {
   color:red;
   box-shadow: 0 0 5px -1px rgba(0,0,0,0.6);
+}
+.selectable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 3px -1px rgba(0,0,0,0.6);
+}
+
+.disabled {
+  cursor: default;
+  opacity: 0.5;
+  box-shadow: none;
+  pointer-events: none;
 }
 
 .card {
@@ -70,36 +53,50 @@ ol, ul {
   text-align: center;
 }
 
-.mini {
-  height: 96px;
+.game-card {
+  display: inline-block;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 1.5em;
+  border: 1px solid #eee;
+  border-radius: 5px;
 }
 
-.white, .ui.cards > .ui.card > .content.white, .ui.card.mini > .content.white{
+.game-card.mini {
+  height: 48px;
+  width: 36px;
+}
+
+.game-card.small {
+  width: 108px;
+}
+
+.white, .ui.cards > .ui.card > .content.white {
   background:rgb(220, 220, 220);
   border-color: #fff;
 }
 
-.blue, .ui.cards > .ui.card > .content.blue, .ui.card.mini > .content.blue {
+.blue, .ui.cards > .ui.card > .content.blue {
   background-color: rgb(140, 160, 210);
   border-color: rgb(30, 70, 180)
 }
 
-.green, .ui.cards > .ui.card > .content.green, .ui.card.mini > .content.green {
+.green, .ui.cards > .ui.card > .content.green {
   background-color: rgb(130, 200, 170);
   border-color: rgb(10, 130, 80);
 }
 
-.red, .ui.cards > .ui.card > .content.red, .ui.card.mini > .content.red {
+.red, .ui.cards > .ui.card > .content.red {
   background-color: rgb(240, 160, 170);
   border-color: rgb(220, 70, 70);
 }
 
-.black, .ui.cards > .ui.card > .content.black, .ui.card.mini > .content.black {
+.black, .ui.cards > .ui.card > .content.black {
   background-color: rgb(150, 150, 150);
   border-color: rgb(50, 50, 50);
 }
 
-.wild, .ui.cards > .ui.card > .content.wild, .ui.card.mini > .content.wild {
+.wild, .ui.cards > .ui.card > .content.wild {
   background-color: rgb(230, 220, 10);
 }
 
@@ -110,10 +107,12 @@ ol, ul {
   text-align: center;
   font-size: 1.5em;
   border: 1px solid #eee;
+  margin: 3px;
+  padding: 3px;
 }
 
-.kbd-navigation .square:focus {
-  background: #ddd;
+.modal.bank > .content > .row > .coin {
+  display: inline-block;
 }
 
 .game {

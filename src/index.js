@@ -213,19 +213,19 @@ class Game extends React.Component {
   }
 
   listSelectableNoblemen(player, noblemen) {
-    let selectableNoblemen = [];
-    for (let noble of noblemen) {
-      let qualify = true;
-      for (let color of Object.keys(noble.price)) {
-        if (player.cards[color].length < noble.price[color]) {
-          qualify = false;
-          break;
+    let selectableNoblemen = noblemen.map(noble => {
+      if (!noble.isDisplayed) {
+        return false;
+      } else {
+        for (let color of Object.keys(noble.price)) {
+          if (player.cards[color].length < noble.price[color]) {
+            return false;
+          }
         }
       }
-      if (qualify) {
-        selectableNoblemen.push(noble);
-      }
-    }
+      return true;
+    });
+
     return selectableNoblemen;
   }
 
@@ -235,7 +235,11 @@ class Game extends React.Component {
     let players = this.state.players.slice();
     let player = players[currentPlayerIdx];
     let noblemen = this.state.noblemen.slice();
-    let [noble] = noblemen.splice(nobleIndex, 1);
+    let noble = noblemen[nobleIndex];
+    // console.log("handleNoblemenSelection before splice", noblemen);
+    // let [noble] = noblemen.splice(nobleIndex, 1);
+    noble.isDisplayed = false;
+    // console.log("handleNoblemenSelection after splice", noblemen);
     player.noblemen.push(noble);
     player.points += noble.points;
     this.setState({
@@ -265,6 +269,15 @@ class Game extends React.Component {
     }
   }
   
+  any(array) {
+    for (let each of array) {
+      if (each === true) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   handleEndTurn() {
     // qualify for nobleman?
     // toggle modal open -> let modal handle real end turn
@@ -272,7 +285,7 @@ class Game extends React.Component {
     const { players, noblemen, currentPlayerIdx, numPlayers } = this.state;
     const player = players[currentPlayerIdx];
     const selectableNoblemen = this.listSelectableNoblemen(player, noblemen);
-    if (0 < selectableNoblemen.length) {
+    if (this.any(selectableNoblemen)) {
       this.setState({
         noblemenSelectionOpen: true,
         selectableNoblemen: selectableNoblemen,
@@ -340,7 +353,8 @@ class Game extends React.Component {
             </Grid.Row>
             <Grid.Row>
               <ModalNoblemen
-                noblemen={selectableNoblemen}
+                noblemen={noblemen}
+                selectableNoblemen={selectableNoblemen}
                 handleNoblemenSelection={this.handleNoblemenSelection}
                 open={noblemenSelectionOpen}
               />

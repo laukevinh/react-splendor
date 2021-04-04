@@ -2,6 +2,7 @@ import React from 'react';
 import { Button, Grid, Card, Modal } from 'semantic-ui-react'
 import CardModal from './cardModal';
 import renderPrice from './utils';
+import { Coin, GameCard } from './utils';
 
 export default class Player extends React.Component {
   constructor(props) {
@@ -10,24 +11,12 @@ export default class Player extends React.Component {
 
   render() {
     const coins = Object.entries(this.props.coins).map(([color, count], idx) => {
-      return (
-        <Grid.Column>
-          <div className={"coin " + color}>
-            {count}
-          </div>
-        </Grid.Column>
-      );
+      const coin = <Coin color={color} content={count} />;
+      return <Grid.Column>{0 < count && coin}</Grid.Column>;
     });
     const cards = Object.entries(this.props.cards).map(([color, cardArray]) => {
-      return (
-        <Grid.Column>
-          <Card className="mini">
-            <Card.Content className={color}>
-              {cardArray.length}
-            </Card.Content>
-          </Card>
-        </Grid.Column>
-      );
+      const card = <GameCard color={color} content={cardArray.length} />;
+      return <Grid.Column>{0 < cardArray.length && card}</Grid.Column>;
     });
     const activePlayer = this.props.activePlayer && !this.props.finished ? "active" : null;
     return (
@@ -71,8 +60,7 @@ class ModalPlayerDetails extends React.Component {
       const cardArrayFormatted = Object.values(cardArray).map(card => {
         return (
           <Grid.Row>
-            <div>{card.color} : {card.points}</div>
-            {renderPrice(card.price)}
+            <GameCard size="small" color={card.color} content={renderPrice(card.price, "coin")} />
           </Grid.Row>
         );
       });
@@ -101,7 +89,14 @@ class ModalPlayerDetails extends React.Component {
         onClose={() => this.setOpen(false)}
         onOpen={() => this.setOpen(true)}
         open={open}
-        trigger={<Card className="mini">...</Card>}
+        trigger={<div className="game-card mini selectable">...</div>}
+        // trigger={<div>...</div>}
+        // using divs, even an empty div, will work as a modal trigger. But the below GameCard component doesn't work.
+        // Semantic-UI calls react.isValidElement() on the trigger. If it isn't a valid element, it returns null and does nothing
+        // that's why using GameCard doesn't work? it's still returning a div... anyway.
+        // https://reactjs.org/docs/react-api.html#isvalidelement
+        // https://github.com/Semantic-Org/Semantic-UI-React/blob/ff703557a3090ea281cb7a263bc486a978fbabdd/src/modules/Modal/Modal.js#L215
+        // trigger={<GameCard color="wild" selectable content="..." />}
       >
         <Modal.Header>
           <Grid columns={2}>

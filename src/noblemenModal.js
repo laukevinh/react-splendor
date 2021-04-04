@@ -28,17 +28,21 @@ export default class ModalNoblemen extends React.Component {
   render() {
     // noblemen only contains the ones you're qualified to select
     let open = this.props.open;
-    const noblemen = this.props.noblemen.map((noble, idx) => {
-      return (
-        <Grid.Column 
+    const noblemen = this.props.selectableNoblemen.map((selectable, idx) => {
+      const noble = this.props.noblemen[idx];
+      return selectable ? (
+        <Grid.Column
           onClick={() => this.handleConfirm(idx)}
-          className="noble"
         >
-          <Grid.Row>
-            VP: {noble.points}
-          </Grid.Row>
-          {renderPrice(noble.price)}
+          <div className="noble selectable">
+            <Grid.Row>
+              VP: {noble.points}
+            </Grid.Row>
+            {renderPrice(noble.price, "game-card")}
+          </div>
         </Grid.Column>
+      ) : (
+        <></>
       )
     });
     

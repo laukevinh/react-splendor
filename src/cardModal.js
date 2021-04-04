@@ -31,7 +31,7 @@ export default class CardModal extends React.Component {
     render() {
       const { source, level, column, index, card } = this.props;
       const { color, points, price } = card;
-      const prices = renderPrice(price);
+      const prices = renderPrice(price, "coin");
       const cardComponent = (
         <Card>
           <Card.Content className={color}>
