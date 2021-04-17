@@ -40,38 +40,97 @@ class ModalPickCoins extends React.Component {
       open: false,
       bankCoins: props.coins,
       tempCoins: Wallet(false),
+      bankCoinsSelectable: this.initBankCoinsSelectable(props.coins),
+      numTempCoins: 0,
       handleCollectCoins: props.handleCollectCoins,
     };
+  }
+
+  initBankCoinsSelectable(coins) {
+    let bankCoinsSelectable = {};
+    for (let [color, count] of Object.entries(coins)) {
+      if (color !== 'wild') {
+        bankCoinsSelectable[color] = 0 < count;
+      }
+    }
+    return bankCoinsSelectable;
   }
 
   onOpenModal() {
     if (!this.props.finished) {
       this.setState({
         open: true,
-        bankCoins: this.props.coins
+        bankCoins: this.props.coins,
+        numTempCoins: 0,
+        bankCoinsSelectable: this.initBankCoinsSelectable(this.props.coins),
       });
     }
   }
 
-  handleCoinTake(color) {
+  setAllObjValues(obj, value) {
+    for (let key of Object.keys(obj)) {
+      obj[key] = value;
+    }
+  }
+
+  handleCoinTake(colorToTake) {
     let bankCoins = Object.assign({}, this.state.bankCoins);
     let tempCoins = Object.assign({}, this.state.tempCoins);
-    bankCoins[color]--;
-    tempCoins[color]++;
+    let numTempCoins = this.state.numTempCoins;
+    let bankCoinsSelectable = Object.assign({}, this.state.bankCoinsSelectable);
+    bankCoins[colorToTake]--;
+    tempCoins[colorToTake]++;
+    numTempCoins++;
+    if (numTempCoins === 0) {
+      alert("Why was it negative");
+    } else if (numTempCoins === 1) {
+      if (bankCoins[colorToTake] < 3) {
+        bankCoinsSelectable[colorToTake] = false;
+      } else {
+        bankCoinsSelectable[colorToTake] = 0 < bankCoins[colorToTake];
+      }
+    } else if (numTempCoins === 2) {
+      if (1 < tempCoins[colorToTake]) {
+        this.setAllObjValues(bankCoinsSelectable, false);
+      } else {
+        for (let tempCoinColor of Object.keys(tempCoins)) {
+          if (0 < tempCoins[tempCoinColor]) {
+            bankCoinsSelectable[tempCoinColor] = false;
+          }
+        }
+        bankCoinsSelectable[colorToTake] = false;
+      }
+    } else if (2 < numTempCoins) {
+      this.setAllObjValues(bankCoinsSelectable, false);
+    }
     this.setState({
       bankCoins: bankCoins,
       tempCoins: tempCoins,
+      numTempCoins: numTempCoins,
+      bankCoinsSelectable: bankCoinsSelectable,
     });
   }
 
-  handleCoinReturn(color) {
+  handleCoinReturn(colorToReturn) {
     let bankCoins = Object.assign({}, this.state.bankCoins);
     let tempCoins = Object.assign({}, this.state.tempCoins);
-    bankCoins[color]++;
-    tempCoins[color]--;
+    let numTempCoins = this.state.numTempCoins;
+    let bankCoinsSelectable = Object.assign({}, this.state.bankCoinsSelectable);
+    bankCoins[colorToReturn]++;
+    tempCoins[colorToReturn]--;
+    numTempCoins--;
+    if (numTempCoins < 2) {
+      this.setAllObjValues(bankCoinsSelectable, true);
+    } else if (numTempCoins === 2) {
+      for (let color of Object.keys(bankCoinsSelectable)) {
+        bankCoinsSelectable[color] = tempCoins[color] === 0;
+      }
+    }
     this.setState({
       bankCoins: bankCoins,
       tempCoins: tempCoins,
+      numTempCoins: numTempCoins,
+      bankCoinsSelectable: bankCoinsSelectable,
     });
   }
   
@@ -90,6 +149,7 @@ class ModalPickCoins extends React.Component {
     this.setState({
       bankCoins: bankCoins,
       tempCoins: tempCoins,
+      numTempCoins: 0,
       open: false,
     });
   }
@@ -97,21 +157,23 @@ class ModalPickCoins extends React.Component {
   render() {
     const open = this.state.open;
     const coins = Object.entries(this.state.bankCoins).map(([color, count], idx) => {
-      const disabled = this.state.bankCoins[color] === 0;
+      const disabled = !this.state.bankCoinsSelectable[color];
       const bankCoinButton = <Coin color={color} content={count} disabled={disabled} onClick={this.handleCoinTake}/>;
       const tempCoinButton = <Coin color={color} content={this.state.tempCoins[color]} onClick={this.handleCoinReturn}/>;
-      return (
+      return color !== 'wild' ? (
         <Grid.Row>
           {bankCoinButton}
           {this.state.tempCoins[color] > 0 && tempCoinButton}
         </Grid.Row>
+      ) : (
+        <></>
       );
     });
 
     return (
       <Modal
         className="bank"
-        onClose={() => this.setState({open: false})}
+        onClose={() => this.handleCancel()}
         onOpen={() => this.onOpenModal()}
         open={open}
         trigger={<Button>Collect Coins</Button>}
@@ -128,6 +190,7 @@ class ModalPickCoins extends React.Component {
             content="confirm"
             onClick={() => this.handleConfirm(this.state.tempCoins)}
             positive
+            disabled={this.state.numTempCoins === 0}
           />
         </Modal.Actions>
       </Modal>

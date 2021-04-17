@@ -16,3 +16,11 @@ export default function Wallet(isBank, numPlayers) {
     'wild': numWilds,
   };
 }
+
+export function sumWallet(wallet) {
+  let sum = 0;
+  for (let value of Object.values(wallet)) {
+    sum += value;
+  }
+  return sum;
+}

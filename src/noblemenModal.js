@@ -9,7 +9,7 @@ export default class ModalNoblemen extends React.Component {
       open: props.open,
     };
   }
-  
+  // TODO none of the setOpen needs to be here... because they're never triggered
   setOpen(open) {
     if (!this.props.finished) {
       this.setState({open: open});
@@ -49,7 +49,8 @@ export default class ModalNoblemen extends React.Component {
     return (
       <Modal
         onClose={() => this.setOpen(false)}
-        onOpen={() => this.setOpen(true)}
+        // onOpen={() => this.setOpen(true)}
+        onOpen={() => alert("ThIs is open")} // this is never called
         open={open}
         trigger={null}
       >

@@ -8,14 +8,16 @@ import { allNoblemen } from './noblemen';
 import Noblemen from './noblemen';
 import ModalNoblemen from './noblemenModal';
 import Player from './player';
-import Wallet from './wallet';
+import Wallet, { sumWallet } from './wallet';
 import 'semantic-ui-css/semantic.min.css';
 import { Grid, Card } from 'semantic-ui-react';
+import ReturnCoinsModal from './returnCoinsModal';
 
 class Game extends React.Component {
   constructor(props) {
     super(props);
     this.handleCollectCoins = this.handleCollectCoins.bind(this);
+    this.handleReturnCoins = this.handleReturnCoins.bind(this);
     this.handleBuy = this.handleBuy.bind(this);
     this.handleReserve = this.handleReserve.bind(this);
     this.handleNoblemenSelection = this.handleNoblemenSelection.bind(this);
@@ -34,6 +36,7 @@ class Game extends React.Component {
       players: this.initPlayers(props.numPlayers),
       currentPlayerIdx: 0,
       bankCoins: Wallet(true, props.numPlayers),
+      returnCoinsModalOpen: false,
       stepNumber: 0,
       moveHistory: [null],
       historyReversed: false,
@@ -111,9 +114,34 @@ class Game extends React.Component {
       bankCoins[color] -= coins[color];
       playerCoins[color] += coins[color];
     }
+    if (10 < sumWallet(playerCoins)) {
+      // trigger modal
+      this.setState({
+        players: players,
+        bankCoins: bankCoins,
+        returnCoinsModalOpen: true,
+      });
+    } else {
+      this.setState({
+        players: players,
+        bankCoins: bankCoins,
+      });
+      this.handleEndTurn();
+    }
+  }
+
+  handleReturnCoins(coins) {
+    let players = this.state.players.slice(0, this.state.numPlayers + 1);
+    let bankCoins = Object.assign({}, this.state.bankCoins);
+    let playerCoins = players[this.state.currentPlayerIdx].coins;
+    for (let color of Object.keys(coins)) {
+      bankCoins[color] += coins[color];
+      playerCoins[color] -= coins[color];
+    }
     this.setState({
       players: players,
       bankCoins: bankCoins,
+      returnCoinsModalOpen: false,
     });
     this.handleEndTurn();
   }
@@ -190,7 +218,12 @@ class Game extends React.Component {
       cards: cards,
       decks: decks,
     });
-    this.handleEndTurn();
+    if (10 < sumWallet(player.coins)) {
+      // trigger modal
+      this.setState({ returnCoinsModalOpen: true });
+    } else {
+      this.handleEndTurn();
+    }
   }
 
   rank(players) {
@@ -236,10 +269,7 @@ class Game extends React.Component {
     let player = players[currentPlayerIdx];
     let noblemen = this.state.noblemen.slice();
     let noble = noblemen[nobleIndex];
-    // console.log("handleNoblemenSelection before splice", noblemen);
-    // let [noble] = noblemen.splice(nobleIndex, 1);
     noble.isDisplayed = false;
-    // console.log("handleNoblemenSelection after splice", noblemen);
     player.noblemen.push(noble);
     player.points += noble.points;
     this.setState({
@@ -345,6 +375,11 @@ class Game extends React.Component {
               coins={this.state.bankCoins}
               handleCollectCoins={this.handleCollectCoins}
               finished={finished}
+            />
+            <ReturnCoinsModal
+              coins={this.state.players[currentPlayerIdx].coins}
+              open={this.state.returnCoinsModalOpen}
+              handleReturnCoins={this.handleReturnCoins}
             />
           </Grid.Column>
           <Grid.Column width={6} className="game-board">
