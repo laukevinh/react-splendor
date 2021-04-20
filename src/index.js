@@ -12,6 +12,7 @@ import Wallet, { sumWallet } from './wallet';
 import 'semantic-ui-css/semantic.min.css';
 import { Grid, Card } from 'semantic-ui-react';
 import ReturnCoinsModal from './returnCoinsModal';
+import { calculateCharge, DECK, BOARD, RESERVED } from './utils';
 
 class Game extends React.Component {
   constructor(props) {
@@ -148,26 +149,16 @@ class Game extends React.Component {
 
   handleBuy(source, level, column, index, card) {
     // todo upgrade: add sidebar where you can choose which coins to spend
+    // todo BUG when you have consecutive handlebuy actions, sometimes the bankcoins go negative
     let players = this.state.players.slice(0, this.state.numPlayers + 1);
     let player = players[this.state.currentPlayerIdx];
     let playerWallet = player.coins;
     let playerCards = player.cards;
     let bankCoins = Object.assign({}, this.state.bankCoins);
-    let charge = Wallet(false);
-    for (let [color, price] of Object.entries(card.price)) {
-      let remainder = price - player.cards[color].length;
-      if (playerWallet[color] + playerWallet['wild'] < remainder) {
-        alert("insufficient funds");
-        return;
-      } else if (playerWallet[color] < remainder) {
-        charge[color] = playerWallet[color];
-        charge['wild'] += remainder - playerWallet[color];
-      } else {
-        charge[color] = remainder;
-      }
-      if (playerWallet['wild'] - charge['wild'] < 0) {
-        return;
-      }
+    let { insufficientFunds, charge } = calculateCharge(card.price, playerWallet, playerCards);
+    if (insufficientFunds) {
+      alert("Insufficient Funds");
+      return;
     }
     // remove coins from player wallet and put coins back into bank
     for (let [color, price] of Object.entries(charge)) {
@@ -178,11 +169,13 @@ class Game extends React.Component {
     playerCards[card.color].push(card);
     player.points += card.points;
     // replace card on the board
+    // TODO don't replace if there remaining deck is 0
+    // TODO after buying from reserved, close all modals
     let cards = this.state.cards.slice();
     let decks = this.state.decks.slice();
-    if (source === "board") {
-      cards[level][column] = decks[level].pop();
-    } else if (source === "reserved") {
+    if (source === BOARD) {
+      cards[level][column] = 0 < decks[level].length ? decks[level].pop() : null;
+    } else if (source === RESERVED) {
       player.reserved.splice(index, 1);
     }
     this.setState({
@@ -194,7 +187,7 @@ class Game extends React.Component {
     this.handleEndTurn();
   }
 
-  handleReserve(level, column, card) {
+  handleReserve(source, level, column, card) {
     let players = this.state.players.slice(0, this.state.numPlayers + 1);
     let player = players[this.state.currentPlayerIdx];
     let reserved = player.reserved;
@@ -203,15 +196,23 @@ class Game extends React.Component {
       alert("exceeds max allow reservations");
       return;
     }
+    if (card === null) {
+      return;
+    }
     player.reserved.push(card);
     if (0 < bankCoins['wild']) {
       player.coins['wild']++;
       bankCoins['wild']--;
     }
     // replace card on the board
+    // TODO if source is top of deck don't replace
+    let decks = this.state.decks.slice();  
     let cards = this.state.cards.slice();
-    let decks = this.state.decks.slice();
-    cards[level][column] = decks[level].pop();
+    if (source === DECK) {
+      decks[level].pop();
+    } else {
+      cards[level][column] = decks[level].pop();
+    }
     this.setState({
       players: players,
       bankCoins: bankCoins,
@@ -264,6 +265,7 @@ class Game extends React.Component {
 
   handleNoblemenSelection(nobleIndex) {
     // player adds noblemen
+    // after picking up noblemen, replace with stub so the placement is still the same
     const { currentPlayerIdx, numPlayers } = this.state;
     let players = this.state.players.slice();
     let player = players[currentPlayerIdx];
@@ -314,6 +316,8 @@ class Game extends React.Component {
     // no -> real end turn
     const { players, noblemen, currentPlayerIdx, numPlayers } = this.state;
     const player = players[currentPlayerIdx];
+    // TODO: BUG: if you qualify for 1 nobleman, you don't need to invest further to get the second... 
+    // might only be a problem now because noblement aren't unique.
     const selectableNoblemen = this.listSelectableNoblemen(player, noblemen);
     if (this.any(selectableNoblemen)) {
       this.setState({
@@ -398,6 +402,8 @@ class Game extends React.Component {
               <Board 
                 cards={cards}
                 decks={decks}
+                playerWallet={this.state.players[currentPlayerIdx].coins}
+                playerCards={this.state.players[currentPlayerIdx].cards}
                 handleBuy={this.handleBuy}
                 handleReserve={this.handleReserve}
                 finished={finished}

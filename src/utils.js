@@ -1,6 +1,17 @@
 import React, { isValidElement } from 'react';
 import 'semantic-ui-css/semantic.min.css';
 import { Grid } from 'semantic-ui-react';
+import Wallet from './wallet';
+
+export const DECK = 'deck';
+export const BOARD = 'board';
+export const RESERVED = 'reserved';
+export const WHITE = 'white';
+export const BLUE = 'blue';
+export const GREEN = 'green';
+export const RED = 'red';
+export const BLACK = 'black';
+export const WILD = 'wild';
 
 export default function renderPrice(price, type) {
   let prices = [];
@@ -84,3 +95,29 @@ export function GameCard(props) {
 //     );
 //   }
 // }
+
+export function calculateCharge(price, playerWallet, playerCards) {
+  let charge = Wallet(false);
+  let response = {
+    insufficientFunds: null,
+    charge: charge,
+  }
+  for (let [color, colorPrice] of Object.entries(price)) {
+    let remainder = colorPrice - playerCards[color].length;
+    if (playerWallet[color] + playerWallet[WILD] < remainder) {
+      response.insufficientFunds = true;
+      return response;
+    } else if (playerWallet[color] < remainder) {
+      charge[color] = playerWallet[color];
+      charge[WILD] += remainder - playerWallet[color];
+    } else {
+      charge[color] = remainder;
+    }
+    if (playerWallet[WILD] - charge[WILD] < 0) {
+      response.insufficientFunds = true;
+      return response;
+    }
+  }
+  response.insufficientFunds = false;
+  return response;
+}

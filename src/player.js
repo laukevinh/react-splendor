@@ -1,8 +1,7 @@
 import React from 'react';
 import { Button, Grid, Card, Modal } from 'semantic-ui-react'
 import CardModal from './cardModal';
-import renderPrice from './utils';
-import { Coin, GameCard } from './utils';
+import renderPrice, { Coin, GameCard, RESERVED } from './utils';
 
 export default class Player extends React.Component {
   constructor(props) {
@@ -71,13 +70,14 @@ class ModalPlayerDetails extends React.Component {
       );
     });
     const reserved = this.props.reserved.map((card, idx) => {
-      const [color, points, prices] = [card.color, card.points, card.prices];
       return (
         <Grid.Row>
           <CardModal 
-            source="reserved"
+            source={RESERVED}
             index={idx}
             card={card}
+            playerWallet={this.props.coins}
+            playerCards={this.props.cards}
             handleBuy={this.props.handleBuy}
           />
         </Grid.Row>

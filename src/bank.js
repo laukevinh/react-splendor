@@ -1,6 +1,6 @@
 import React from 'react';
 import Wallet from './wallet';
-import { Coin } from './utils';
+import { Coin, WILD } from './utils';
 import { Button, Grid, Icon, Modal } from 'semantic-ui-react'
 
 export default class Bank extends React.Component {
@@ -49,7 +49,7 @@ class ModalPickCoins extends React.Component {
   initBankCoinsSelectable(coins) {
     let bankCoinsSelectable = {};
     for (let [color, count] of Object.entries(coins)) {
-      if (color !== 'wild') {
+      if (color !== WILD) {
         bankCoinsSelectable[color] = 0 < count;
       }
     }
@@ -160,7 +160,7 @@ class ModalPickCoins extends React.Component {
       const disabled = !this.state.bankCoinsSelectable[color];
       const bankCoinButton = <Coin color={color} content={count} disabled={disabled} onClick={this.handleCoinTake}/>;
       const tempCoinButton = <Coin color={color} content={this.state.tempCoins[color]} onClick={this.handleCoinReturn}/>;
-      return color !== 'wild' ? (
+      return color !== WILD ? (
         <Grid.Row>
           {bankCoinButton}
           {this.state.tempCoins[color] > 0 && tempCoinButton}

@@ -2,7 +2,7 @@ import React from 'react';
 import './index.css';
 import 'semantic-ui-css/semantic.min.css';
 import { Grid, Card, Modal, Button } from 'semantic-ui-react';
-import renderPrice from './utils'
+import renderPrice, { calculateCharge, RESERVED } from './utils'
 
 export default class CardModal extends React.Component {
     constructor(props) {
@@ -18,9 +18,9 @@ export default class CardModal extends React.Component {
       }
     }
     
-    handleReserve(level, column, card) {
+    handleReserve(source, level, column, card) {
       this.setState({open: false});
-      this.props.handleReserve(level, column, card); //assume props is okay, don't need to use state
+      this.props.handleReserve(source, level, column, card); //assume props is okay, don't need to use state
     }
     
     handleConfirm(source, level, column, index, card) {
@@ -29,7 +29,10 @@ export default class CardModal extends React.Component {
     }
     
     render() {
-      const { source, level, column, index, card } = this.props;
+      const { source, level, column, index, card, playerWallet, playerCards } = this.props;
+      if (card === null || card === undefined) {
+        return <></>;
+      }
       const { color, points, price } = card;
       const prices = renderPrice(price, "coin");
       const cardComponent = (
@@ -49,6 +52,8 @@ export default class CardModal extends React.Component {
           </Card.Content>
         </Card>
       );
+      // TODO: BUG: you can buy another player's reserved card.
+      const insufficientFunds = calculateCharge(price, playerWallet, playerCards).insufficientFunds;
       return (
         <Modal
           onClose={() => this.setOpen(false)}
@@ -74,10 +79,12 @@ export default class CardModal extends React.Component {
             <Button
               color='yellow'
               content="Reserve"
-              onClick={() => this.handleReserve(level, column, card)}
+              disabled={source === RESERVED}
+              onClick={() => this.handleReserve(source, level, column, card)}
             />
             <Button
               content="Buy"
+              disabled={insufficientFunds}
               onClick={() => this.handleConfirm(source, level, column, index, card)}
               positive
             />
