@@ -1,26 +1,22 @@
-export default function Wallet(isBank, numPlayers) {
-  const maxCoins = {
-    2:4,  // in 2 player game, bank carries max 4 coins per color
-    3:5,
-    4:7,
-  };
-  const startingBalance = isBank ? maxCoins[numPlayers] : 0;
-  const numWilds = isBank ? 5 : 0;  // max 5 wild coins for all games
-
-  return {
-    'white': startingBalance,
-    'blue': startingBalance,
-    'green': startingBalance,
-    'red': startingBalance,
-    'black': startingBalance,
-    'wild': numWilds,
-  };
-}
-
-export function sumWallet(wallet) {
-  let sum = 0;
-  for (let value of Object.values(wallet)) {
-    sum += value;
+/**
+ * Summary. Carries coins for buying cards.
+ *
+ * Description. Used by PlayerBase and BankBase classes. Not used by CardBase.
+ * If the startingBalance is set above 0, we assume this is a wallet for the 
+ * BankBase and thus set the wilds to 5.
+ *
+ */
+export default class Wallet {
+  constructor(startingBalance = 0) {
+    this.white = startingBalance;
+    this.blue = startingBalance;
+    this.green = startingBalance;
+    this.red = startingBalance;
+    this.black = startingBalance;
+    this.wild = 0 < startingBalance ? 5 : 0;  // max 5 wild coins for all games
   }
-  return sum;
+
+  sum() {
+    return this.white + this.blue + this.green + this.red + this.black + this.wild;
+  }
 }

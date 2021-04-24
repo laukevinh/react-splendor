@@ -97,22 +97,26 @@ var level2 = [
     ['red',5,0,0,7,3,0],
 ];
 
-function convertToObj(array) {
-  return {
-    'color': array[0],
-    'points': array[1],
-    'price': {
-      'white': array[2],
-      'blue': array[3],
-      'green': array[4],
-      'red': array[5],
-      'black': array[6]
-    },
+export class Price {
+  constructor(white, blue, green, red, black) {
+    this.white = white;
+    this.blue = blue;
+    this.green = green;
+    this.red = red;
+    this.black = black;
+  }
+}
+
+class CardBase {
+  constructor(color, points, white, blue, green, red, black) {
+    this.color = color;
+    this.points = points;
+    this.price = new Price(white, blue, green, red, black);
   }
 }
 
 function convertLevel(level) {
-  return level.map(cardArray => convertToObj(cardArray));
+  return level.map(([color, points, white, blue, green, red, black]) => new CardBase(color, points, white, blue, green, red, black));
 }
 
 var decks = [convertLevel(level0), convertLevel(level1), convertLevel(level2)];

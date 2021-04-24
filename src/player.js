@@ -1,7 +1,8 @@
 import React from 'react';
-import { Button, Grid, Card, Modal } from 'semantic-ui-react'
+import { Button, Grid, Modal } from 'semantic-ui-react'
 import CardModal from './cardModal';
 import renderPrice, { Coin, GameCard, RESERVED } from './utils';
+import Wallet from './wallet';
 
 export default class Player extends React.Component {
   constructor(props) {
@@ -22,7 +23,7 @@ export default class Player extends React.Component {
       <Grid className={activePlayer}>
         <Grid.Row columns={2}>
           <Grid.Column>{this.props.points}</Grid.Column>
-          <Grid.Column textAlign="right">{this.props.playerName}</Grid.Column>
+          <Grid.Column textAlign="right">{this.props.name}</Grid.Column>
         </Grid.Row>
         <Grid.Row columns={6}>
           {coins}
@@ -54,7 +55,7 @@ class ModalPlayerDetails extends React.Component {
 
   render() {
     const open = this.state.open;
-    const playerName = this.props.playerName;
+    const name = this.props.name;
     const cards = Object.entries(this.props.cards).map(([color, cardArray]) => {
       const cardArrayFormatted = Object.values(cardArray).map(card => {
         return (
@@ -101,7 +102,7 @@ class ModalPlayerDetails extends React.Component {
         <Modal.Header>
           <Grid columns={2}>
             <Grid.Column>{this.props.points}</Grid.Column>
-            <Grid.Column textAlign="right">{playerName}</Grid.Column>
+            <Grid.Column textAlign="right">{name}</Grid.Column>
           </Grid>
         </Modal.Header>
         <Modal.Content>
@@ -123,4 +124,38 @@ class ModalPlayerDetails extends React.Component {
     );
   }
 
+}
+
+class PurchasedCards {
+  constructor() {
+    this.white = [];
+    this.blue = [];
+    this.green = [];
+    this.red = [];
+    this.black = [];
+  }
+}
+
+export class PlayerBase {
+  constructor(name, position) {
+    this.coins = new Wallet();
+    this.cards = new PurchasedCards();
+    this.reserved = [];
+    this.points = 0;
+    this.noblemen = [];
+    this.name = name;
+    this.position = position;
+  }
+
+  reserve(card) {
+    this.reserved.push(card);
+  }
+
+  addNoble(noble) {
+    this.noblemen.push(noble);
+  }
+
+  addPoints(points) {
+    this.points += points;
+  }
 }

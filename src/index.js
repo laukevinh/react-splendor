@@ -5,14 +5,13 @@ import decks from './cards';
 import Board from './board';
 import Bank from './bank';
 import { allNoblemen } from './noblemen';
-import Noblemen from './noblemen';
-import ModalNoblemen from './noblemenModal';
-import Player from './player';
-import Wallet, { sumWallet } from './wallet';
+import Noblemen, { ModalNoblemen } from './noblemen';
+import Player, { PlayerBase } from './player';
+import Wallet from './wallet';
 import 'semantic-ui-css/semantic.min.css';
 import { Grid, Card } from 'semantic-ui-react';
 import ReturnCoinsModal from './returnCoinsModal';
-import { calculateCharge, DECK, BOARD, RESERVED } from './utils';
+import { calculateCharge, shuffle, WILD, DECK, BOARD, RESERVED } from './utils';
 
 class Game extends React.Component {
   constructor(props) {
@@ -23,11 +22,16 @@ class Game extends React.Component {
     this.handleReserve = this.handleReserve.bind(this);
     this.handleNoblemenSelection = this.handleNoblemenSelection.bind(this);
     let shuffledDecks = [
-      this.shuffle(decks[0]),
-      this.shuffle(decks[1]),
-      this.shuffle(decks[2]),
+      shuffle(decks[0]),
+      shuffle(decks[1]),
+      shuffle(decks[2]),
     ];
     let cards = this.initCards(shuffledDecks);
+    const maxCoins = {
+      2:4,  // in 2 player game, bank carries max 4 coins per color
+      3:5,
+      4:7,
+    };
     
     this.state = {
       history: [{
@@ -36,7 +40,7 @@ class Game extends React.Component {
       }],
       players: this.initPlayers(props.numPlayers),
       currentPlayerIdx: 0,
-      bankCoins: Wallet(true, props.numPlayers),
+      bankCoins: new Wallet(maxCoins[props.numPlayers]),
       returnCoinsModalOpen: false,
       stepNumber: 0,
       moveHistory: [null],
@@ -56,21 +60,7 @@ class Game extends React.Component {
   initPlayers(numPlayers) {
     let players = Array(numPlayers);
     for (let i=0; i < numPlayers; i++) {
-      players[i] = {
-        coins: Wallet(false, numPlayers),
-        cards: {
-          'white': [],
-          'blue': [],
-          'green': [],
-          'red': [],
-          'black': [],
-        },
-        reserved: [],
-        points: 0,
-        noblemen: [],
-        playerName: "player" + i,
-        position: i,
-      };
+      players[i] = new PlayerBase("player" + i, i);
     }
     return players;
   }
@@ -88,23 +78,7 @@ class Game extends React.Component {
   }
 
   initNoblemen(numPlayers) {
-    return this.shuffle(allNoblemen).slice(0, numPlayers + 1);
-  }
-
-  shuffle(A) {
-    function randInt(i, j) {
-      return Math.floor(Math.random() * (j - i) + i);
-    }
-    function swap(A, i, j) {
-      let temp = A[i];
-      A[i] = A[j];
-      A[j] = temp;
-    }
-    let n = A.length;
-    for (let k = 0; k < n; k++) {
-      swap(A, k, randInt(0, n - 1));
-    }
-    return A;
+    return shuffle(allNoblemen).slice(0, numPlayers + 1);
   }
 
   handleCollectCoins(coins) {
@@ -115,7 +89,7 @@ class Game extends React.Component {
       bankCoins[color] -= coins[color];
       playerCoins[color] += coins[color];
     }
-    if (10 < sumWallet(playerCoins)) {
+    if (10 < playerCoins.sum()) {
       // trigger modal
       this.setState({
         players: players,
@@ -167,7 +141,7 @@ class Game extends React.Component {
     }
     // add card and points to player
     playerCards[card.color].push(card);
-    player.points += card.points;
+    player.addPoints(card.points);
     // replace card on the board
     // TODO don't replace if there remaining deck is 0
     // TODO after buying from reserved, close all modals
@@ -199,10 +173,10 @@ class Game extends React.Component {
     if (card === null) {
       return;
     }
-    player.reserved.push(card);
-    if (0 < bankCoins['wild']) {
-      player.coins['wild']++;
-      bankCoins['wild']--;
+    player.reserve(card);
+    if (0 < bankCoins[WILD]) {
+      player.coins[WILD]++;
+      bankCoins[WILD]--;
     }
     // replace card on the board
     // TODO if source is top of deck don't replace
@@ -219,7 +193,7 @@ class Game extends React.Component {
       cards: cards,
       decks: decks,
     });
-    if (10 < sumWallet(player.coins)) {
+    if (10 < player.coins.sum()) {
       // trigger modal
       this.setState({ returnCoinsModalOpen: true });
     } else {
@@ -237,13 +211,13 @@ class Game extends React.Component {
 
   declareWinner(playersRanked) {
     let msg = playersRanked.map((player, idx) => {
-      return `\n${idx+1}. ${player.playerName} ${player.points}`;
+      return `\n${idx+1}. ${player.name} ${player.points}`;
     })
     alert("Winner: \n" + msg);
   }
 
   displayRank(playersRanked) {
-    return playersRanked.map((player, idx) => `\n${idx+1}. ${player.playerName} : ${player.points}`);
+    return playersRanked.map((player, idx) => `\n${idx+1}. ${player.name} : ${player.points}`);
   }
 
   listSelectableNoblemen(player, noblemen) {
@@ -272,8 +246,8 @@ class Game extends React.Component {
     let noblemen = this.state.noblemen.slice();
     let noble = noblemen[nobleIndex];
     noble.isDisplayed = false;
-    player.noblemen.push(noble);
-    player.points += noble.points;
+    player.addNoble(noble);
+    player.addPoints(noble.points);
     this.setState({
       players: players,
       noblemen: noblemen,
@@ -349,7 +323,7 @@ class Game extends React.Component {
       const playersRanked = this.rank(this.state.players);
       status = "Game Over:\n" + this.displayRank(playersRanked);
     } else {
-      status = "Next player: " + this.state.players[currentPlayerIdx].playerName;
+      status = "Next player: " + this.state.players[currentPlayerIdx].name;
     }
 
     let moves = history.map((step, move) => { //move is the index

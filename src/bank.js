@@ -1,7 +1,7 @@
 import React from 'react';
 import Wallet from './wallet';
 import { Coin, WILD } from './utils';
-import { Button, Grid, Icon, Modal } from 'semantic-ui-react'
+import { Button, Grid, Modal } from 'semantic-ui-react'
 
 export default class Bank extends React.Component {
   constructor(props) {
@@ -39,7 +39,7 @@ class ModalPickCoins extends React.Component {
     this.state = {
       open: false,
       bankCoins: props.coins,
-      tempCoins: Wallet(false),
+      tempCoins: new Wallet(),
       bankCoinsSelectable: this.initBankCoinsSelectable(props.coins),
       numTempCoins: 0,
       handleCollectCoins: props.handleCollectCoins,
@@ -135,7 +135,7 @@ class ModalPickCoins extends React.Component {
   }
   
   handleConfirm(coins) {
-    this.setState({tempCoins: Wallet(false), open: false});  // reset temp coins
+    this.setState({tempCoins: new Wallet(), open: false});  // reset temp coins
     this.state.handleCollectCoins(coins);
   }
   

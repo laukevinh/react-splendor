@@ -1,5 +1,5 @@
 import React from 'react';
-import Wallet, { sumWallet } from './wallet';
+import Wallet from './wallet';
 import { Coin } from './utils';
 import { Button, Grid, Modal } from 'semantic-ui-react';
 
@@ -11,8 +11,8 @@ export default class ReturnCoinsModal extends React.Component {
     this.state = {
       open: false,
       playerCoins: props.coins,
-      numPlayerCoins: sumWallet(props.coins),
-      tempCoins: Wallet(false),
+      numPlayerCoins: props.coins.sum(),
+      tempCoins: new Wallet(),
       refreshState: true,
     }
   }
@@ -21,8 +21,8 @@ export default class ReturnCoinsModal extends React.Component {
     if (!this.props.finished && this.props.open && this.state.refreshState) {
       this.setState({
         playerCoins: this.props.coins,
-        numPlayerCoins: sumWallet(this.props.coins),
-        tempCoins: Wallet(false),
+        numPlayerCoins: this.props.coins.sum(),
+        tempCoins: new Wallet(),
         refreshState: false,
       });
     }
@@ -60,7 +60,7 @@ export default class ReturnCoinsModal extends React.Component {
   
   handleConfirm(coins) {
     this.setState({
-      tempCoins: Wallet(false),
+      tempCoins: new Wallet(),
       open: false,
       refreshState: true,
     });  // reset temp coins

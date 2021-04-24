@@ -48,7 +48,7 @@ body {
   font-size: 24px;
   font-weight: normal;
   line-height: 34px;
-  height: 260px;
+  height: 240px;
   padding: 0;
   text-align: center;
 }
@@ -113,6 +113,23 @@ body {
   border: 1px solid #eee;
   margin: 3px;
   padding: 3px;
+}
+
+.coinContainer {
+  position: relative;
+  display: inline-flex;
+}
+
+.coinContent {
+  position: absolute;
+  /* top: 50%; */
+  /* left: 50%; */
+  /* transform: translate(-50%, -50%); */
+  bottom: 4px;
+  margin-left: 13px;
+  /* width: 100%; */
+  height: auto;
+  color: #fff;
 }
 
 .modal.bank > .content > .row > .coin {

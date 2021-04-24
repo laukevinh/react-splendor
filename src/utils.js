@@ -1,7 +1,13 @@
-import React, { isValidElement } from 'react';
+import React from 'react';
 import 'semantic-ui-css/semantic.min.css';
-import { Grid } from 'semantic-ui-react';
+import { Image } from 'semantic-ui-react';
 import Wallet from './wallet';
+import whiteCoin from './assets/white-coin.png';
+import blueCoin from './assets/blue-coin.png';
+import greenCoin from './assets/green-coin.png';
+import redCoin from './assets/red-coin.png';
+import blackCoin from './assets/black-coin.png';
+import wildCoin from './assets/wild-coin.png';
 
 export const DECK = 'deck';
 export const BOARD = 'board';
@@ -23,7 +29,7 @@ export default function renderPrice(price, type) {
       } else if (type === 'game-card') {
         elem = <GameCard color={color} content={colorPrice} />;
       }
-      prices.push(<Grid.Row>{elem}</Grid.Row>);
+      prices.push(elem);
     }
   }
   return (prices);
@@ -38,31 +44,42 @@ export function Coin(props) {
   } else {
     displayClass = "";
   }
-  const classNames = ["coin", props.color, displayClass].join(" ");
+  const classNames = ["coinContainer", displayClass].join(" ");
+  let imgSrc;
+  if (props.color === WHITE) {
+    imgSrc = whiteCoin;
+  } else if (props.color === BLUE) {
+    imgSrc = blueCoin;
+  } else if (props.color === GREEN) {
+    imgSrc = greenCoin;
+  } else if (props.color === RED) {
+    imgSrc = redCoin;
+  } else if (props.color === BLACK) {
+    imgSrc = blackCoin;
+  } else if (props.color === WILD) {
+    imgSrc = wildCoin;
+  } else {
+    imgSrc = null;
+  }
   return (
     <div
       className={classNames}
       onClick={() => {props.onClick && !props.disabled ? props.onClick(props.color) : void(0)}}
     >
-      {props.content}
+      <Image src={imgSrc} size='mini' />
+      <div className='coinContent'>{props.content}</div>
     </div>
   );
 }
 
 export function GameCard(props) {
   let displayClass;
-  if (props.selectable) {
+  if (props.selectable === true) {
     displayClass = "selectable";
   } else {
     displayClass = "";
   }
-  let size;
-  if (props.size) {
-    size = props.size;
-  } else {
-    size = "mini"
-  }
-  const classNames = ["game-card", size, props.color, displayClass].join(" ");
+  const classNames = ["game-card", props.size || "mini", props.color, displayClass].join(" ");
   return (
     <div
       className={classNames}
@@ -71,33 +88,9 @@ export function GameCard(props) {
     </div>
   );
 }
-// export class GameCard extends React.Component {
-//   constructor(props) {
-//     super(props);
-//   }
-//   render() {
-//     console.log("GameCard valid component?", isValidElement(this));
-//     console.log("div valid component?", isValidElement(<div></div>));
-//     const { selectable, color, content } = this.props;
-//     let displayClass;
-//     if (selectable) {
-//       displayClass = "selectable";
-//     } else {
-//       displayClass = "";
-//     }
-//     const classNames = ["game-card", "mini", color, displayClass].join(" ");
-//     return (
-//       <div
-//         className={classNames}
-//       >
-//         {content}
-//       </div>
-//     );
-//   }
-// }
 
 export function calculateCharge(price, playerWallet, playerCards) {
-  let charge = Wallet(false);
+  let charge = new Wallet();
   let response = {
     insufficientFunds: null,
     charge: charge,
@@ -120,4 +113,22 @@ export function calculateCharge(price, playerWallet, playerCards) {
   }
   response.insufficientFunds = false;
   return response;
+}
+
+function randInt(i, j) {
+  return Math.floor(Math.random() * (j - i) + i);
+}
+
+function swap(A, i, j) {
+  let temp = A[i];
+  A[i] = A[j];
+  A[j] = temp;
+}
+
+export function shuffle(A) {
+  let n = A.length;
+  for (let k = 0; k < n; k++) {
+    swap(A, k, randInt(0, n - 1));
+  }
+  return A;
 }

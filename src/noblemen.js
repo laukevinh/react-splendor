@@ -1,5 +1,6 @@
 import React from 'react';
-import { Grid } from 'semantic-ui-react';
+import { Grid, Modal } from 'semantic-ui-react';
+import { Price } from './cards';
 import renderPrice from './utils'
 
 var VP = 3;
@@ -29,21 +30,31 @@ var nobles = [
   [VP, 0, 0, 0, 0, 1],
 ];
 
-function convertToObj(array) {
-  return {
-    'points': array[0],
-    'price': {
-      'white': array[1],
-      'blue': array[2],
-      'green': array[3],
-      'red': array[4],
-      'black': array[5]
-    },
-    'isDisplayed': true,
+class NobleBase {
+  constructor(points, white, blue, green, red, black, isDisplayed) {
+    this.points = points;
+    this.price = new Price(white, blue, green, red, black);
+    this.isDisplayed = isDisplayed;
   }
 }
 
-export const allNoblemen = nobles.map(noble => convertToObj(noble));
+export const allNoblemen = nobles.map(([points, white, blue, green, red, black]) => new NobleBase(points, white, blue, green, red, black, true));
+
+function Noble(props) {
+  const isDisplayed = props.isDisplayed;
+  const selectable = props.selectable ? "selectable" : "";
+  const classNames = ["noble", selectable].join(" ");
+  return isDisplayed ? (
+    <div className={classNames}>
+      <Grid.Row>
+        VP: {props.points}
+      </Grid.Row>
+      {renderPrice(props.price, "game-card")}
+    </div>
+  ) : (
+    <></>
+  );
+}
 
 export default class Noblemen extends React.Component {
   constructor(props) {
@@ -51,24 +62,69 @@ export default class Noblemen extends React.Component {
   }
   render() {
     const noblemen = this.props.noblemen.map(noble => {
-      return noble.isDisplayed ? (
+      return (
         <Grid.Column>
-          <div className="noble">
-            <Grid.Row>
-              VP: {noble.points}
-            </Grid.Row>
-            {renderPrice(noble.price, "game-card")}
-          </div>
+          <Noble
+            points={noble.points}
+            price={noble.price}
+            isDisplayed={noble.isDisplayed}
+          />
         </Grid.Column>
-      ) : (
-        <></>
-      )
+      );
     });
     
     return (
       <Grid columns={this.props.noblemen.length}>
         {noblemen}
       </Grid>
+    );
+  }
+}
+
+export class ModalNoblemen extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      open: props.open,
+    };
+  }
+
+  handleConfirm(nobleIndex) {
+    this.setState({open: false});
+    this.props.handleNoblemenSelection(nobleIndex);
+  }
+
+  handleSelect(index) {
+    this.setState({selectedNoble: index});
+  }
+
+  render() {
+    // noblemen only contains the ones you're qualified to select
+    const noblemen = this.props.selectableNoblemen.map((selectable, idx) => {
+      const noble = this.props.noblemen[idx];
+      return selectable ? (
+        <Grid.Column onClick={() => this.handleConfirm(idx)}>
+          <Noble
+            points={noble.points}
+            price={noble.price}
+            isDisplayed={noble.isDisplayed}
+            selectable
+          />
+        </Grid.Column>
+      ) : (
+        <Grid.Column></Grid.Column>
+      )
+    });
+    
+    return (
+      <Modal open={this.props.open}>
+        <Modal.Header>Select Noble</Modal.Header>
+        <Modal.Content>
+          <Grid columns={noblemen.length}>
+            {noblemen}
+          </Grid>
+        </Modal.Content>
+      </Modal>
     );
   }
 }
