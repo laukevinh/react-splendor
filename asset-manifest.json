@@ -1,0 +1,30 @@
+{
+  "files": {
+    "main.css": "/react-splendor/static/css/main.ece98876.chunk.css",
+    "main.js": "/react-splendor/static/js/main.bad0eb4d.chunk.js",
+    "main.js.map": "/react-splendor/static/js/main.bad0eb4d.chunk.js.map",
+    "runtime-main.js": "/react-splendor/static/js/runtime-main.1199b771.js",
+    "runtime-main.js.map": "/react-splendor/static/js/runtime-main.1199b771.js.map",
+    "static/css/2.2a214776.chunk.css": "/react-splendor/static/css/2.2a214776.chunk.css",
+    "static/js/2.7478598a.chunk.js": "/react-splendor/static/js/2.7478598a.chunk.js",
+    "static/js/2.7478598a.chunk.js.map": "/react-splendor/static/js/2.7478598a.chunk.js.map",
+    "index.html": "/react-splendor/index.html",
+    "static/css/2.2a214776.chunk.css.map": "/react-splendor/static/css/2.2a214776.chunk.css.map",
+    "static/css/main.ece98876.chunk.css.map": "/react-splendor/static/css/main.ece98876.chunk.css.map",
+    "static/js/2.7478598a.chunk.js.LICENSE.txt": "/react-splendor/static/js/2.7478598a.chunk.js.LICENSE.txt",
+    "static/media/black-coin.184968ab.png": "/react-splendor/static/media/black-coin.184968ab.png",
+    "static/media/blue-coin.dd9993c7.png": "/react-splendor/static/media/blue-coin.dd9993c7.png",
+    "static/media/semantic.min.css": "/react-splendor/static/media/outline-icons.ddae9b1b.woff",
+    "static/media/green-coin.d0135588.png": "/react-splendor/static/media/green-coin.d0135588.png",
+    "static/media/red-coin.97467f0f.png": "/react-splendor/static/media/red-coin.97467f0f.png",
+    "static/media/white-coin.eb7204ef.png": "/react-splendor/static/media/white-coin.eb7204ef.png",
+    "static/media/wild-coin.fcf1c1c1.png": "/react-splendor/static/media/wild-coin.fcf1c1c1.png"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.1199b771.js",
+    "static/css/2.2a214776.chunk.css",
+    "static/js/2.7478598a.chunk.js",
+    "static/css/main.ece98876.chunk.css",
+    "static/js/main.bad0eb4d.chunk.js"
+  ]
+}
