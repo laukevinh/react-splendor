@@ -115,9 +115,20 @@ body {
   padding: 3px;
 }
 
+.circle {
+  border-radius: 50%;
+  height: 36px;
+  width: 36px;
+  text-align: center;
+  font-size: 1.5em;
+  border: 3px solid #eee;
+  margin: 3px;
+  padding: 3px;
+}
+
 .coinContainer {
   position: relative;
-  display: inline-flex;
+  display: inline flex;
 }
 
 .coinContent {
@@ -130,6 +141,12 @@ body {
   /* width: 100%; */
   height: auto;
   color: #fff;
+}
+
+.icon {
+  position: relative;
+  top: 24px;
+  left: -12px;
 }
 
 .modal.bank > .content > .row > .coin {

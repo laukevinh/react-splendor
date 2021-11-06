@@ -16,7 +16,7 @@ function Coin(props) {
   } else {
     displayClass = "";
   }
-  const classNames = ["coinContainer", displayClass].join(" ");
+  const classNames = ["circle", props.color, displayClass].join(" ");
   let imgSrc;
   if (props.color === WHITE) {
     imgSrc = whiteCoin;
@@ -34,15 +34,16 @@ function Coin(props) {
     imgSrc = null;
   }
   return (
-    <div
-      className={classNames}
-      onClick={() => { props.onClick && !props.disabled ? props.onClick(props.color) : void (0) }}
-    >
-      <Image src={imgSrc} size='mini' />
-      <div className='coinContent'>{props.content}</div>
+    <div className={'coinContainer'}>
+      <div
+        className={classNames}
+        onClick={() => { props.onClick && !props.disabled ? props.onClick(props.color) : void (0) }}
+      >
+        {props.content}
+      </div>
+      <img className={'icon'} src={imgSrc} width={16} height={16} />
     </div>
   );
 }
-
 
 export default Coin;
