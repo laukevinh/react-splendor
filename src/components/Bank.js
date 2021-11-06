@@ -1,6 +1,6 @@
 import React from 'react';
-import Wallet from './wallet';
-import { Coin, WILD } from './utils';
+import Wallet from './Wallet';
+import { Coin, WILD } from '../utils';
 import { Button, Grid, Modal } from 'semantic-ui-react'
 
 export default class Bank extends React.Component {
@@ -12,7 +12,7 @@ export default class Bank extends React.Component {
     const coins = Object.entries(this.props.coins).map(([color, count], idx) => {
       return (
         <Grid.Row>
-          <Coin color={color} content={count}/>
+          <Coin color={color} content={count} />
         </Grid.Row>
       );
     });
@@ -20,7 +20,7 @@ export default class Bank extends React.Component {
       <Grid.Column>
         {coins}
         <Grid.Row>
-          <ModalPickCoins 
+          <ModalPickCoins
             coins={this.props.coins}
             handleCollectCoins={this.props.handleCollectCoins}
             finished={this.props.finished}
@@ -133,12 +133,12 @@ class ModalPickCoins extends React.Component {
       bankCoinsSelectable: bankCoinsSelectable,
     });
   }
-  
+
   handleConfirm(coins) {
-    this.setState({tempCoins: new Wallet(), open: false});  // reset temp coins
+    this.setState({ tempCoins: new Wallet(), open: false });  // reset temp coins
     this.state.handleCollectCoins(coins);
   }
-  
+
   handleCancel() {
     let bankCoins = Object.assign({}, this.state.bankCoins);
     let tempCoins = Object.assign({}, this.state.tempCoins);
@@ -158,8 +158,8 @@ class ModalPickCoins extends React.Component {
     const open = this.state.open;
     const coins = Object.entries(this.state.bankCoins).map(([color, count], idx) => {
       const disabled = !this.state.bankCoinsSelectable[color];
-      const bankCoinButton = <Coin color={color} content={count} disabled={disabled} onClick={this.handleCoinTake}/>;
-      const tempCoinButton = <Coin color={color} content={this.state.tempCoins[color]} onClick={this.handleCoinReturn}/>;
+      const bankCoinButton = <Coin color={color} content={count} disabled={disabled} onClick={this.handleCoinTake} />;
+      const tempCoinButton = <Coin color={color} content={this.state.tempCoins[color]} onClick={this.handleCoinReturn} />;
       return color !== WILD ? (
         <Grid.Row>
           {bankCoinButton}
@@ -181,7 +181,7 @@ class ModalPickCoins extends React.Component {
         <Modal.Header>Select Coins</Modal.Header>
         <Modal.Content>{coins}</Modal.Content>
         <Modal.Actions>
-          <Button 
+          <Button
             color='black'
             content="Cancel"
             onClick={() => this.handleCancel()}

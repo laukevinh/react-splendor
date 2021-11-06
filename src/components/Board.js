@@ -1,9 +1,7 @@
 import React from 'react';
-import './index.css';
-import 'semantic-ui-css/semantic.min.css';
 import { Grid, Card } from 'semantic-ui-react';
-import CardModal from './cardModal';
-import { DECK, BOARD } from './utils';
+import CardModal from './CardModal';
+import { DECK, BOARD } from '../utils';
 
 export default class Board extends React.Component {
   constructor(props) {
@@ -28,7 +26,7 @@ export default class Board extends React.Component {
       for (let col = 0; col < 4; col++) {
         let card = cards[level][col];
         cols.push(
-          <CardModal 
+          <CardModal
             source={BOARD}
             level={level}
             column={col}

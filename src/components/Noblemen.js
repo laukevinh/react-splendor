@@ -1,8 +1,8 @@
 import React from 'react';
 import { Grid, Modal } from 'semantic-ui-react';
-import Price from './components/Price';
+import Price from './Price';
 
-import renderPrice from './utils'
+import renderPrice from '../utils'
 
 var VP = 3;
 

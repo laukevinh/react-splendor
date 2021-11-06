@@ -1,11 +1,11 @@
-import Board from '../board';
-import Bank from '../bank';
-import { allNoblemen } from '../noblemen';
-import Noblemen, { ModalNoblemen } from '../noblemen';
-import Player, { PlayerBase } from '../player';
-import Wallet from '../wallet';
+import Board from './Board';
+import Bank from './Bank';
+import { allNoblemen } from './Noblemen';
+import Noblemen, { ModalNoblemen } from './Noblemen';
+import Player, { PlayerBase } from './Player';
+import Wallet from './Wallet';
 import { Grid, Card } from 'semantic-ui-react';
-import ReturnCoinsModal from '../returnCoinsModal';
+import ReturnCoinsModal from './ReturnCoinsModal';
 import { calculateCharge, shuffle, WILD, DECK, BOARD, RESERVED } from '../utils';
 import React from 'react';
 import cardData from "../constants/cardData.json";

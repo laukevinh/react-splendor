@@ -1,6 +1,6 @@
 import React from 'react';
-import Wallet from './wallet';
-import { Coin } from './utils';
+import Wallet from './Wallet';
+import { Coin } from '../utils';
 import { Button, Grid, Modal } from 'semantic-ui-react';
 
 export default class ReturnCoinsModal extends React.Component {
@@ -57,7 +57,7 @@ export default class ReturnCoinsModal extends React.Component {
       numPlayerCoins: this.state.numPlayerCoins + 1,
     });
   }
-  
+
   handleConfirm(coins) {
     this.setState({
       tempCoins: new Wallet(),
@@ -69,11 +69,11 @@ export default class ReturnCoinsModal extends React.Component {
 
   render() {
     let open = this.props.open;
-    
+
     const coins = Object.entries(this.state.playerCoins).map(([color, count], idx) => {
       const disabled = count <= 0;
-      const playerCoinButton = <Coin color={color} content={count} disabled={disabled} onClick={this.handleCoinTake}/>;
-      const tempCoinButton = <Coin color={color} content={this.state.tempCoins[color]} onClick={this.handleCoinReturn}/>;
+      const playerCoinButton = <Coin color={color} content={count} disabled={disabled} onClick={this.handleCoinTake} />;
+      const tempCoinButton = <Coin color={color} content={this.state.tempCoins[color]} onClick={this.handleCoinReturn} />;
       return (
         <Grid.Row>
           {playerCoinButton}
@@ -81,7 +81,7 @@ export default class ReturnCoinsModal extends React.Component {
         </Grid.Row>
       );
     });
-    
+
     return (
       <Modal
         className="bank"

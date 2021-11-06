@@ -1,9 +1,7 @@
 import React from 'react';
-import './index.css';
-import 'semantic-ui-css/semantic.min.css';
 import { Grid, Card, Modal, Button } from 'semantic-ui-react';
-import renderPrice, { BOARD, calculateCharge, RESERVED, DECK, GameCard } from './utils';
-import { Coin } from './utils';
+import renderPrice, { BOARD, calculateCharge, RESERVED, DECK, GameCard } from '../utils';
+import { Coin } from '../utils';
 
 export default class CardModal extends React.Component {
   constructor(props) {
@@ -12,23 +10,23 @@ export default class CardModal extends React.Component {
       open: false,
     };
   }
-  
+
   setOpen(open) {
     if (!this.props.finished) {
-      this.setState({open: open});
+      this.setState({ open: open });
     }
   }
-  
+
   handleReserve(source, level, column, card) {
-    this.setState({open: false});
+    this.setState({ open: false });
     this.props.handleReserve(source, level, column, card); //assume props is okay, don't need to use state
   }
-  
+
   handleConfirm(source, level, column, index, card) {
-    this.setState({open: false});
+    this.setState({ open: false });
     this.props.handleBuy(source, level, column, index, card); //assume props is okay, don't need to use state
   }
-  
+
   render() {
     let { source, level, column, index, card, playerWallet, playerCards, deck } = this.props;
     let color;
@@ -105,7 +103,7 @@ export default class CardModal extends React.Component {
         <Modal.Header>{modalHeader}</Modal.Header>
         <Modal.Content>{modalContent}</Modal.Content>
         <Modal.Actions>
-          <Button 
+          <Button
             color='black'
             content="Cancel"
             onClick={() => this.setOpen(false)}

@@ -1,7 +1,7 @@
 import React from 'react';
 import 'semantic-ui-css/semantic.min.css';
 import { Image } from 'semantic-ui-react';
-import Wallet from './wallet';
+import Wallet from './components/Wallet';
 import whiteCoin from './assets/white-coin.png';
 import blueCoin from './assets/blue-coin.png';
 import greenCoin from './assets/green-coin.png';
@@ -64,7 +64,7 @@ export function Coin(props) {
   return (
     <div
       className={classNames}
-      onClick={() => {props.onClick && !props.disabled ? props.onClick(props.color) : void(0)}}
+      onClick={() => { props.onClick && !props.disabled ? props.onClick(props.color) : void (0) }}
     >
       <Image src={imgSrc} size='mini' />
       <div className='coinContent'>{props.content}</div>
