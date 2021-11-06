@@ -1,7 +1,7 @@
 import React from 'react';
 import Wallet from './Wallet';
-import { Coin } from '../utils';
 import { Button, Grid, Modal } from 'semantic-ui-react';
+import Coin from './Coin';
 
 export default class ReturnCoinsModal extends React.Component {
   constructor(props) {

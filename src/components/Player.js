@@ -1,8 +1,9 @@
 import React from 'react';
 import { Button, Grid, Modal } from 'semantic-ui-react'
 import CardModal from './CardModal';
-import renderPrice, { Coin, GameCard, RESERVED } from '../utils';
+import renderPrice, { GameCard, RESERVED } from '../utils';
 import Wallet from './Wallet';
+import Coin from './Coin';
 
 export default class Player extends React.Component {
   constructor(props) {
