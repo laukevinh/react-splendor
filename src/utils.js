@@ -8,7 +8,7 @@ import greenCoin from './assets/green-coin.png';
 import redCoin from './assets/red-coin.png';
 import blackCoin from './assets/black-coin.png';
 import wildCoin from './assets/wild-coin.png';
-import Coin from './objects/Coin';
+import Coin from './components/Coin';
 
 export const DECK = 'deck';
 export const BOARD = 'board';
