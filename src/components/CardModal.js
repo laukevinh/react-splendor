@@ -1,7 +1,7 @@
 import React from 'react';
 import { Grid, Card, Modal, Button } from 'semantic-ui-react';
 import renderPrice, { BOARD, calculateCharge, RESERVED, DECK, GameCard } from '../utils';
-import Coin from './Coin';
+import Coin from '../objects/Coin';
 
 export default class CardModal extends React.Component {
   constructor(props) {

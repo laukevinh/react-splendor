@@ -1,14 +1,14 @@
 import React from 'react';
 import 'semantic-ui-css/semantic.min.css';
 import { Image } from 'semantic-ui-react';
-import Wallet from './components/Wallet';
+import Wallet from './objects/Wallet';
 import whiteCoin from './assets/white-coin.png';
 import blueCoin from './assets/blue-coin.png';
 import greenCoin from './assets/green-coin.png';
 import redCoin from './assets/red-coin.png';
 import blackCoin from './assets/black-coin.png';
 import wildCoin from './assets/wild-coin.png';
-import Coin from './components/Coin';
+import Coin from './objects/Coin';
 
 export const DECK = 'deck';
 export const BOARD = 'board';

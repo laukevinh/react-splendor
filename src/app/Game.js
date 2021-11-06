@@ -3,14 +3,14 @@ import Bank from '../components/Bank';
 import { allNoblemen } from '../components/Noblemen';
 import Noblemen, { ModalNoblemen } from '../components/Noblemen';
 import Player, { PlayerBase } from '../components/Player';
-import Wallet from '../components/Wallet';
+import Wallet from '../objects/Wallet';
 import { Grid, Card } from 'semantic-ui-react';
 import ReturnCoinsModal from '../components/ReturnCoinsModal';
 import { calculateCharge, shuffle, WILD, DECK, BOARD, RESERVED } from '../utils';
 import React from 'react';
 import cardData from "../constants/cardData.json";
 import nobleData from "../constants/nobleData.json";
-import Mine from '../components/Mine';
+import Mine from '../objects/Mine';
 
 class Game extends React.Component {
   constructor(props) {
