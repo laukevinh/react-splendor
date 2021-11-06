@@ -1,7 +1,7 @@
 import React from 'react';
 import Wallet from '../objects/Wallet';
 import { WILD } from '../utils';
-import { Button, Grid, Modal } from 'semantic-ui-react'
+import { Button, Container, Grid, Modal } from 'semantic-ui-react'
 import Coin from './Coin';
 
 export default class Bank extends React.Component {
@@ -12,22 +12,18 @@ export default class Bank extends React.Component {
   render() {
     const coins = Object.entries(this.props.coins).map(([color, count], idx) => {
       return (
-        <Grid.Row>
-          <Coin color={color} content={count} />
-        </Grid.Row>
+        <Coin color={color}>{count}</Coin>
       );
     });
     return (
-      <Grid.Column>
+      <Container>
         {coins}
-        <Grid.Row>
-          <ModalPickCoins
-            coins={this.props.coins}
-            handleCollectCoins={this.props.handleCollectCoins}
-            finished={this.props.finished}
-          />
-        </Grid.Row>
-      </Grid.Column>
+        <ModalPickCoins
+          coins={this.props.coins}
+          handleCollectCoins={this.props.handleCollectCoins}
+          finished={this.props.finished}
+        />
+      </Container>
     );
   }
 }
@@ -159,8 +155,8 @@ class ModalPickCoins extends React.Component {
     const open = this.state.open;
     const coins = Object.entries(this.state.bankCoins).map(([color, count], idx) => {
       const disabled = !this.state.bankCoinsSelectable[color];
-      const bankCoinButton = <Coin color={color} content={count} disabled={disabled} onClick={this.handleCoinTake} />;
-      const tempCoinButton = <Coin color={color} content={this.state.tempCoins[color]} onClick={this.handleCoinReturn} />;
+      const bankCoinButton = <Coin color={color} disabled={disabled} onClick={this.handleCoinTake}>{count}</Coin>;
+      const tempCoinButton = <Coin color={color} onClick={this.handleCoinReturn}>{this.state.tempCoins[color]}</Coin>;
       return color !== WILD ? (
         <Grid.Row>
           {bankCoinButton}

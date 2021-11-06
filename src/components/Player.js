@@ -12,11 +12,11 @@ export default class Player extends React.Component {
 
   render() {
     const coins = Object.entries(this.props.coins).map(([color, count], idx) => {
-      const coin = <Coin color={color} content={count} />;
+      const coin = <Coin color={color}>{count}</Coin>;
       return <Grid.Column>{0 < count && coin}</Grid.Column>;
     });
     const cards = Object.entries(this.props.cards).map(([color, cardArray]) => {
-      const card = <GameCard color={color} content={cardArray.length} />;
+      const card = <GameCard color={color}>{cardArray.length}</GameCard>;
       return <Grid.Column>{0 < cardArray.length && card}</Grid.Column>;
     });
     const activePlayer = this.props.activePlayer && !this.props.finished ? "active" : null;
@@ -61,7 +61,7 @@ class ModalPlayerDetails extends React.Component {
       const cardArrayFormatted = Object.values(cardArray).map(card => {
         return (
           <Grid.Row>
-            <GameCard size="small" color={card.color} content={renderPrice(card.price, "coin")} />
+            <GameCard size="small" color={card.color}>{renderPrice(card.price, "coin")}</GameCard>
           </Grid.Row>
         );
       });

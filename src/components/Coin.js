@@ -39,7 +39,7 @@ function Coin(props) {
         className={classNames}
         onClick={() => { props.onClick && !props.disabled ? props.onClick(props.color) : void (0) }}
       >
-        {props.content}
+        {props.children}
       </div>
       <img className={'icon'} src={imgSrc} width={16} height={16} />
     </div>

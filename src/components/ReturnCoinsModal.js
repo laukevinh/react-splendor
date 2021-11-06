@@ -72,8 +72,8 @@ export default class ReturnCoinsModal extends React.Component {
 
     const coins = Object.entries(this.state.playerCoins).map(([color, count], idx) => {
       const disabled = count <= 0;
-      const playerCoinButton = <Coin color={color} content={count} disabled={disabled} onClick={this.handleCoinTake} />;
-      const tempCoinButton = <Coin color={color} content={this.state.tempCoins[color]} onClick={this.handleCoinReturn} />;
+      const playerCoinButton = <Coin color={color} disabled={disabled} onClick={this.handleCoinTake}>{count}</Coin>;
+      const tempCoinButton = <Coin color={color} onClick={this.handleCoinReturn}>{this.state.tempCoins[color]}</Coin>;
       return (
         <Grid.Row>
           {playerCoinButton}
