@@ -7,10 +7,6 @@ body {
   margin-bottom: 10px;
 }
 
-.game-players {
-  padding-left: 100px;
-}
-
 .active {
   border: 5px solid #000;
 }
@@ -153,11 +149,6 @@ body {
   display: inline-block;
 }
 
-.game {
-  display: flex;
-  flex-direction: row;
-}
-
-.game-info {
-  margin-left: 20px;
+.ui.container.large {
+  width: 1500px;
 }
