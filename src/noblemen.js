@@ -1,6 +1,7 @@
 import React from 'react';
 import { Grid, Modal } from 'semantic-ui-react';
-import { Price } from './cards';
+import Price from './components/Price';
+
 import renderPrice from './utils'
 
 var VP = 3;
@@ -72,7 +73,7 @@ export default class Noblemen extends React.Component {
         </Grid.Column>
       );
     });
-    
+
     return (
       <Grid columns={this.props.noblemen.length}>
         {noblemen}
@@ -90,12 +91,12 @@ export class ModalNoblemen extends React.Component {
   }
 
   handleConfirm(nobleIndex) {
-    this.setState({open: false});
+    this.setState({ open: false });
     this.props.handleNoblemenSelection(nobleIndex);
   }
 
   handleSelect(index) {
-    this.setState({selectedNoble: index});
+    this.setState({ selectedNoble: index });
   }
 
   render() {
@@ -115,7 +116,7 @@ export class ModalNoblemen extends React.Component {
         <Grid.Column></Grid.Column>
       )
     });
-    
+
     return (
       <Modal open={this.props.open}>
         <Modal.Header>Select Noble</Modal.Header>

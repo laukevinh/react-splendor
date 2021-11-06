@@ -1,4 +1,3 @@
-import decks from '../cards';
 import Board from '../board';
 import Bank from '../bank';
 import { allNoblemen } from '../noblemen';
@@ -9,6 +8,9 @@ import { Grid, Card } from 'semantic-ui-react';
 import ReturnCoinsModal from '../returnCoinsModal';
 import { calculateCharge, shuffle, WILD, DECK, BOARD, RESERVED } from '../utils';
 import React from 'react';
+import cardData from "../constants/cardData.json";
+import nobleData from "../constants/nobleData.json";
+import Mine from './Mine';
 
 class Game extends React.Component {
   constructor(props) {
@@ -19,9 +21,9 @@ class Game extends React.Component {
     this.handleReserve = this.handleReserve.bind(this);
     this.handleNoblemenSelection = this.handleNoblemenSelection.bind(this);
     let shuffledDecks = [
-      shuffle(decks[0]),
-      shuffle(decks[1]),
-      shuffle(decks[2]),
+      shuffle(this.prepareCards(cardData["0"])),
+      shuffle(this.prepareCards(cardData["1"])),
+      shuffle(this.prepareCards(cardData["2"])),
     ];
     let cards = this.initCards(shuffledDecks);
     const maxCoins = {
@@ -52,6 +54,15 @@ class Game extends React.Component {
       maxReserve: 3,
       finished: false,
     };
+  }
+
+  prepareCards(cardsArray) {
+    return cardsArray.map(([
+      color, points, white, blue, green, red, black
+    ]) => {
+      return new Mine(color, points, white, blue, green, red, black)
+    }
+    );
   }
 
   initPlayers(numPlayers) {
