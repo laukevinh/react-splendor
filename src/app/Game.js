@@ -4,7 +4,7 @@ import { allNoblemen } from '../components/Noblemen';
 import Noblemen, { ModalNoblemen } from '../components/Noblemen';
 import Player, { PlayerBase } from '../components/Player';
 import Wallet from '../objects/Wallet';
-import { Grid, Card, Container } from 'semantic-ui-react';
+import { Grid, Container, Button, Menu } from 'semantic-ui-react';
 import ReturnCoinsModal from '../components/ReturnCoinsModal';
 import { calculateCharge, shuffle, WILD, DECK, BOARD, RESERVED } from '../utils';
 import React from 'react';
@@ -354,52 +354,70 @@ class Game extends React.Component {
     });
 
     return (
-      <Container className={'large'}>
-        <Grid>
-          <Grid.Column width={4}>
-            {players}
-          </Grid.Column>
-          <Grid.Column width={2}>
-            <Bank
-              coins={this.state.bankCoins}
-              handleCollectCoins={this.handleCollectCoins}
-              finished={finished}
-            />
-            <ReturnCoinsModal
-              coins={this.state.players[currentPlayerIdx].coins}
-              open={this.state.returnCoinsModalOpen}
-              handleReturnCoins={this.handleReturnCoins}
-            />
-          </Grid.Column>
-          <Grid.Column width={7}>
-            <Grid.Row>
-              <Noblemen noblemen={noblemen} />
-            </Grid.Row>
-            <Grid.Row>
-              <ModalNoblemen
-                noblemen={noblemen}
-                selectableNoblemen={selectableNoblemen}
-                handleNoblemenSelection={this.handleNoblemenSelection}
-                open={noblemenSelectionOpen}
-              />
-            </Grid.Row>
-            <Grid.Row>
-              <Board
-                cards={cards}
-                decks={decks}
-                playerWallet={this.state.players[currentPlayerIdx].coins}
-                playerCards={this.state.players[currentPlayerIdx].cards}
-                handleBuy={this.handleBuy}
-                handleReserve={this.handleReserve}
+      <>
+        <Menu>
+          <Container>
+            <Menu.Item header>
+              <h1>Splendor</h1>
+            </Menu.Item>
+            <Menu.Item header>
+              <h1>Target: {this.state.pointsToWin}</h1>
+            </Menu.Item>
+            <Menu.Item>
+              <Button>New Game</Button>
+            </Menu.Item>
+            <Menu.Item>
+              <Button>Settings</Button>
+            </Menu.Item>
+          </Container>
+        </Menu>
+        <Container className={'large'} style={{ marginTop: '3em' }}>
+          <Grid>
+            <Grid.Column width={4}>
+              {players}
+            </Grid.Column>
+            <Grid.Column width={2}>
+              <Bank
+                coins={this.state.bankCoins}
+                handleCollectCoins={this.handleCollectCoins}
                 finished={finished}
               />
-            </Grid.Row>
-          </Grid.Column>
-          <Grid.Column width={3}>
-            <History status={status} moves={moves} />
-          </Grid.Column>
-        </Grid>
-      </Container>
+              <ReturnCoinsModal
+                coins={this.state.players[currentPlayerIdx].coins}
+                open={this.state.returnCoinsModalOpen}
+                handleReturnCoins={this.handleReturnCoins}
+              />
+            </Grid.Column>
+            <Grid.Column width={7}>
+              <Grid.Row>
+                <Noblemen noblemen={noblemen} />
+              </Grid.Row>
+              <Grid.Row>
+                <ModalNoblemen
+                  noblemen={noblemen}
+                  selectableNoblemen={selectableNoblemen}
+                  handleNoblemenSelection={this.handleNoblemenSelection}
+                  open={noblemenSelectionOpen}
+                />
+              </Grid.Row>
+              <Grid.Row>
+                <Board
+                  cards={cards}
+                  decks={decks}
+                  playerWallet={this.state.players[currentPlayerIdx].coins}
+                  playerCards={this.state.players[currentPlayerIdx].cards}
+                  handleBuy={this.handleBuy}
+                  handleReserve={this.handleReserve}
+                  finished={finished}
+                />
+              </Grid.Row>
+            </Grid.Column>
+            <Grid.Column width={3}>
+              <History status={status} moves={moves} />
+            </Grid.Column>
+          </Grid>
+        </Container>
+      </>
     ); // is the entire ordered list of moves getting re-rendered? or only what has changed?
   }
 }
