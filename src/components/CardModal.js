@@ -49,7 +49,7 @@ export default class CardModal extends React.Component {
                 <Grid>
                   <Grid.Row columns={2}>
                     <Grid.Column><Coin color={color} /></Grid.Column>
-                    <Grid.Column textAlign="right">{points}</Grid.Column>
+                    <Grid.Column textAlign="right" className={"pointValue"}>{points}</Grid.Column>
                   </Grid.Row>
                 </Grid>
               </Card.Header>

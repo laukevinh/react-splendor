@@ -4,7 +4,7 @@ import { allNoblemen } from '../components/Noblemen';
 import Noblemen, { ModalNoblemen } from '../components/Noblemen';
 import Player, { PlayerBase } from '../components/Player';
 import Wallet from '../objects/Wallet';
-import { Grid, Container, Button, Menu } from 'semantic-ui-react';
+import { Grid, Container, Button, Menu, Divider } from 'semantic-ui-react';
 import ReturnCoinsModal from '../components/ReturnCoinsModal';
 import { calculateCharge, shuffle, WILD, DECK, BOARD, RESERVED } from '../utils';
 import React from 'react';
@@ -320,12 +320,15 @@ class Game extends React.Component {
     const current = history[this.state.stepNumber];
     const players = Object.values(this.state.players).map((player) => {
       return (
-        <Player
-          {...player}
-          activePlayer={player.position === currentPlayerIdx}
-          finished={finished}
-          handleBuy={this.handleBuy}
-        />
+        <>
+          <Player
+            {...player}
+            activePlayer={player.position === currentPlayerIdx}
+            finished={finished}
+            handleBuy={this.handleBuy}
+          />
+          <Divider />
+        </>
       );
     });
     let status;
@@ -335,23 +338,6 @@ class Game extends React.Component {
     } else {
       status = "Next player: " + this.state.players[currentPlayerIdx].name;
     }
-
-    let moves = history.map((step, move) => { //move is the index
-      const col = moveHistory[move] % 3;
-      const row = Math.floor(moveHistory[move] / 3);
-      const desc = move ?
-        "Go to move #" + move + " (" + col + ", " + row + ")" :
-        "Go to game start";
-      return (
-        <li key={move}>
-          <button
-            className={(move === this.state.stepNumber) ? "bold" : ""}
-          >
-            {desc}
-          </button>
-        </li>
-      );
-    });
 
     return (
       <>
@@ -413,7 +399,7 @@ class Game extends React.Component {
               </Grid.Row>
             </Grid.Column>
             <Grid.Column width={3}>
-              <History status={status} moves={moves} />
+              <History status={status} />
             </Grid.Column>
           </Grid>
         </Container>
