@@ -139,7 +139,7 @@ body {
   color: #fff;
 }
 
-.icon {
+.circle + .icon {
   position: relative;
   top: 24px;
   left: -12px;
@@ -151,4 +151,18 @@ body {
 
 .ui.container.large {
   width: 1500px;
+}
+
+.ui.container.large.padded {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.ui.container.horizontal {
+  display: block flex;
+}
+
+.pointValue {
+  font-size: 2rem;
+  font-weight: 800;
 }

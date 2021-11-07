@@ -4,7 +4,7 @@ import { allNoblemen } from '../components/Noblemen';
 import Noblemen, { ModalNoblemen } from '../components/Noblemen';
 import Player, { PlayerBase } from '../components/Player';
 import Wallet from '../objects/Wallet';
-import { Grid, Container, Button, Menu, Divider } from 'semantic-ui-react';
+import { Grid, Container, Button, Menu, Divider, Dropdown } from 'semantic-ui-react';
 import ReturnCoinsModal from '../components/ReturnCoinsModal';
 import { calculateCharge, shuffle, WILD, DECK, BOARD, RESERVED } from '../utils';
 import React from 'react';
@@ -13,6 +13,7 @@ import nobleData from "../constants/nobleData.json";
 import Mine from '../objects/Mine';
 import History from '../components/History';
 import DesktopLayout from '../layouts/desktop';
+import { MAX_COINS } from '../constants/defaults';
 
 class Game extends React.Component {
   constructor(props) {
@@ -28,11 +29,6 @@ class Game extends React.Component {
       shuffle(this.prepareCards(cardData["2"])),
     ];
     let cards = this.initCards(shuffledDecks);
-    const maxCoins = {
-      2: 4,  // in 2 player game, bank carries max 4 coins per color
-      3: 5,
-      4: 7,
-    };
 
     this.state = {
       history: [{
@@ -41,7 +37,7 @@ class Game extends React.Component {
       }],
       players: this.initPlayers(props.numPlayers),
       currentPlayerIdx: 0,
-      bankCoins: new Wallet(maxCoins[props.numPlayers]),
+      bankCoins: new Wallet(MAX_COINS[props.numPlayers]),
       returnCoinsModalOpen: false,
       stepNumber: 0,
       moveHistory: [null],
@@ -55,7 +51,74 @@ class Game extends React.Component {
       pointsToWin: props.pointsToWin,
       maxReserve: 3,
       finished: false,
+      isNewGame: props.isNewGame
     };
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.isNewGame === true) {
+      let shuffledDecks = [
+        shuffle(this.prepareCards(cardData["0"])),
+        shuffle(this.prepareCards(cardData["1"])),
+        shuffle(this.prepareCards(cardData["2"])),
+      ];
+      let cards = this.initCards(shuffledDecks);
+
+      this.setState((state, props) => {
+        props.setIsNewGame(false);
+        return {
+          players: this.initPlayers(state.numPlayers),
+          currentPlayerIdx: 0,
+          bankCoins: new Wallet(MAX_COINS[props.numPlayers]),
+          returnCoinsModalOpen: false,
+          stepNumber: 0,
+          moveHistory: [null],
+          historyReversed: false,
+          cards: cards,
+          decks: shuffledDecks,
+          noblemen: this.initNoblemen(props.numPlayers),
+          noblemenSelectionOpen: false,
+          selectableNoblemen: [],
+          numPlayers: props.numPlayers,
+          pointsToWin: props.pointsToWin,
+          maxReserve: 3,
+          finished: false,
+          isNewGame: false
+        };
+      });
+    }
+  }
+
+  initializeNewGame() {
+    let shuffledDecks = [
+      shuffle(this.prepareCards(cardData["0"])),
+      shuffle(this.prepareCards(cardData["1"])),
+      shuffle(this.prepareCards(cardData["2"])),
+    ];
+    let cards = this.initCards(shuffledDecks);
+
+    this.setState((state, props) => {
+      console.log(props);
+      return {
+        players: this.initPlayers(state.numPlayers),
+        currentPlayerIdx: 0,
+        bankCoins: new Wallet(MAX_COINS[props.numPlayers]),
+        returnCoinsModalOpen: false,
+        stepNumber: 0,
+        moveHistory: [null],
+        historyReversed: false,
+        cards: cards,
+        decks: shuffledDecks,
+        noblemen: this.initNoblemen(props.numPlayers),
+        noblemenSelectionOpen: false,
+        selectableNoblemen: [],
+        numPlayers: props.numPlayers,
+        pointsToWin: props.pointsToWin,
+        maxReserve: 3,
+        finished: false,
+        isNewGame: props.isNewGame
+      };
+    });
   }
 
   prepareCards(cardsArray) {
@@ -340,70 +403,53 @@ class Game extends React.Component {
     }
 
     return (
-      <>
-        <Menu>
-          <Container>
-            <Menu.Item header>
-              <h1>Splendor</h1>
-            </Menu.Item>
-            <Menu.Item header>
-              <h1>Target: {this.state.pointsToWin}</h1>
-            </Menu.Item>
-            <Menu.Item>
-              <Button>New Game</Button>
-            </Menu.Item>
-            <Menu.Item>
-              <Button>Settings</Button>
-            </Menu.Item>
-          </Container>
-        </Menu>
-        <Container className={'large'} style={{ marginTop: '3em' }}>
-          <Grid>
-            <Grid.Column width={4}>
-              {players}
-            </Grid.Column>
-            <Grid.Column width={2}>
-              <Bank
-                coins={this.state.bankCoins}
-                handleCollectCoins={this.handleCollectCoins}
+
+      <Container className={'large'} style={{ marginTop: '3em' }}>
+        <Grid>
+          <Grid.Column width={4}>
+            {players}
+          </Grid.Column>
+          <Grid.Column width={2}>
+            <Bank
+              coins={this.state.bankCoins}
+              handleCollectCoins={this.handleCollectCoins}
+              finished={finished}
+            />
+            <ReturnCoinsModal
+              coins={this.state.players[currentPlayerIdx].coins}
+              open={this.state.returnCoinsModalOpen}
+              handleReturnCoins={this.handleReturnCoins}
+            />
+          </Grid.Column>
+          <Grid.Column width={7}>
+            <Grid.Row>
+              <Noblemen noblemen={noblemen} />
+            </Grid.Row>
+            <Grid.Row>
+              <ModalNoblemen
+                noblemen={noblemen}
+                selectableNoblemen={selectableNoblemen}
+                handleNoblemenSelection={this.handleNoblemenSelection}
+                open={noblemenSelectionOpen}
+              />
+            </Grid.Row>
+            <Grid.Row>
+              <Board
+                cards={cards}
+                decks={decks}
+                playerWallet={this.state.players[currentPlayerIdx].coins}
+                playerCards={this.state.players[currentPlayerIdx].cards}
+                handleBuy={this.handleBuy}
+                handleReserve={this.handleReserve}
                 finished={finished}
               />
-              <ReturnCoinsModal
-                coins={this.state.players[currentPlayerIdx].coins}
-                open={this.state.returnCoinsModalOpen}
-                handleReturnCoins={this.handleReturnCoins}
-              />
-            </Grid.Column>
-            <Grid.Column width={7}>
-              <Grid.Row>
-                <Noblemen noblemen={noblemen} />
-              </Grid.Row>
-              <Grid.Row>
-                <ModalNoblemen
-                  noblemen={noblemen}
-                  selectableNoblemen={selectableNoblemen}
-                  handleNoblemenSelection={this.handleNoblemenSelection}
-                  open={noblemenSelectionOpen}
-                />
-              </Grid.Row>
-              <Grid.Row>
-                <Board
-                  cards={cards}
-                  decks={decks}
-                  playerWallet={this.state.players[currentPlayerIdx].coins}
-                  playerCards={this.state.players[currentPlayerIdx].cards}
-                  handleBuy={this.handleBuy}
-                  handleReserve={this.handleReserve}
-                  finished={finished}
-                />
-              </Grid.Row>
-            </Grid.Column>
-            <Grid.Column width={3}>
-              <History status={status} />
-            </Grid.Column>
-          </Grid>
-        </Container>
-      </>
+            </Grid.Row>
+          </Grid.Column>
+          <Grid.Column width={3}>
+            <History status={status} />
+          </Grid.Column>
+        </Grid>
+      </Container>
     ); // is the entire ordered list of moves getting re-rendered? or only what has changed?
   }
 }

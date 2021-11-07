@@ -2,11 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import 'semantic-ui-css/semantic.min.css';
-import Game from './app/Game';
+import App from './app/App';
 
 // ========================================
 
 ReactDOM.render(
-  <Game numPlayers={2} pointsToWin={3} />,
+  <App />,
   document.getElementById('root')
 );
