@@ -31,17 +31,11 @@ class Game extends React.Component {
     let cards = this.initCards(shuffledDecks);
 
     this.state = {
-      history: [{
-        cards: [Array(4), Array(4), Array(4)],
-        players: this.initPlayers(props.numPlayers),
-      }],
       players: this.initPlayers(props.numPlayers),
       currentPlayerIdx: 0,
       bankCoins: new Wallet(MAX_COINS[props.numPlayers]),
       returnCoinsModalOpen: false,
       stepNumber: 0,
-      moveHistory: [null],
-      historyReversed: false,
       cards: cards,
       decks: shuffledDecks,
       noblemen: this.initNoblemen(props.numPlayers),
@@ -67,13 +61,11 @@ class Game extends React.Component {
       this.setState((state, props) => {
         props.setIsNewGame(false);
         return {
-          players: this.initPlayers(state.numPlayers),
+          players: this.initPlayers(props.numPlayers),
           currentPlayerIdx: 0,
           bankCoins: new Wallet(MAX_COINS[props.numPlayers]),
           returnCoinsModalOpen: false,
           stepNumber: 0,
-          moveHistory: [null],
-          historyReversed: false,
           cards: cards,
           decks: shuffledDecks,
           noblemen: this.initNoblemen(props.numPlayers),
@@ -87,38 +79,6 @@ class Game extends React.Component {
         };
       });
     }
-  }
-
-  initializeNewGame() {
-    let shuffledDecks = [
-      shuffle(this.prepareCards(cardData["0"])),
-      shuffle(this.prepareCards(cardData["1"])),
-      shuffle(this.prepareCards(cardData["2"])),
-    ];
-    let cards = this.initCards(shuffledDecks);
-
-    this.setState((state, props) => {
-      console.log(props);
-      return {
-        players: this.initPlayers(state.numPlayers),
-        currentPlayerIdx: 0,
-        bankCoins: new Wallet(MAX_COINS[props.numPlayers]),
-        returnCoinsModalOpen: false,
-        stepNumber: 0,
-        moveHistory: [null],
-        historyReversed: false,
-        cards: cards,
-        decks: shuffledDecks,
-        noblemen: this.initNoblemen(props.numPlayers),
-        noblemenSelectionOpen: false,
-        selectableNoblemen: [],
-        numPlayers: props.numPlayers,
-        pointsToWin: props.pointsToWin,
-        maxReserve: 3,
-        finished: false,
-        isNewGame: props.isNewGame
-      };
-    });
   }
 
   prepareCards(cardsArray) {
@@ -379,8 +339,7 @@ class Game extends React.Component {
   }
 
   render() {
-    const { history, moveHistory, cards, decks, noblemen, noblemenSelectionOpen, selectableNoblemen, currentPlayerIdx, numPlayers, finished } = this.state;
-    const current = history[this.state.stepNumber];
+    const { cards, decks, noblemen, noblemenSelectionOpen, selectableNoblemen, currentPlayerIdx, numPlayers, finished } = this.state;
     const players = Object.values(this.state.players).map((player) => {
       return (
         <>
