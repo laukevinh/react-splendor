@@ -64,7 +64,7 @@ export default class ReturnCoinsModal extends React.Component {
       open: false,
       refreshState: true,
     });  // reset temp coins
-    this.props.handleReturnCoins(coins);
+    this.props.handleCoinTransaction(coins, false);
   }
 
   render() {

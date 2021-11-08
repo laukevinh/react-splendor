@@ -14,7 +14,7 @@ export default function Bank(props) {
       {coins}
       <ModalPickCoins
         coins={props.coins}
-        handleCollectCoins={props.handleCollectCoins}
+        handleCoinTransaction={props.handleCoinTransaction}
         finished={props.finished}
       />
     </Container>
@@ -32,7 +32,7 @@ class ModalPickCoins extends React.Component {
       tempCoins: new Wallet(),
       bankCoinsSelectable: this.initBankCoinsSelectable(props.coins),
       numTempCoins: 0,
-      handleCollectCoins: props.handleCollectCoins,
+      handleCoinTransaction: props.handleCoinTransaction,
     };
   }
 
@@ -126,7 +126,7 @@ class ModalPickCoins extends React.Component {
 
   handleConfirm(coins) {
     this.setState({ tempCoins: new Wallet(), open: false });  // reset temp coins
-    this.state.handleCollectCoins(coins);
+    this.state.handleCoinTransaction(coins, true);
   }
 
   handleCancel() {

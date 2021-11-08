@@ -13,13 +13,12 @@ import nobleData from "../constants/nobleData.json";
 import Mine from '../objects/Mine';
 import History from '../components/History';
 import DesktopLayout from '../layouts/desktop';
-import { MAX_COINS } from '../constants/defaults';
+import { MAX_BANK_COINS, MAX_PLAYER_COINS } from '../constants/defaults';
 
 class Game extends React.Component {
   constructor(props) {
     super(props);
-    this.handleCollectCoins = this.handleCollectCoins.bind(this);
-    this.handleReturnCoins = this.handleReturnCoins.bind(this);
+    this.handleCoinTransaction = this.handleCoinTransaction.bind(this);
     this.handleBuy = this.handleBuy.bind(this);
     this.handleReserve = this.handleReserve.bind(this);
     this.handleNoblemenSelection = this.handleNoblemenSelection.bind(this);
@@ -33,7 +32,7 @@ class Game extends React.Component {
     this.state = {
       players: this.initPlayers(props.numPlayers),
       currentPlayerIdx: 0,
-      bankCoins: new Wallet(MAX_COINS[props.numPlayers]),
+      bankCoins: new Wallet(MAX_BANK_COINS[props.numPlayers]),
       returnCoinsModalOpen: false,
       stepNumber: 0,
       cards: cards,
@@ -63,7 +62,7 @@ class Game extends React.Component {
         return {
           players: this.initPlayers(props.numPlayers),
           currentPlayerIdx: 0,
-          bankCoins: new Wallet(MAX_COINS[props.numPlayers]),
+          bankCoins: new Wallet(MAX_BANK_COINS[props.numPlayers]),
           returnCoinsModalOpen: false,
           stepNumber: 0,
           cards: cards,
@@ -114,44 +113,35 @@ class Game extends React.Component {
     return shuffle(allNoblemen).slice(0, numPlayers + 1);
   }
 
-  handleCollectCoins(coins) {
-    let players = this.state.players.slice(0, this.state.numPlayers + 1);
-    let bankCoins = Object.assign({}, this.state.bankCoins);
-    let playerCoins = players[this.state.currentPlayerIdx].coins;
-    for (let color of Object.keys(coins)) {
-      bankCoins[color] -= coins[color];
-      playerCoins[color] += coins[color];
+  handleCoinTransaction(transactionAmountWallet, isPlayerCollecting) {
+    let players = this.state.players.slice();
+    let bankCoins = Object.assign(new Wallet(), this.state.bankCoins);
+    let player = players[this.state.currentPlayerIdx];
+    for (let color of Object.keys(transactionAmountWallet)) {
+      if (isPlayerCollecting) {
+        bankCoins[color] -= transactionAmountWallet[color];
+        player.coins[color] += transactionAmountWallet[color];
+      } else {
+        bankCoins[color] += transactionAmountWallet[color];
+        player.coins[color] -= transactionAmountWallet[color];
+      }
     }
-    if (10 < playerCoins.sum()) {
+
+    if (MAX_PLAYER_COINS < player.coins.sum()) {
       // trigger modal
       this.setState({
         players: players,
         bankCoins: bankCoins,
-        returnCoinsModalOpen: true,
+        returnCoinsModalOpen: true
       });
     } else {
       this.setState({
         players: players,
         bankCoins: bankCoins,
+        returnCoinsModalOpen: false
       });
       this.handleEndTurn();
     }
-  }
-
-  handleReturnCoins(coins) {
-    let players = this.state.players.slice(0, this.state.numPlayers + 1);
-    let bankCoins = Object.assign({}, this.state.bankCoins);
-    let playerCoins = players[this.state.currentPlayerIdx].coins;
-    for (let color of Object.keys(coins)) {
-      bankCoins[color] += coins[color];
-      playerCoins[color] -= coins[color];
-    }
-    this.setState({
-      players: players,
-      bankCoins: bankCoins,
-      returnCoinsModalOpen: false,
-    });
-    this.handleEndTurn();
   }
 
   handleBuy(source, level, column, index, card) {
@@ -371,13 +361,13 @@ class Game extends React.Component {
           <Grid.Column width={2}>
             <Bank
               coins={this.state.bankCoins}
-              handleCollectCoins={this.handleCollectCoins}
+              handleCoinTransaction={this.handleCoinTransaction}
               finished={finished}
             />
             <ReturnCoinsModal
               coins={this.state.players[currentPlayerIdx].coins}
               open={this.state.returnCoinsModalOpen}
-              handleReturnCoins={this.handleReturnCoins}
+              handleCoinTransaction={this.handleCoinTransaction}
             />
           </Grid.Column>
           <Grid.Column width={7}>
