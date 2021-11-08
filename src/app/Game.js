@@ -13,7 +13,7 @@ import nobleData from "../constants/nobleData.json";
 import Mine from '../objects/Mine';
 import History from '../components/History';
 import DesktopLayout from '../layouts/desktop';
-import { MAX_BANK_COINS, MAX_PLAYER_COINS } from '../constants/defaults';
+import { MAX_BANK_COINS, MAX_BOARD_COLS, MAX_BOARD_ROWS, MAX_PLAYER_COINS } from '../constants/defaults';
 
 class Game extends React.Component {
   constructor(props) {
@@ -22,15 +22,11 @@ class Game extends React.Component {
     this.handleBuy = this.handleBuy.bind(this);
     this.handleReserve = this.handleReserve.bind(this);
     this.handleNoblemenSelection = this.handleNoblemenSelection.bind(this);
-    let shuffledDecks = [
-      shuffle(this.prepareCards(cardData["0"])),
-      shuffle(this.prepareCards(cardData["1"])),
-      shuffle(this.prepareCards(cardData["2"])),
-    ];
-    let cards = this.initCards(shuffledDecks);
+    let shuffledDecks = this.createDecks();
+    let cards = this.createBoard(shuffledDecks);
 
     this.state = {
-      players: this.initPlayers(props.numPlayers),
+      players: this.createPlayerBases(props.numPlayers),
       currentPlayerIdx: 0,
       bankCoins: new Wallet(MAX_BANK_COINS[props.numPlayers]),
       returnCoinsModalOpen: false,
@@ -50,23 +46,19 @@ class Game extends React.Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (this.props.isNewGame === true) {
-      let shuffledDecks = [
-        shuffle(this.prepareCards(cardData["0"])),
-        shuffle(this.prepareCards(cardData["1"])),
-        shuffle(this.prepareCards(cardData["2"])),
-      ];
-      let cards = this.initCards(shuffledDecks);
+      let shuffledDecks = this.createDecks();
+      let cards = this.createBoard(shuffledDecks);
 
       this.setState((state, props) => {
         props.setIsNewGame(false);
         return {
-          players: this.initPlayers(props.numPlayers),
+          players: this.createPlayerBases(props.numPlayers),
           currentPlayerIdx: 0,
           bankCoins: new Wallet(MAX_BANK_COINS[props.numPlayers]),
           returnCoinsModalOpen: false,
           stepNumber: 0,
           cards: cards,
-          decks: shuffledDecks,
+          decks: this.createDecks(),
           noblemen: this.initNoblemen(props.numPlayers),
           noblemenSelectionOpen: false,
           selectableNoblemen: [],
@@ -80,33 +72,34 @@ class Game extends React.Component {
     }
   }
 
-  prepareCards(cardsArray) {
-    return cardsArray.map(([
-      color, points, white, blue, green, red, black
-    ]) => {
-      return new Mine(color, points, white, blue, green, red, black)
-    }
-    );
+  createCards(cardDataList) {
+    return cardDataList.map((
+      [color, points, white, blue, green, red, black]
+    ) => {
+      return new Mine(color, points, white, blue, green, red, black);
+    });
   }
 
-  initPlayers(numPlayers) {
-    let players = Array(numPlayers);
-    for (let i = 0; i < numPlayers; i++) {
-      players[i] = new PlayerBase("player" + i, i);
-    }
-    return players;
+  createDecks() {
+    const levels = ["0", "1", "2"];
+    return levels.map(level => {
+      return shuffle(this.createCards(cardData[level]));
+    })
   }
 
-  initCards(decks) {
-    let cards = Array(3);
-    for (let i = 0; i < cards.length; i++) {
-      let row = Array(4);
-      for (let j = 0; j < row.length; j++) {
-        row[j] = decks[i].pop();
-      }
-      cards[i] = row;
-    }
-    return cards;
+  createBoard(decks) {
+    return Array(MAX_BOARD_ROWS).fill(undefined).map((e, idx) => {
+      return Array(MAX_BOARD_COLS).fill(undefined).map(() => {
+        const level = idx;
+        return decks[level].pop();
+      })
+    });
+  }
+
+  createPlayerBases(numPlayers) {
+    return Array(numPlayers).fill(undefined).map((e, idx) => {
+      return new PlayerBase(`Player ${idx}`, idx);
+    });
   }
 
   initNoblemen(numPlayers) {
