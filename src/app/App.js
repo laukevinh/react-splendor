@@ -1,6 +1,7 @@
 import React from "react";
 import Game from "./Game";
 import NavBar from "./NavBar";
+import { MIN_PLAYERS, MIN_POINTS_TO_WIN } from "../constants/defaults";
 
 class App extends React.Component {
   constructor(props) {
@@ -9,13 +10,9 @@ class App extends React.Component {
       NUM_OF_PLAYERS: [2, 3, 4],
       POINTS_TO_WIN: [15, 21]
     }
-    this.defaults = {
-      MIN_PLAYERS: 2,
-      MIN_POINTS_TO_WIN: 15,
-    }
     this.state = {
-      numPlayers: this.defaults.MIN_PLAYERS,
-      pointsToWin: this.defaults.MIN_POINTS_TO_WIN,
+      numPlayers: MIN_PLAYERS,
+      pointsToWin: MIN_POINTS_TO_WIN,
       isNewGame: false
     }
     this.createNewGame = this.createNewGame.bind(this);
@@ -50,7 +47,6 @@ class App extends React.Component {
           pointsToWin={pointsToWin}
           createNewGame={this.createNewGame}
           options={this.options}
-          defaults={this.defaults}
         />
         <Game
           numPlayers={numPlayers}
