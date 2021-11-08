@@ -4,28 +4,21 @@ import { WILD } from '../utils';
 import { Button, Container, Grid, Modal } from 'semantic-ui-react'
 import Coin from './Coin';
 
-export default class Bank extends React.Component {
-  constructor(props) {
-    super(props);
-  }
+export default function Bank(props) {
+  const coins = Object.entries(props.coins).map(([color, count], idx) => {
+    return <Coin color={color}>{count}</Coin>
+  });
 
-  render() {
-    const coins = Object.entries(this.props.coins).map(([color, count], idx) => {
-      return (
-        <Coin color={color}>{count}</Coin>
-      );
-    });
-    return (
-      <Container>
-        {coins}
-        <ModalPickCoins
-          coins={this.props.coins}
-          handleCollectCoins={this.props.handleCollectCoins}
-          finished={this.props.finished}
-        />
-      </Container>
-    );
-  }
+  return (
+    <Container>
+      {coins}
+      <ModalPickCoins
+        coins={props.coins}
+        handleCollectCoins={props.handleCollectCoins}
+        finished={props.finished}
+      />
+    </Container>
+  );
 }
 
 class ModalPickCoins extends React.Component {
