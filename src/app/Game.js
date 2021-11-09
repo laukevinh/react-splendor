@@ -26,18 +26,18 @@ class Game extends React.Component {
     let cards = this.createBoard(shuffledDecks);
 
     this.state = {
+      numPlayers: props.numPlayers,
+      pointsToWin: props.pointsToWin,
       players: this.createPlayerBases(props.numPlayers),
       currentPlayerIdx: 0,
       bank: new BankBase(props.numPlayers),
-      returnCoinsModalOpen: false,
-      cards: cards,
       decks: shuffledDecks,
-      noblemen: this.createNobles(props.numPlayers),
+      cards: cards,
+      nobles: this.createNobles(props.numPlayers),
+      finished: false,
+      returnCoinsModalOpen: false,
       noblemenSelectionOpen: false,
       selectableNoblemen: [],
-      numPlayers: props.numPlayers,
-      pointsToWin: props.pointsToWin,
-      finished: false,
       isNewGame: props.isNewGame
     };
   }
@@ -56,7 +56,7 @@ class Game extends React.Component {
           returnCoinsModalOpen: false,
           cards: cards,
           decks: this.createDecks(),
-          noblemen: this.createNobles(props.numPlayers),
+          nobles: this.createNobles(props.numPlayers),
           noblemenSelectionOpen: false,
           selectableNoblemen: [],
           numPlayers: props.numPlayers,
@@ -234,8 +234,8 @@ class Game extends React.Component {
     return playersRanked.map((player, idx) => `\n${idx + 1}. ${player.name} : ${player.points}`);
   }
 
-  listSelectableNoblemen(player, noblemen) {
-    let selectableNoblemen = noblemen.map(noble => {
+  listSelectableNoblemen(player, nobles) {
+    let selectableNoblemen = nobles.map(noble => {
       if (!noble.isDisplayed) {
         return false;
       } else {
@@ -257,14 +257,14 @@ class Game extends React.Component {
     const { currentPlayerIdx, numPlayers } = this.state;
     let players = this.state.players.slice();
     let player = players[currentPlayerIdx];
-    let noblemen = this.state.noblemen.slice();
-    let noble = noblemen[nobleIndex];
+    let nobles = this.state.nobles.slice();
+    let noble = nobles[nobleIndex];
     noble.isDisplayed = false;
     player.addNoble(noble);
     player.addPoints(noble.points);
     this.setState({
       players: players,
-      noblemen: noblemen,
+      nobles: nobles,
       selectableNoblemen: [],
       noblemenSelectionOpen: false,
     });
@@ -293,11 +293,11 @@ class Game extends React.Component {
     // qualify for nobleman?
     // toggle modal open -> let modal handle real end turn
     // no -> real end turn
-    const { players, noblemen, currentPlayerIdx, numPlayers } = this.state;
+    const { players, nobles, currentPlayerIdx, numPlayers } = this.state;
     const player = players[currentPlayerIdx];
     // TODO: BUG: if you qualify for 1 nobleman, you don't need to invest further to get the second... 
     // might only be a problem now because noblement aren't unique.
-    const selectableNoblemen = this.listSelectableNoblemen(player, noblemen);
+    const selectableNoblemen = this.listSelectableNoblemen(player, nobles);
     if (any(selectableNoblemen)) {
       this.setState({
         noblemenSelectionOpen: true,
@@ -311,7 +311,7 @@ class Game extends React.Component {
   }
 
   render() {
-    const { cards, decks, noblemen, noblemenSelectionOpen, selectableNoblemen, currentPlayerIdx, numPlayers, finished } = this.state;
+    const { cards, decks, nobles, noblemenSelectionOpen, selectableNoblemen, currentPlayerIdx, numPlayers, finished } = this.state;
     const players = Object.values(this.state.players).map((player) => {
       return (
         <>
@@ -353,9 +353,9 @@ class Game extends React.Component {
           </Grid.Column>
           <Grid.Column width={7}>
             <Grid.Row>
-              <Noblemen noblemen={noblemen} />
+              <Noblemen noblemen={nobles} />
               <ModalNoblemen
-                noblemen={noblemen}
+                noblemen={nobles}
                 selectableNoblemen={selectableNoblemen}
                 handleNoblemenSelection={this.handleNoblemenSelection}
                 open={noblemenSelectionOpen}
