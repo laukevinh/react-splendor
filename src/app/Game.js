@@ -2,8 +2,7 @@ import Board from '../components/Board';
 import Bank from '../components/Bank';
 import Noblemen, { ModalNoblemen } from '../components/Noblemen';
 import Player, { PlayerBase } from '../components/Player';
-import Wallet from '../objects/Wallet';
-import { Grid, Container, Button, Menu, Divider, Dropdown } from 'semantic-ui-react';
+import { Grid, Container, Divider } from 'semantic-ui-react';
 import ReturnCoinsModal from '../components/ReturnCoinsModal';
 import { calculateCharge, shuffle, WILD, DECK, BOARD, RESERVED, any, rank } from '../utils';
 import React from 'react';
@@ -12,8 +11,9 @@ import nobleData from "../constants/nobleData.json";
 import Mine from '../objects/Mine';
 import History from '../components/History';
 import DesktopLayout from '../layouts/desktop';
-import { MAX_BANK_COINS, MAX_BOARD_COLS, MAX_BOARD_ROWS, MAX_PLAYER_COINS } from '../constants/defaults';
+import { MAX_BOARD_COLS, MAX_BOARD_ROWS, MAX_PLAYER_COINS, MAX_PLAYER_RESERVATION } from '../constants/defaults';
 import { NobleBase } from '../objects/NobleBase';
+import BankBase from '../objects/BankBase';
 
 class Game extends React.Component {
   constructor(props) {
@@ -28,9 +28,8 @@ class Game extends React.Component {
     this.state = {
       players: this.createPlayerBases(props.numPlayers),
       currentPlayerIdx: 0,
-      bankCoins: new Wallet(MAX_BANK_COINS[props.numPlayers]),
+      bank: new BankBase(props.numPlayers),
       returnCoinsModalOpen: false,
-      stepNumber: 0,
       cards: cards,
       decks: shuffledDecks,
       noblemen: this.createNobles(props.numPlayers),
@@ -38,7 +37,6 @@ class Game extends React.Component {
       selectableNoblemen: [],
       numPlayers: props.numPlayers,
       pointsToWin: props.pointsToWin,
-      maxReserve: 3,
       finished: false,
       isNewGame: props.isNewGame
     };
@@ -54,9 +52,8 @@ class Game extends React.Component {
         return {
           players: this.createPlayerBases(props.numPlayers),
           currentPlayerIdx: 0,
-          bankCoins: new Wallet(MAX_BANK_COINS[props.numPlayers]),
+          bank: new BankBase(props.numPlayers),
           returnCoinsModalOpen: false,
-          stepNumber: 0,
           cards: cards,
           decks: this.createDecks(),
           noblemen: this.createNobles(props.numPlayers),
@@ -64,7 +61,6 @@ class Game extends React.Component {
           selectableNoblemen: [],
           numPlayers: props.numPlayers,
           pointsToWin: props.pointsToWin,
-          maxReserve: 3,
           finished: false,
           isNewGame: false
         };
@@ -111,14 +107,15 @@ class Game extends React.Component {
 
   handleCoinTransaction(transactionAmountWallet, isPlayerCollecting) {
     let players = this.state.players.slice();
-    let bankCoins = Object.assign(new Wallet(), this.state.bankCoins);
+    let bank = new BankBase();
+    Object.assign(bank.wallet, this.state.bank.wallet);
     let player = players[this.state.currentPlayerIdx];
     for (let color of Object.keys(transactionAmountWallet)) {
       if (isPlayerCollecting) {
-        bankCoins[color] -= transactionAmountWallet[color];
+        bank.wallet[color] -= transactionAmountWallet[color];
         player.coins[color] += transactionAmountWallet[color];
       } else {
-        bankCoins[color] += transactionAmountWallet[color];
+        bank.wallet[color] += transactionAmountWallet[color];
         player.coins[color] -= transactionAmountWallet[color];
       }
     }
@@ -127,13 +124,13 @@ class Game extends React.Component {
       // trigger modal
       this.setState({
         players: players,
-        bankCoins: bankCoins,
+        bank: bank,
         returnCoinsModalOpen: true
       });
     } else {
       this.setState({
         players: players,
-        bankCoins: bankCoins,
+        bank: bank,
         returnCoinsModalOpen: false
       });
       this.handleEndTurn();
@@ -147,7 +144,8 @@ class Game extends React.Component {
     let player = players[this.state.currentPlayerIdx];
     let playerWallet = player.coins;
     let playerCards = player.cards;
-    let bankCoins = Object.assign({}, this.state.bankCoins);
+    let bank = new BankBase();
+    Object.assign(bank.wallet, this.state.bank.wallet);
     let { insufficientFunds, charge } = calculateCharge(card.price, playerWallet, playerCards);
     if (insufficientFunds) {
       alert("Insufficient Funds");
@@ -156,7 +154,7 @@ class Game extends React.Component {
     // remove coins from player wallet and put coins back into bank
     for (let [color, price] of Object.entries(charge)) {
       playerWallet[color] -= price;
-      bankCoins[color] += price;
+      bank.wallet[color] += price;
     }
     // add card and points to player
     playerCards[card.color].push(card);
@@ -173,7 +171,7 @@ class Game extends React.Component {
     }
     this.setState({
       players: players,
-      bankCoins: bankCoins,
+      bank: bank,
       cards: cards,
       decks: decks,
     })
@@ -184,8 +182,9 @@ class Game extends React.Component {
     let players = this.state.players.slice(0, this.state.numPlayers + 1);
     let player = players[this.state.currentPlayerIdx];
     let reserved = player.reserved;
-    let bankCoins = Object.assign({}, this.state.bankCoins);
-    if (this.state.maxReserve <= reserved.length) {
+    let bank = new BankBase();
+    Object.assign(bank.wallet, this.state.bank.wallet);
+    if (MAX_PLAYER_RESERVATION <= reserved.length) {
       alert("exceeds max allow reservations");
       return;
     }
@@ -193,9 +192,9 @@ class Game extends React.Component {
       return;
     }
     player.reserve(card);
-    if (0 < bankCoins[WILD]) {
+    if (0 < bank.wallet[WILD]) {
       player.coins[WILD]++;
-      bankCoins[WILD]--;
+      bank.wallet[WILD]--;
     }
     // replace card on the board
     // TODO if source is top of deck don't replace
@@ -208,7 +207,7 @@ class Game extends React.Component {
     }
     this.setState({
       players: players,
-      bankCoins: bankCoins,
+      bank: bank,
       cards: cards,
       decks: decks,
     });
@@ -342,7 +341,7 @@ class Game extends React.Component {
           </Grid.Column>
           <Grid.Column width={2}>
             <Bank
-              coins={this.state.bankCoins}
+              coins={this.state.bank.wallet}
               handleCoinTransaction={this.handleCoinTransaction}
               finished={finished}
             />
