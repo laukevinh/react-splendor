@@ -1,6 +1,5 @@
 import Board from '../components/Board';
 import Bank from '../components/Bank';
-import { allNoblemen } from '../components/Noblemen';
 import Noblemen, { ModalNoblemen } from '../components/Noblemen';
 import Player, { PlayerBase } from '../components/Player';
 import Wallet from '../objects/Wallet';
@@ -14,6 +13,7 @@ import Mine from '../objects/Mine';
 import History from '../components/History';
 import DesktopLayout from '../layouts/desktop';
 import { MAX_BANK_COINS, MAX_BOARD_COLS, MAX_BOARD_ROWS, MAX_PLAYER_COINS } from '../constants/defaults';
+import { NobleBase } from '../objects/NobleBase';
 
 class Game extends React.Component {
   constructor(props) {
@@ -33,7 +33,7 @@ class Game extends React.Component {
       stepNumber: 0,
       cards: cards,
       decks: shuffledDecks,
-      noblemen: this.initNoblemen(props.numPlayers),
+      noblemen: this.createNobles(props.numPlayers),
       noblemenSelectionOpen: false,
       selectableNoblemen: [],
       numPlayers: props.numPlayers,
@@ -59,7 +59,7 @@ class Game extends React.Component {
           stepNumber: 0,
           cards: cards,
           decks: this.createDecks(),
-          noblemen: this.initNoblemen(props.numPlayers),
+          noblemen: this.createNobles(props.numPlayers),
           noblemenSelectionOpen: false,
           selectableNoblemen: [],
           numPlayers: props.numPlayers,
@@ -102,8 +102,11 @@ class Game extends React.Component {
     });
   }
 
-  initNoblemen(numPlayers) {
-    return shuffle(allNoblemen).slice(0, numPlayers + 1);
+  createNobles(numPlayers) {
+    let nobles = nobleData.map(([points, white, blue, green, red, black]) => {
+      return new NobleBase(points, white, blue, green, red, black, true)
+    });
+    return shuffle(nobles).slice(0, numPlayers + 1);
   }
 
   handleCoinTransaction(transactionAmountWallet, isPlayerCollecting) {
