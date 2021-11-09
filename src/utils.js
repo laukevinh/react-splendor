@@ -87,3 +87,16 @@ export function shuffle(A) {
   }
   return A;
 }
+
+export function any(array) {
+  for (let each of array) {
+    if (each === true) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export function rank(array, attribute) {
+  return array.slice().sort((a, b) => b[attribute] - a[attribute]);
+}

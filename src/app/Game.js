@@ -5,7 +5,7 @@ import Player, { PlayerBase } from '../components/Player';
 import Wallet from '../objects/Wallet';
 import { Grid, Container, Button, Menu, Divider, Dropdown } from 'semantic-ui-react';
 import ReturnCoinsModal from '../components/ReturnCoinsModal';
-import { calculateCharge, shuffle, WILD, DECK, BOARD, RESERVED } from '../utils';
+import { calculateCharge, shuffle, WILD, DECK, BOARD, RESERVED, any, rank } from '../utils';
 import React from 'react';
 import cardData from "../constants/cardData.json";
 import nobleData from "../constants/nobleData.json";
@@ -220,10 +220,6 @@ class Game extends React.Component {
     }
   }
 
-  rank(players) {
-    return players.slice().sort((a, b) => b.points - a.points);
-  }
-
   calculateWinner(playersRanked) {
     return this.state.pointsToWin <= playersRanked[0].points ? playersRanked[0] : null;
   }
@@ -279,7 +275,7 @@ class Game extends React.Component {
 
   handleWinner(players, currentPlayerIdx, numPlayers) {
     if (currentPlayerIdx + 1 === numPlayers) {  // check for winner at end of round
-      const playersRanked = this.rank(players);
+      const playersRanked = rank(players, 'points');
       const winner = this.calculateWinner(playersRanked);
       if (winner) {
         this.setState({ finished: true });
@@ -294,15 +290,6 @@ class Game extends React.Component {
     }
   }
 
-  any(array) {
-    for (let each of array) {
-      if (each === true) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   handleEndTurn() {
     // qualify for nobleman?
     // toggle modal open -> let modal handle real end turn
@@ -312,7 +299,7 @@ class Game extends React.Component {
     // TODO: BUG: if you qualify for 1 nobleman, you don't need to invest further to get the second... 
     // might only be a problem now because noblement aren't unique.
     const selectableNoblemen = this.listSelectableNoblemen(player, noblemen);
-    if (this.any(selectableNoblemen)) {
+    if (any(selectableNoblemen)) {
       this.setState({
         noblemenSelectionOpen: true,
         selectableNoblemen: selectableNoblemen,
@@ -341,14 +328,13 @@ class Game extends React.Component {
     });
     let status;
     if (finished) {  // check for winner at end of round
-      const playersRanked = this.rank(this.state.players);
+      const playersRanked = rank(this.state.players, 'points');
       status = "Game Over:\n" + this.displayRank(playersRanked);
     } else {
       status = "Next player: " + this.state.players[currentPlayerIdx].name;
     }
 
     return (
-
       <Container className={'large'} style={{ marginTop: '3em' }}>
         <Grid>
           <Grid.Column width={4}>
@@ -369,8 +355,6 @@ class Game extends React.Component {
           <Grid.Column width={7}>
             <Grid.Row>
               <Noblemen noblemen={noblemen} />
-            </Grid.Row>
-            <Grid.Row>
               <ModalNoblemen
                 noblemen={noblemen}
                 selectableNoblemen={selectableNoblemen}
@@ -395,7 +379,7 @@ class Game extends React.Component {
           </Grid.Column>
         </Grid>
       </Container>
-    ); // is the entire ordered list of moves getting re-rendered? or only what has changed?
+    );
   }
 }
 
