@@ -23,7 +23,7 @@ class Game extends React.Component {
     this.handleReserve = this.handleReserve.bind(this);
     this.handleNoblemenSelection = this.handleNoblemenSelection.bind(this);
     let shuffledDecks = this.createDecks();
-    let cards = this.createBoard(shuffledDecks);
+    let board = this.createBoard(shuffledDecks);
 
     this.state = {
       numPlayers: props.numPlayers,
@@ -32,7 +32,7 @@ class Game extends React.Component {
       currentPlayerIdx: 0,
       bank: new BankBase(props.numPlayers),
       decks: shuffledDecks,
-      cards: cards,
+      board: board,
       nobles: this.createNobles(props.numPlayers),
       finished: false,
       returnCoinsModalOpen: false,
@@ -45,7 +45,7 @@ class Game extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     if (this.props.isNewGame === true) {
       let shuffledDecks = this.createDecks();
-      let cards = this.createBoard(shuffledDecks);
+      let board = this.createBoard(shuffledDecks);
 
       this.setState((state, props) => {
         props.setIsNewGame(false);
@@ -54,7 +54,7 @@ class Game extends React.Component {
           currentPlayerIdx: 0,
           bank: new BankBase(props.numPlayers),
           returnCoinsModalOpen: false,
-          cards: cards,
+          board: board,
           decks: this.createDecks(),
           nobles: this.createNobles(props.numPlayers),
           noblemenSelectionOpen: false,
@@ -162,17 +162,17 @@ class Game extends React.Component {
     // replace card on the board
     // TODO don't replace if there remaining deck is 0
     // TODO after buying from reserved, close all modals
-    let cards = this.state.cards.slice();
+    let board = this.state.board.slice();
     let decks = this.state.decks.slice();
     if (source === BOARD) {
-      cards[level][column] = 0 < decks[level].length ? decks[level].pop() : null;
+      board[level][column] = 0 < decks[level].length ? decks[level].pop() : null;
     } else if (source === RESERVED) {
       player.reserved.splice(index, 1);
     }
     this.setState({
       players: players,
       bank: bank,
-      cards: cards,
+      board: board,
       decks: decks,
     })
     this.handleEndTurn();
@@ -199,16 +199,16 @@ class Game extends React.Component {
     // replace card on the board
     // TODO if source is top of deck don't replace
     let decks = this.state.decks.slice();
-    let cards = this.state.cards.slice();
+    let board = this.state.board.slice();
     if (source === DECK) {
       decks[level].pop();
     } else {
-      cards[level][column] = decks[level].pop();
+      board[level][column] = decks[level].pop();
     }
     this.setState({
       players: players,
       bank: bank,
-      cards: cards,
+      board: board,
       decks: decks,
     });
     if (10 < player.coins.sum()) {
@@ -311,7 +311,7 @@ class Game extends React.Component {
   }
 
   render() {
-    const { cards, decks, nobles, noblemenSelectionOpen, selectableNoblemen, currentPlayerIdx, numPlayers, finished } = this.state;
+    const { board, decks, nobles, noblemenSelectionOpen, selectableNoblemen, currentPlayerIdx, numPlayers, finished } = this.state;
     const players = Object.values(this.state.players).map((player) => {
       return (
         <>
@@ -363,7 +363,7 @@ class Game extends React.Component {
             </Grid.Row>
             <Grid.Row>
               <Board
-                cards={cards}
+                cards={board}
                 decks={decks}
                 playerWallet={this.state.players[currentPlayerIdx].coins}
                 playerCards={this.state.players[currentPlayerIdx].cards}
