@@ -267,11 +267,12 @@ class Game extends React.Component {
 
   render() {
     const { board, decks, nobles, noblemenSelectionOpen, selectableNoblemen, currentPlayerIdx, numPlayers, finished } = this.state;
-    const players = Object.values(this.state.players).map((player) => {
+    const players = this.state.players.map((player) => {
       return (
         <>
           <Player
             {...player}
+            player={player}
             activePlayer={player.position === currentPlayerIdx}
             finished={finished}
             handleBuy={this.handleBuy}

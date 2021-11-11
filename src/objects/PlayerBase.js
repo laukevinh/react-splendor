@@ -10,7 +10,7 @@ class PurchasedCards {
   }
 }
 
-export class PlayerBase {
+export default class PlayerBase {
   constructor(name, position) {
     this.coins = new Wallet();
     this.cards = new PurchasedCards();

@@ -1,4 +1,3 @@
-import { PlayerBase } from "../components/Player";
 import { NobleBase } from "./NobleBase";
 import { MAX_BANK_COINS, MAX_BOARD_COLS, MAX_BOARD_ROWS } from "../constants/defaults";
 import { shuffle } from "../utils";
@@ -7,6 +6,7 @@ import Mine from "./Mine";
 import cardData from "../constants/cardData.json";
 import nobleData from "../constants/nobleData.json";
 import BankBase from "./BankBase";
+import PlayerBase from "./PlayerBase";
 
 export default class GameBase {
   constructor(numPlayers, pointsToWin) {
