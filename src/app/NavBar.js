@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Button, Container, Dropdown, Grid, Menu, Modal } from "semantic-ui-react";
-import { MIN_PLAYERS, MIN_POINTS_TO_WIN } from "../constants/defaults";
+import { MIN_PLAYERS, MIN_POINTS_TO_WIN, NUM_PLAYERS_LIST, POINTS_TO_WIN_LIST } from "../constants/defaults";
 
 export default function NavBar(props) {
-  const { pointsToWin, numPlayers, createNewGame, options } = props;
+  const { pointsToWin, numPlayers, createNewGame } = props;
 
   return (
     <Menu>
@@ -18,7 +18,6 @@ export default function NavBar(props) {
           <ModalNewGame
             numPlayers={numPlayers}
             createNewGame={createNewGame}
-            options={options}
           />
         </Menu.Item>
       </Container>
@@ -27,7 +26,7 @@ export default function NavBar(props) {
 }
 
 function ModalNewGame(props) {
-  const { options, numPlayers, pointsToWin, createNewGame } = props;
+  const { numPlayers, pointsToWin, createNewGame } = props;
   const [open, setOpen] = useState(false);
   const [localNumPlayers, setLocalNumPlayers] = useState(numPlayers);
   const [localPointsToWin, setLocalPointsToWin] = useState(pointsToWin);
@@ -60,7 +59,7 @@ function ModalNewGame(props) {
             <Dropdown
               defaultValue={MIN_PLAYERS}
               selection
-              options={getDropdownOptions('players', options.NUM_OF_PLAYERS)}
+              options={getDropdownOptions('players', NUM_PLAYERS_LIST)}
               onChange={(e, { value }) => setLocalNumPlayers(value)}
             />
           </Grid.Column>
@@ -69,7 +68,7 @@ function ModalNewGame(props) {
             <Dropdown
               defaultValue={MIN_POINTS_TO_WIN}
               selection
-              options={getDropdownOptions('points', options.POINTS_TO_WIN)}
+              options={getDropdownOptions('points', POINTS_TO_WIN_LIST)}
               onChange={(e, { value }) => setLocalPointsToWin(value)}
             />
           </Grid.Column>
