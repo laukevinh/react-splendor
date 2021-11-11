@@ -1,18 +1,14 @@
 import Board from '../components/Board';
 import Bank from '../components/Bank';
 import Noblemen, { ModalNoblemen } from '../components/Noblemen';
-import Player, { PlayerBase } from '../components/Player';
+import Player from '../components/Player';
 import { Grid, Container, Divider } from 'semantic-ui-react';
 import ReturnCoinsModal from '../components/ReturnCoinsModal';
-import { calculateCharge, shuffle, WILD, DECK, BOARD, RESERVED, any, rank } from '../utils';
+import { calculateCharge, WILD, DECK, BOARD, RESERVED, any, rank } from '../utils';
 import React from 'react';
-import cardData from "../constants/cardData.json";
-import nobleData from "../constants/nobleData.json";
-import Mine from '../objects/Mine';
 import History from '../components/History';
 import DesktopLayout from '../layouts/desktop';
-import { MAX_BOARD_COLS, MAX_BOARD_ROWS, MAX_PLAYER_COINS, MAX_PLAYER_RESERVATION } from '../constants/defaults';
-import { NobleBase } from '../objects/NobleBase';
+import { MAX_PLAYER_COINS, MAX_PLAYER_RESERVATION } from '../constants/defaults';
 import BankBase from '../objects/BankBase';
 
 class Game extends React.Component {
@@ -22,87 +18,46 @@ class Game extends React.Component {
     this.handleBuy = this.handleBuy.bind(this);
     this.handleReserve = this.handleReserve.bind(this);
     this.handleNoblemenSelection = this.handleNoblemenSelection.bind(this);
-    let shuffledDecks = this.createDecks();
-    let board = this.createBoard(shuffledDecks);
 
     this.state = {
-      numPlayers: props.numPlayers,
-      pointsToWin: props.pointsToWin,
-      players: this.createPlayerBases(props.numPlayers),
-      currentPlayerIdx: 0,
-      bank: new BankBase(props.numPlayers),
-      decks: shuffledDecks,
-      board: board,
-      nobles: this.createNobles(props.numPlayers),
+      game: props.game,
+      numPlayers: props.game.numPlayers,
+      pointsToWin: props.game.pointsToWin,
+      players: props.game.players,
+      currentPlayerIdx: props.game.currentPlayerIdx,
+      bank: props.game.bank,
+      decks: props.game.decks,
+      board: props.game.board,
+      nobles: props.game.nobles,
+      status: props.game.status,
       finished: false,
       returnCoinsModalOpen: false,
       noblemenSelectionOpen: false,
       selectableNoblemen: [],
-      isNewGame: props.isNewGame
     };
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.props.isNewGame === true) {
-      let shuffledDecks = this.createDecks();
-      let board = this.createBoard(shuffledDecks);
-
+    if (this.props.game !== prevProps.game) {
       this.setState((state, props) => {
-        props.setIsNewGame(false);
         return {
-          players: this.createPlayerBases(props.numPlayers),
-          currentPlayerIdx: 0,
-          bank: new BankBase(props.numPlayers),
+          game: props.game,
+          numPlayers: props.game.numPlayers,
+          pointsToWin: props.game.pointsToWin,
+          players: props.game.players,
+          currentPlayerIdx: props.game.currentPlayerIdx,
+          bank: props.game.bank,
+          decks: props.game.decks,
+          board: props.game.board,
+          nobles: props.game.nobles,
+          status: props.game.status,
+          finished: false,
           returnCoinsModalOpen: false,
-          board: board,
-          decks: this.createDecks(),
-          nobles: this.createNobles(props.numPlayers),
           noblemenSelectionOpen: false,
           selectableNoblemen: [],
-          numPlayers: props.numPlayers,
-          pointsToWin: props.pointsToWin,
-          finished: false,
-          isNewGame: false
-        };
+        }
       });
     }
-  }
-
-  createCards(cardDataList) {
-    return cardDataList.map((
-      [color, points, white, blue, green, red, black]
-    ) => {
-      return new Mine(color, points, white, blue, green, red, black);
-    });
-  }
-
-  createDecks() {
-    const levels = ["0", "1", "2"];
-    return levels.map(level => {
-      return shuffle(this.createCards(cardData[level]));
-    })
-  }
-
-  createBoard(decks) {
-    return Array(MAX_BOARD_ROWS).fill(undefined).map((e, idx) => {
-      return Array(MAX_BOARD_COLS).fill(undefined).map(() => {
-        const level = idx;
-        return decks[level].pop();
-      })
-    });
-  }
-
-  createPlayerBases(numPlayers) {
-    return Array(numPlayers).fill(undefined).map((e, idx) => {
-      return new PlayerBase(`Player ${idx}`, idx);
-    });
-  }
-
-  createNobles(numPlayers) {
-    let nobles = nobleData.map(([points, white, blue, green, red, black]) => {
-      return new NobleBase(points, white, blue, green, red, black, true)
-    });
-    return shuffle(nobles).slice(0, numPlayers + 1);
   }
 
   handleCoinTransaction(transactionAmountWallet, isPlayerCollecting) {

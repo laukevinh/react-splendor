@@ -2,6 +2,7 @@ import React from "react";
 import Game from "./Game";
 import NavBar from "./NavBar";
 import { MIN_PLAYERS, MIN_POINTS_TO_WIN } from "../constants/defaults";
+import GameBase from "../objects/GameBase";
 
 class App extends React.Component {
   constructor(props) {
@@ -9,23 +10,16 @@ class App extends React.Component {
     this.state = {
       numPlayers: MIN_PLAYERS,
       pointsToWin: MIN_POINTS_TO_WIN,
-      isNewGame: false
+      game: new GameBase(MIN_PLAYERS, MIN_POINTS_TO_WIN)
     }
     this.createNewGame = this.createNewGame.bind(this);
-    this.setIsNewGame = this.setIsNewGame.bind(this);
   }
 
   createNewGame(numPlayers, pointsToWin) {
     this.setState({
       numPlayers: numPlayers,
       pointsToWin: pointsToWin,
-      isNewGame: true
-    });
-  }
-
-  setIsNewGame(bool) {
-    this.setState({
-      isNewGame: bool
+      game: new GameBase(numPlayers, pointsToWin),
     });
   }
 
@@ -33,7 +27,7 @@ class App extends React.Component {
     const {
       numPlayers,
       pointsToWin,
-      isNewGame
+      game
     } = this.state;
 
     return (
@@ -46,8 +40,7 @@ class App extends React.Component {
         <Game
           numPlayers={numPlayers}
           pointsToWin={pointsToWin}
-          isNewGame={isNewGame}
-          setIsNewGame={this.setIsNewGame}
+          game={game}
         />
       </>
     )
