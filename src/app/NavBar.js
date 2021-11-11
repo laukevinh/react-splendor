@@ -17,6 +17,7 @@ export default function NavBar(props) {
         <Menu.Item>
           <ModalNewGame
             numPlayers={numPlayers}
+            pointsToWin={pointsToWin}
             createNewGame={createNewGame}
           />
         </Menu.Item>
