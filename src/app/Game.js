@@ -10,6 +10,7 @@ import History from '../components/History';
 import DesktopLayout from '../layouts/desktop';
 import { MAX_PLAYER_COINS, MAX_PLAYER_RESERVATION } from '../constants/defaults';
 import BankBase from '../objects/BankBase';
+import GameState from '../objects/GameState';
 
 class Game extends React.Component {
   constructor(props) {
@@ -30,6 +31,7 @@ class Game extends React.Component {
       board: props.game.board,
       nobles: props.game.nobles,
       status: props.game.status,
+      lifecycle: new GameState(),
       finished: false,
       returnCoinsModalOpen: false,
       noblemenSelectionOpen: false,
@@ -57,21 +59,52 @@ class Game extends React.Component {
           selectableNoblemen: [],
         }
       });
+    } else if (this.state.lifecycle !== prevState.lifecycle) {
+      if (this.state.lifecycle.state.description === 'returnCoins') {
+        this.setState((state, props) => {
+          return {
+            returnCoinsModalOpen: true
+          }
+        })
+      } else if (this.state.lifecycle.state.description === 'selectNoble') {
+        const selectableNoblemen = this.listSelectableNoblemen(this.state.players[this.state.currentPlayerIdx], this.state.nobles);
+        if (any(selectableNoblemen)) {
+          this.setState({
+            noblemenSelectionOpen: true,
+            selectableNoblemen: selectableNoblemen
+          });
+        } else {
+          this.setState({
+            lifecycle: new GameState(this.state.lifecycle.state.endOfTurn.description)
+          });
+        }
+      } else if (this.state.lifecycle.state.description === 'endOfTurn') {
+        this.handleEndTurn();
+      }
     }
   }
 
   handleCoinTransaction(transactionAmountWallet, isPlayerCollecting) {
+    let lifecycle = this.state.lifecycle;
+    console.log("current state: ", lifecycle.state.description, lifecycle.state);
+    if (lifecycle.state['collectCoins'] === undefined && lifecycle.state['returnCoins'] === undefined && lifecycle.state.description !== 'returnCoins') {
+      console.log("Cannot collect or return coins in current lifecycle state: ", lifecycle.state);
+      return;
+    }
     let players = this.state.players.slice();
     let bank = new BankBase();
     Object.assign(bank.wallet, this.state.bank.wallet);
     let player = players[this.state.currentPlayerIdx];
+    let newLifecycleState;
     for (let color of Object.keys(transactionAmountWallet)) {
       if (isPlayerCollecting) {
+        newLifecycleState = new GameState(lifecycle.state.collectCoins.description);
         bank.wallet[color] -= transactionAmountWallet[color];
         player.coins[color] += transactionAmountWallet[color];
       } else {
         bank.wallet[color] += transactionAmountWallet[color];
         player.coins[color] -= transactionAmountWallet[color];
+        newLifecycleState = lifecycle;
       }
     }
 
@@ -80,21 +113,29 @@ class Game extends React.Component {
       this.setState({
         players: players,
         bank: bank,
-        returnCoinsModalOpen: true
+        lifecycle: new GameState(newLifecycleState.state.returnCoins.description),
+        // returnCoinsModalOpen: true
       });
     } else {
       this.setState({
         players: players,
         bank: bank,
+        lifecycle: new GameState(newLifecycleState.state.selectNoble.description),
         returnCoinsModalOpen: false
       });
-      this.handleEndTurn();
+      // this.handleEndTurn();
     }
   }
 
   handleBuy(source, level, column, index, card) {
     // todo upgrade: add sidebar where you can choose which coins to spend
     // todo BUG when you have consecutive handlebuy actions, sometimes the bankcoins go negative
+    let lifecycle = this.state.lifecycle;
+    console.log("current state: ", lifecycle.state.description, lifecycle.state);
+    if (lifecycle.state['buyFromBoard'] === undefined && lifecycle.state['buyFromReservation'] === undefined) {
+      console.log("Cannot buy in current lifecycle state: ", lifecycle.state);
+      return;
+    }
     let players = this.state.players.slice(0, this.state.numPlayers + 1);
     let player = players[this.state.currentPlayerIdx];
     let playerWallet = player.coins;
@@ -119,16 +160,20 @@ class Game extends React.Component {
     // TODO after buying from reserved, close all modals
     let board = this.state.board.slice();
     let decks = this.state.decks.slice();
+    let newLifecycleState;
     if (source === BOARD) {
       board[level][column] = 0 < decks[level].length ? decks[level].pop() : null;
+      newLifecycleState = new GameState(lifecycle.state.buyFromBoard.description);
     } else if (source === RESERVED) {
       player.reserved.splice(index, 1);
+      newLifecycleState = new GameState(lifecycle.state.buyFromReservation.description);
     }
     this.setState({
       players: players,
       bank: bank,
       board: board,
       decks: decks,
+      lifecycle: newLifecycleState
     })
     this.handleEndTurn();
   }
@@ -207,6 +252,12 @@ class Game extends React.Component {
   }
 
   handleNoblemenSelection(nobleIndex) {
+    let lifecycle = this.state.lifecycle;
+    console.log("current state: ", lifecycle.state.description, lifecycle.state);
+    if (lifecycle.state['selectNoble'] === undefined) {
+      console.log("Cannot select Noble in current lifecycle state: ", lifecycle.state);
+      return;
+    }
     // player adds noblemen
     // after picking up noblemen, replace with stub so the placement is still the same
     const { currentPlayerIdx, numPlayers } = this.state;
@@ -221,6 +272,7 @@ class Game extends React.Component {
       players: players,
       nobles: nobles,
       selectableNoblemen: [],
+      lifecycle: new GameState(lifecycle.state.endOfTurn.description),
       noblemenSelectionOpen: false,
     });
     this.handleWinner(players, currentPlayerIdx, numPlayers);
@@ -245,24 +297,18 @@ class Game extends React.Component {
   }
 
   handleEndTurn() {
-    // qualify for nobleman?
-    // toggle modal open -> let modal handle real end turn
-    // no -> real end turn
-    const { players, nobles, currentPlayerIdx, numPlayers } = this.state;
-    const player = players[currentPlayerIdx];
-    // TODO: BUG: if you qualify for 1 nobleman, you don't need to invest further to get the second... 
-    // might only be a problem now because noblement aren't unique.
-    const selectableNoblemen = this.listSelectableNoblemen(player, nobles);
-    if (any(selectableNoblemen)) {
-      this.setState({
-        noblemenSelectionOpen: true,
-        selectableNoblemen: selectableNoblemen,
-      });
-    } else {
-      this.setState({ selectableNoblemen: [] });
-      this.handleWinner(players, currentPlayerIdx, numPlayers);
-      this.handleNextTurn(currentPlayerIdx, numPlayers);
-    }
+    const { players, currentPlayerIdx, numPlayers, lifecycle } = this.state;
+    console.log("current state: ", lifecycle.state.description, lifecycle.state);
+    // if (lifecycle.state['endOfTurn'] === undefined) {
+    //   console.log("Cannot end turn in current lifecycle state: ", lifecycle.state);
+    //   return;
+    // }
+    this.setState({
+      selectableNoblemen: [],
+      lifecycle: new GameState(lifecycle.state.startOfTurn.description)
+    });
+    this.handleWinner(players, currentPlayerIdx, numPlayers);
+    this.handleNextTurn(currentPlayerIdx, numPlayers);
   }
 
   render() {
