@@ -173,6 +173,12 @@ class Game extends React.Component {
   }
 
   handleReserve(source, level, column, card) {
+    let lifecycle = this.state.lifecycle;
+    console.log("current state: ", lifecycle.description, lifecycle);
+    if (lifecycle.reserveFromBoard === undefined && lifecycle.reserveFromDecks === undefined) {
+      console.log("Cannot reserve in current lifecycle state: ", lifecycle);
+      return;
+    }
     let players = this.state.players.slice(0, this.state.numPlayers + 1);
     let player = players[this.state.currentPlayerIdx];
     let reserved = player.reserved;
@@ -186,31 +192,29 @@ class Game extends React.Component {
       return;
     }
     player.reserve(card);
-    if (0 < bank.wallet[WILD]) {
-      player.coins[WILD]++;
-      bank.wallet[WILD]--;
-    }
-    // replace card on the board
-    // TODO if source is top of deck don't replace
     let decks = this.state.decks.slice();
     let board = this.state.board.slice();
     if (source === DECK) {
+      lifecycle = lifecycle.reserveFromDecks;
       decks[level].pop();
     } else {
-      board[level][column] = decks[level].pop();
+      lifecycle = lifecycle.reserveFromBoard;
+      lifecycle = lifecycle.replenishBoard;
+      board[level][column] = 0 < decks[level].length ? decks[level].pop() : null;
     }
+    if (0 < bank.wallet[WILD]) {
+      lifecycle = lifecycle.collectCoins;
+      player.coins[WILD]++;
+      bank.wallet[WILD]--;
+    }
+    lifecycle = MAX_PLAYER_COINS < player.coins.sum() ? lifecycle.returnCoins : lifecycle.selectNoble;
     this.setState({
       players: players,
       bank: bank,
       board: board,
       decks: decks,
+      lifecycle: lifecycle
     });
-    if (10 < player.coins.sum()) {
-      // trigger modal
-      this.setState({ returnCoinsModalOpen: true });
-    } else {
-      this.handleEndTurn();
-    }
   }
 
   calculateWinner(playersRanked) {

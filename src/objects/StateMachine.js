@@ -15,14 +15,16 @@ export default class StateMachine {
       description: 'selectNoble',
       endOfTurn: this.endOfTurn
     }
-    this.replenishBoard = {
-      description: 'replenishBoard',
-      selectNoble: this.selectNoble,
-    }
     this.returnCoins = {
       description: 'returnCoins',
       selectNoble: this.selectNoble,
       endOfTurn: this.endOfTurn
+    }
+    this.replenishBoard = {
+      description: 'replenishBoard',
+      returnCoins: this.returnCoins,
+      collectCoins: undefined,
+      selectNoble: this.selectNoble
     }
     this.buyFromBoard = {
       description: 'buyFromBoard',
@@ -36,15 +38,16 @@ export default class StateMachine {
       description: 'reserveFromBoard',
       replenishBoard: this.replenishBoard
     }
-    this.reserveFromDecks = {
-      description: 'reserveFromDecks',
-      selectNoble: this.selectNoble
-    }
     this.collectCoins = {
       description: 'collectCoins',
       returnCoins: this.returnCoins,
       selectNoble: this.selectNoble,
       endOfTurn: this.endOfTurn
+    }
+    this.reserveFromDecks = {
+      description: 'reserveFromDecks',
+      collectCoins: this.collectCoins,
+      selectNoble: this.selectNoble
     }
     this.startOfTurn = {
       description: 'startOfTurn',
@@ -62,6 +65,7 @@ export default class StateMachine {
       description: 'startOfGame',
       startOfRound: this.startOfRound
     }
+    this.replenishBoard.collectCoins = this.collectCoins;
     this.endOfRound.startOfRound = this.startOfRound;
     this.endOfTurn.startOfTurn = this.startOfTurn;
     // this.selector = {
