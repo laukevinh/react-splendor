@@ -4,12 +4,15 @@ export default class StateMachine {
       description: 'endOfGame'
     };
     this.endOfRound = {
+      description: 'endOfRound',
       startOfRound: undefined,
+      startOfTurn: undefined,
       endOfGame: this.endOfGame
     }
     this.endOfTurn = {
       description: 'endOfTurn',
-      startOfTurn: undefined
+      startOfTurn: undefined,
+      endOfRound: this.endOfRound
     }
     this.selectNoble = {
       description: 'selectNoble',
@@ -67,6 +70,7 @@ export default class StateMachine {
     }
     this.replenishBoard.collectCoins = this.collectCoins;
     this.endOfRound.startOfRound = this.startOfRound;
+    this.endOfRound.startOfTurn = this.startOfTurn;
     this.endOfTurn.startOfTurn = this.startOfTurn;
     // this.selector = {
     //   'startOfGame': this.startOfGame,

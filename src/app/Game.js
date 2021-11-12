@@ -78,6 +78,10 @@ class Game extends React.Component {
         }
       } else if (this.state.lifecycle.description === 'endOfTurn') {
         this.handleEndTurn();
+      } else if (this.state.lifecycle.description === 'endOfRound') {
+        this.handleEndRound();
+      } else if (this.state.lifecycle.description === 'endOfGame') {
+        this.handleEndGame();
       }
     }
   }
@@ -252,7 +256,7 @@ class Game extends React.Component {
   handleNoblemenSelection(nobleIndex) {
     let lifecycle = this.state.lifecycle;
     console.log("current state: ", lifecycle.description, lifecycle);
-    if (lifecycle['selectNoble'] === undefined) {
+    if (lifecycle.description !== 'selectNoble') {
       console.log("Cannot select Noble in current lifecycle state: ", lifecycle);
       return;
     }
@@ -273,8 +277,6 @@ class Game extends React.Component {
       lifecycle: lifecycle.endOfTurn,
       noblemenSelectionOpen: false,
     });
-    this.handleWinner(players, currentPlayerIdx, numPlayers);
-    this.handleNextTurn(currentPlayerIdx, numPlayers);
   }
 
   handleWinner(players, currentPlayerIdx, numPlayers) {
@@ -294,19 +296,43 @@ class Game extends React.Component {
     }
   }
 
-  handleEndTurn() {
-    const { players, currentPlayerIdx, numPlayers, lifecycle } = this.state;
+  handleEndGame() {
+    alert(this.displayRank(rank(this.state.players, 'points')));
+    this.setState({ finished: true });
+  }
+
+  handleEndRound() {
+    const { players, lifecycle } = this.state;
     console.log("current state: ", lifecycle.description, lifecycle);
-    // if (lifecycle['endOfTurn'] === undefined) {
-    //   console.log("Cannot end turn in current lifecycle state: ", lifecycle);
-    //   return;
-    // }
+    if (lifecycle.description !== 'endOfRound') {
+      console.log("Cannot end round in current lifecycle state: ", lifecycle);
+      return;
+    }
+    const playersRanked = rank(players, 'points');
+    const winner = this.calculateWinner(playersRanked);
+    this.setState({
+      lifecycle: winner ? lifecycle.endOfGame : lifecycle.startOfTurn
+    });
+  }
+
+  handleEndTurn() {
+    const { currentPlayerIdx, numPlayers, lifecycle } = this.state;
+    console.log("current state: ", lifecycle.description, lifecycle);
+    if (lifecycle.description !== 'endOfTurn') {
+      console.log("Cannot end turn in current lifecycle state: ", lifecycle);
+      return;
+    }
+    let nextLifecycle = lifecycle;
+    if (currentPlayerIdx + 1 === numPlayers) {
+      nextLifecycle = lifecycle.endOfRound;
+    } else {
+      nextLifecycle = lifecycle.startOfTurn;
+    }
     this.setState({
       selectableNoblemen: [],
-      lifecycle: lifecycle.startOfTurn
+      currentPlayerIdx: (currentPlayerIdx + 1) % numPlayers,
+      lifecycle: nextLifecycle
     });
-    this.handleWinner(players, currentPlayerIdx, numPlayers);
-    this.handleNextTurn(currentPlayerIdx, numPlayers);
   }
 
   render() {
