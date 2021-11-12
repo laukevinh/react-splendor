@@ -31,8 +31,7 @@ class ModalPickCoins extends React.Component {
       bankCoins: props.coins,
       tempCoins: new Wallet(),
       bankCoinsSelectable: this.initBankCoinsSelectable(props.coins),
-      numTempCoins: 0,
-      handleCoinTransaction: props.handleCoinTransaction,
+      numTempCoins: 0
     };
   }
 
@@ -126,7 +125,7 @@ class ModalPickCoins extends React.Component {
 
   handleConfirm(coins) {
     this.setState({ tempCoins: new Wallet(), open: false });  // reset temp coins
-    this.state.handleCoinTransaction(coins, true);
+    this.props.handleCoinTransaction(coins, true);
   }
 
   handleCancel() {
