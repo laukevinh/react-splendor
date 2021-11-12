@@ -127,7 +127,7 @@ class Game extends React.Component {
     // todo BUG when you have consecutive handlebuy actions, sometimes the bankcoins go negative
     let lifecycle = this.state.lifecycle;
     console.log("current state: ", lifecycle.description, lifecycle);
-    if (lifecycle['buyFromBoard'] === undefined && lifecycle['buyFromReservation'] === undefined) {
+    if (lifecycle.buyFromBoard === undefined && lifecycle.buyFromReservation === undefined) {
       console.log("Cannot buy in current lifecycle state: ", lifecycle);
       return;
     }
@@ -156,8 +156,9 @@ class Game extends React.Component {
     let board = this.state.board.slice();
     let decks = this.state.decks.slice();
     if (source === BOARD) {
-      board[level][column] = 0 < decks[level].length ? decks[level].pop() : null;
       lifecycle = lifecycle.buyFromBoard;
+      lifecycle = lifecycle.replenishBoard;
+      board[level][column] = 0 < decks[level].length ? decks[level].pop() : null;
     } else if (source === RESERVED) {
       player.reserved.splice(index, 1);
       lifecycle = lifecycle.buyFromReservation;
@@ -167,9 +168,8 @@ class Game extends React.Component {
       bank: bank,
       board: board,
       decks: decks,
-      lifecycle: lifecycle
+      lifecycle: lifecycle.selectNoble
     })
-    this.handleEndTurn();
   }
 
   handleReserve(source, level, column, card) {
