@@ -7,6 +7,7 @@ import cardData from "../constants/cardData.json";
 import nobleData from "../constants/nobleData.json";
 import BankBase from "./BankBase";
 import PlayerBase from "./PlayerBase";
+import StateMachine from "./StateMachine";
 
 export default class GameBase {
   constructor(numPlayers, pointsToWin) {
@@ -19,6 +20,7 @@ export default class GameBase {
     this.board = this.createBoard();
     this.nobles = this.createNobles();
     this.status = 'Not started';
+    this.stateMachine = new StateMachine();
   }
 
   createPlayerBases() {

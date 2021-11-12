@@ -1,16 +1,12 @@
-export default class GameState {
-  constructor(startingState) {
-    // this.startOfTurn = undefined;
-    // this.buyFromBoard = undefined;
-    // this.buyFromReservation = undefined;
-    // this.reserveFromBoard = undefined;
-    // this.reserveFromDecks = undefined;
-    // this.collectCoins = undefined;
-    // this.replenishBoard = undefined;
-    // this.returnCoins = undefined;
-    // this.selectNoble = undefined;
-    // this.endOfTurn = undefined;
-    // this.stateDescription = undefined;
+export default class StateMachine {
+  constructor() {
+    this.endOfGame = {
+      description: 'endOfGame'
+    };
+    this.endOfRound = {
+      startOfRound: undefined,
+      endOfGame: this.endOfGame
+    }
     this.endOfTurn = {
       description: 'endOfTurn',
       startOfTurn: undefined
@@ -58,22 +54,32 @@ export default class GameState {
       reserveFromDecks: this.reserveFromDecks,
       collectCoins: this.collectCoins,
     };
-    this.endOfTurn = {
-      description: 'endOfTurn',
+    this.startOfRound = {
+      description: 'startOfRound',
       startOfTurn: this.startOfTurn
     }
-    this.selector = {
-      'startOfTurn': this.startOfTurn,
-      'buyFromBoard': this.buyFromBoard,
-      'buyFromReservation': this.buyFromReservation,
-      'reserveFromBoard': this.reserveFromBoard,
-      'reserveFromDecks': this.reserveFromDecks,
-      'collectCoins': this.collectCoins,
-      'replenishBoard': this.replenishBoard,
-      'returnCoins': this.returnCoins,
-      'selectNoble': this.selectNoble,
-      'endOfTurn': this.endOfTurn
+    this.startOfGame = {
+      description: 'startOfGame',
+      startOfRound: this.startOfRound
     }
-    this.state = this.selector[startingState] || this.startOfTurn;
+    this.endOfRound.startOfRound = this.startOfRound;
+    this.endOfTurn.startOfTurn = this.startOfTurn;
+    // this.selector = {
+    //   'startOfGame': this.startOfGame,
+    //   'startOfRound': this.startOfRound,
+    //   'startOfTurn': this.startOfTurn,
+    //   'buyFromBoard': this.buyFromBoard,
+    //   'buyFromReservation': this.buyFromReservation,
+    //   'reserveFromBoard': this.reserveFromBoard,
+    //   'reserveFromDecks': this.reserveFromDecks,
+    //   'collectCoins': this.collectCoins,
+    //   'replenishBoard': this.replenishBoard,
+    //   'returnCoins': this.returnCoins,
+    //   'selectNoble': this.selectNoble,
+    //   'endOfTurn': this.endOfTurn,
+    //   'endOfRound': this.endOfRound,
+    //   'endOfGame': this.endOfGame
+    // }
+    // this.state = this.selector[startingState] || this.startOfGame;
   }
 }
