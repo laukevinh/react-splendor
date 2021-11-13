@@ -379,11 +379,14 @@ class Game extends React.Component {
           </Grid.Column>
           <Grid.Column width={7}>
             <Grid.Row>
-              <Noblemen noblemen={nobles} />
+              <Noblemen
+                noblemen={nobles}
+                includesList={nobles.map(noble => noble.isDisplayed)}
+              />
               <ModalNoblemen
                 noblemen={nobles}
-                selectableNoblemen={selectableNoblemen}
-                handleNoblemenSelection={this.handleNoblemenSelection}
+                includesList={selectableNoblemen}
+                onClick={this.handleNoblemenSelection}
                 open={noblemenSelectionOpen}
               />
             </Grid.Row>

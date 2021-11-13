@@ -3,16 +3,17 @@ import { Card, Grid, Modal } from 'semantic-ui-react';
 import renderPrice from '../utils'
 
 function Noble(props) {
+  const { idx, points, price, onClick } = props;
   const content = (
     <Card.Content>
       <Card.Header textAlign='right' as='h1'>
-        {props.points}
+        {points}
       </Card.Header>
-      {renderPrice(props.price, "game-card")}
+      {renderPrice(price, "game-card")}
     </Card.Content>
   );
-  return props.handleNoblemenSelection ? (
-    <Card onClick={() => props.handleNoblemenSelection(props.idx)}>
+  return onClick ? (
+    <Card onClick={() => onClick(idx)}>
       {content}
     </Card>
   ) : (
@@ -23,15 +24,17 @@ function Noble(props) {
 }
 
 export default function Noblemen(props) {
-  const { noblemen } = props;
-  const nobles = noblemen.map(noble => {
+  const { noblemen, includesList, onClick } = props;
+  const nobles = noblemen.map((noble, idx) => {
     return (
       <Grid.Column>
         {
-          noble.isDisplayed &&
+          includesList[idx] &&
           <Noble
+            idx={idx}
             points={noble.points}
             price={noble.price}
+            onClick={onClick}
           />
         }
       </Grid.Column>
@@ -46,30 +49,17 @@ export default function Noblemen(props) {
 }
 
 export function ModalNoblemen(props) {
-  const { noblemen, selectableNoblemen, handleNoblemenSelection, open } = props;
-  const nobles = noblemen.map((noble, idx) => {
-    return (
-      <Grid.Column>
-        {
-          selectableNoblemen[idx] &&
-          <Noble
-            idx={idx}
-            points={noble.points}
-            price={noble.price}
-            handleNoblemenSelection={handleNoblemenSelection}
-          />
-        }
-      </Grid.Column>
-    );
-  });
+  const { noblemen, includesList, onClick, open } = props;
 
   return (
     <Modal open={open}>
       <Modal.Header>Select Noble</Modal.Header>
       <Modal.Content>
-        <Grid columns={noblemen.length}>
-          {nobles}
-        </Grid>
+        <Noblemen
+          noblemen={noblemen}
+          includesList={includesList}
+          onClick={onClick}
+        />
       </Modal.Content>
     </Modal>
   );
