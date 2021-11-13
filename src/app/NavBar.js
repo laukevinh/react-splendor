@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button, Container, Dropdown, Grid, Menu, Modal } from "semantic-ui-react";
-import { MIN_PLAYERS, MIN_POINTS_TO_WIN, NUM_PLAYERS_LIST, POINTS_TO_WIN_LIST } from "../constants/defaults";
+import { NUM_PLAYERS_LIST, POINTS_TO_WIN_LIST } from "../constants/defaults";
 
 export default function NavBar(props) {
   const { pointsToWin, numPlayers, createNewGame } = props;
@@ -58,7 +58,7 @@ function ModalNewGame(props) {
           <Grid.Column>
             {'Number of players: '}
             <Dropdown
-              defaultValue={MIN_PLAYERS}
+              defaultValue={numPlayers}
               selection
               options={getDropdownOptions('players', NUM_PLAYERS_LIST)}
               onChange={(e, { value }) => setLocalNumPlayers(value)}
@@ -67,7 +67,7 @@ function ModalNewGame(props) {
           <Grid.Column>
             {'Points to Win: '}
             <Dropdown
-              defaultValue={MIN_POINTS_TO_WIN}
+              defaultValue={pointsToWin}
               selection
               options={getDropdownOptions('points', POINTS_TO_WIN_LIST)}
               onChange={(e, { value }) => setLocalPointsToWin(value)}
