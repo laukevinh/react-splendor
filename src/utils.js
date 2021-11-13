@@ -12,19 +12,17 @@ export const BLACK = 'black';
 export const WILD = 'wild';
 
 export default function renderPrice(price, type) {
-  let prices = [];
-  for (let [color, colorPrice] of Object.entries(price)) {
-    if (0 < colorPrice) {
-      let elem;
-      if (type === 'coin') {
-        elem = <Coin color={color}>{colorPrice}</Coin>;
-      } else if (type === 'game-card') {
-        elem = <GameCard color={color}>{colorPrice}</GameCard>;
-      }
-      prices.push(elem);
+  return Object.entries(price).map(([color, amt]) => {
+    if (amt === 0) {
+      return <></>;
     }
-  }
-  return (prices);
+    if (type === 'coin') {
+      return <Coin color={color}>{amt}</Coin>;
+    }
+    if (type === 'game-card') {
+      return <GameCard color={color}>{amt}</GameCard>;
+    }
+  });
 }
 
 export function GameCard(props) {
