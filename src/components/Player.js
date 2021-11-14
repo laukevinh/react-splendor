@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Button, Grid, Modal } from 'semantic-ui-react'
 import { GameCardModal } from './CardModal';
-import DeckCard from './DeckCard';
-import renderPrice, { GameCard } from '../utils';
+import renderPrice from '../utils';
 import Coin from './Coin';
+import MiniCard from './MiniCard';
+import GameCard from './GameCard';
 
 export default function Player(props) {
   const {
@@ -18,7 +19,7 @@ export default function Player(props) {
     return <Grid.Column>{0 < count && coin}</Grid.Column>;
   });
   const cards = Object.entries(player.cards).map(([color, cardArray]) => {
-    const card = <GameCard color={color}>{cardArray.length}</GameCard>;
+    const card = <MiniCard size={'small'} color={color}>{cardArray.length}</MiniCard>;
     return <Grid.Column>{0 < cardArray.length && card}</Grid.Column>;
   });
   return (
@@ -58,7 +59,10 @@ function ModalPlayerDetails(props) {
     const cardArrayFormatted = Object.values(cardArray).map(card => {
       return (
         <Grid.Row>
-          <GameCard size="small" color={card.color}>{renderPrice(card.price, "coin")}</GameCard>
+          <GameCard
+            card={card}
+            size="medium"
+          />
         </Grid.Row>
       );
     });
@@ -88,7 +92,7 @@ function ModalPlayerDetails(props) {
       onClose={() => setOpen(false)}
       onOpen={() => setOpen(!finished)}
       open={open}
-      trigger={<DeckCard size={'small'} />}
+      trigger={<MiniCard size={'small'}>{'...'}</MiniCard>}
     >
       <Modal.Header>
         <Grid columns={2}>

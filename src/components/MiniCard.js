@@ -1,12 +1,18 @@
-export default function DeckCard(props) {
+export default function MiniCard(props) {
   const {
     size,
+    color,
     fluid,
     onClick,
     disabled,
     children
   } = props;
-  let classNames = ['deck-card', 'beige'];
+  let classNames = ['mini-card'];
+  if (color) {
+    classNames.push(color);
+  } else {
+    classNames.push('beige');
+  }
   if (size) {
     classNames.push(size);
   }
@@ -19,16 +25,9 @@ export default function DeckCard(props) {
   if (disabled) {
     classNames.push('disabled');
   }
-  if (children) {
-
-  }
   return (
     <div className={classNames.join(" ")} {...props}>
-      <div>{'...'}</div>
-      {
-        children &&
-        <div>{children}</div>
-      }
+      {children}
     </div>
   );
 }

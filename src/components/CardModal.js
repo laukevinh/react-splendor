@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Modal, Button } from 'semantic-ui-react';
 import { calculateCharge } from '../utils';
 import GameCard from './GameCard';
-import DeckCard from './DeckCard';
 import { MAX_PLAYER_RESERVATION } from '../constants/defaults';
+import MiniCard from './MiniCard';
 
 export function DeckModal(props) {
   const {
@@ -22,21 +22,29 @@ export function DeckModal(props) {
     onClick(level);
   }
 
+  const triggerComponent = (
+    <MiniCard size={'small'}>
+      <div>{'...'}</div>
+      <div>{deck.length}</div>
+    </MiniCard>
+  );
+
   return (
     <Modal
       size={'mini'}
       onClose={() => setOpen(false)}
       onOpen={() => setOpen(true)}
       open={open && !disabled}
-      trigger={<DeckCard size={'small'}>{deck.length}</DeckCard>}
+      trigger={triggerComponent}
     >
       <Modal.Content>
-        <DeckCard
+        <MiniCard
           size={'large'}
           fluid
         >
+          {'...'}
           {deck.length}
-        </DeckCard>
+        </MiniCard>
       </Modal.Content>
       <Modal.Actions>
         <Button

@@ -42,7 +42,7 @@ body {
   margin-top: -1em;
 }
 
-.game-card, .deck-card {
+.game-card, .mini-card {
   display: inline-block;
   text-align: center;
   vertical-align: middle;
@@ -60,16 +60,16 @@ body {
   width: 108px;
 }
 
-.deck-card.small {
+.mini-card.small {
   height: 48px;
   width: 36px;
 }
 
-.deck-card.large {
+.mini-card.large {
   min-height: 300px;
 }
 
-.deck-card.fluid {
+.mini-card.fluid {
   max-width: 100%;
   width: 9999px;
 }

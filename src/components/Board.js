@@ -54,6 +54,6 @@ export default function Board(props) {
     );
   });
   return (
-    <Grid>{rows}</Grid>
+    <Grid>{rows.reverse()}</Grid>
   );
 }
