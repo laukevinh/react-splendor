@@ -502,13 +502,10 @@ class Game extends React.Component {
               </Grid.Row>
               <Grid.Row>
                 <Board
-                  cards={board}
                   board={board}
                   decks={decks}
                   players={this.state.players}
                   currentPlayerIdx={currentPlayerIdx}
-                  playerWallet={this.state.players[currentPlayerIdx].coins}
-                  playerCards={this.state.players[currentPlayerIdx].cards}
                   handleBuyFromBoard={this.handleBuyFromBoard}
                   handleReserveFromDeck={this.handleReserveFromDeck}
                   handleReserveFromBoard={this.handleReserveFromBoard}
