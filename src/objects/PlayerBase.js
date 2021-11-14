@@ -1,19 +1,9 @@
-import Wallet from "./Wallet";
-
-class PurchasedCards {
-  constructor() {
-    this.white = [];
-    this.blue = [];
-    this.green = [];
-    this.red = [];
-    this.black = [];
-  }
-}
+import { CardWallet, CoinWallet } from "./Wallet";
 
 export default class PlayerBase {
   constructor(name, position) {
-    this.coins = new Wallet();
-    this.cards = new PurchasedCards();
+    this.coins = new CoinWallet();
+    this.cards = new CardWallet();
     this.reserved = [];
     this.points = 0;
     this.noblemen = [];

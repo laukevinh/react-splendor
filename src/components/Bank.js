@@ -1,5 +1,5 @@
 import React from 'react';
-import Wallet from '../objects/Wallet';
+import { CoinWallet } from '../objects/Wallet';
 import { WILD } from '../utils';
 import { Button, Container, Grid, Modal } from 'semantic-ui-react'
 import Coin from './Coin';
@@ -29,7 +29,7 @@ class ModalPickCoins extends React.Component {
     this.state = {
       open: false,
       bankCoins: props.coins,
-      tempCoins: new Wallet(),
+      tempCoins: new CoinWallet(),
       bankCoinsSelectable: this.initBankCoinsSelectable(props.coins),
       numTempCoins: 0
     };
@@ -124,7 +124,7 @@ class ModalPickCoins extends React.Component {
   }
 
   handleConfirm(coins) {
-    this.setState({ tempCoins: new Wallet(), open: false });  // reset temp coins
+    this.setState({ tempCoins: new CoinWallet(), open: false });  // reset temp coins
     this.props.handleCoinTransaction(coins, true);
   }
 

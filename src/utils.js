@@ -1,5 +1,5 @@
-import Wallet from './objects/Wallet';
 import Coin from './components/Coin';
+import { CoinWallet } from './objects/Wallet';
 
 export const DECK = 'deck';
 export const BOARD = 'board';
@@ -43,7 +43,7 @@ export function GameCard(props) {
 }
 
 export function calculateCharge(price, playerWallet, playerCards) {
-  let charge = new Wallet();
+  let charge = new CoinWallet();
   let response = {
     insufficientFunds: null,
     charge: charge,
