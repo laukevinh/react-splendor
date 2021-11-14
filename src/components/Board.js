@@ -1,27 +1,31 @@
 import React from 'react';
 import { Grid, Card } from 'semantic-ui-react';
-import CardModal from './CardModal';
+import CardModal, { DeckModal } from './CardModal';
 import { DECK, BOARD } from '../utils';
-import { MAX_BOARD_COLS, MAX_BOARD_ROWS } from '../constants/defaults';
 
 export default function Board(props) {
-  let cards = props.cards;
-  let rows = [];
-  for (let level = 0; level < MAX_BOARD_ROWS; level++) {
-    let deck = props.decks[level];
+  const {
+    board,
+    decks,
+    players,
+    currentPlayerIdx,
+    handleReserveFromDeck,
+    finished
+  } = props;
+
+  let rows = board.map((row, level) => {
     let deckModal = (
-      <CardModal
-        source={DECK}
+      <DeckModal
         level={level}
-        deck={deck}
-        handleReserve={props.handleReserve}
-        finished={props.finished}
+        deck={decks[level]}
+        onClick={handleReserveFromDeck}
+        players={players}
+        currentPlayerIdx={currentPlayerIdx}
+        disabled={finished}
       />
     );
-    let cols = [];
-    for (let col = 0; col < MAX_BOARD_COLS; col++) {
-      let card = cards[level][col];
-      cols.push(
+    let cols = row.map((card, col) => {
+      return (
         <CardModal
           source={BOARD}
           level={level}
@@ -31,11 +35,11 @@ export default function Board(props) {
           playerCards={props.playerCards}
           handleBuy={props.handleBuy}
           handleReserve={props.handleReserve}
-          finished={props.finished}
+          finished={finished}
         />
       );
-    }
-    rows.push(
+    });
+    return (
       <Grid.Row columns={2}>
         <Grid.Column width={1}>
           {deckModal}
@@ -47,7 +51,7 @@ export default function Board(props) {
         </Grid.Column>
       </Grid.Row>
     );
-  }
+  });
   return (
     <Grid>{rows}</Grid>
   );

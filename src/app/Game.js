@@ -10,6 +10,7 @@ import History from '../components/History';
 import DesktopLayout from '../layouts/desktop';
 import { MAX_PLAYER_COINS, MAX_PLAYER_RESERVATION } from '../constants/defaults';
 import BankBase from '../objects/BankBase';
+import PlayerBase from '../objects/PlayerBase';
 
 class Game extends React.Component {
   constructor(props) {
@@ -17,6 +18,7 @@ class Game extends React.Component {
     this.handleCoinTransaction = this.handleCoinTransaction.bind(this);
     this.handleBuy = this.handleBuy.bind(this);
     this.handleReserve = this.handleReserve.bind(this);
+    this.handleReserveFromDeck = this.handleReserveFromDeck.bind(this);
     this.handleNoblemenSelection = this.handleNoblemenSelection.bind(this);
 
     this.state = {
@@ -174,6 +176,54 @@ class Game extends React.Component {
       decks: decks,
       lifecycle: lifecycle.selectNoble
     })
+  }
+
+  handleReserveFromDeck(level) {
+    const {
+      players,
+      currentPlayerIdx,
+      bank,
+      decks,
+      lifecycle
+    } = this.state;
+
+    console.log("current state: ", lifecycle.description, lifecycle);
+    if (lifecycle.reserveFromDecks === undefined) {
+      console.log("Cannot reserve from deck in current lifecycle state: ", lifecycle);
+    }
+
+    const currentPlayer = players[currentPlayerIdx];
+    if (MAX_PLAYER_RESERVATION <= currentPlayer.reserved.length) {
+      alert("exceeds max allow reservations");
+      return;
+    }
+    if (decks[level].length === 0) {
+      alert("empty deck size: ", decks[level].length);
+      return;
+    }
+
+    let newLifecycle = lifecycle.reserveFromDecks;
+    let newPlayers = players.slice();
+    let newPlayer = Object.assign(new PlayerBase, currentPlayer);
+    let newDecks = decks.slice();
+    newPlayer.reserve(newDecks[level].pop());
+
+    let newBank = Object.assign(new BankBase, bank);
+    if (0 < bank.wallet[WILD]) {
+      newLifecycle = newLifecycle.collectCoins;
+      newPlayer.coins[WILD]++;
+      newBank.wallet[WILD]--;
+    }
+
+    newPlayers[currentPlayerIdx] = newPlayer;
+    newLifecycle = MAX_PLAYER_COINS < newPlayer.coins.sum() ? newLifecycle.returnCoins : newLifecycle.selectNoble;
+
+    this.setState({
+      players: newPlayers,
+      bank: newBank,
+      decks: newDecks,
+      lifecycle: newLifecycle
+    });
   }
 
   handleReserve(source, level, column, card) {
@@ -394,11 +444,15 @@ class Game extends React.Component {
               <Grid.Row>
                 <Board
                   cards={board}
+                  board={board}
                   decks={decks}
+                  players={this.state.players}
+                  currentPlayerIdx={currentPlayerIdx}
                   playerWallet={this.state.players[currentPlayerIdx].coins}
                   playerCards={this.state.players[currentPlayerIdx].cards}
                   handleBuy={this.handleBuy}
                   handleReserve={this.handleReserve}
+                  handleReserveFromDeck={this.handleReserveFromDeck}
                   finished={finished}
                 />
               </Grid.Row>
