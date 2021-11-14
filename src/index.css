@@ -37,6 +37,12 @@ body {
   pointer-events: none;
 }
 
+.background {
+  background: #715331;
+  padding-top: 3em;
+  margin-top: -1em;
+}
+
 .game-card {
   display: inline-block;
   text-align: center;
@@ -114,9 +120,21 @@ body {
   padding: 3px;
 }
 
+.coinContainer.floated, img.floated {
+  display: inline-block;
+}
+
+.coinContainer.floated.left, img.floated.left {
+  float: left
+}
+.coinContainer.floated.right, img.floated.right {
+  float: right
+}
+
 .coinContainer {
   position: relative;
   display: inline flex;
+  margin: 0.25em;
 }
 
 .coinContent {
@@ -132,9 +150,24 @@ body {
 }
 
 .circle + .icon {
-  position: relative;
-  top: 24px;
-  left: -12px;
+  position: absolute;
+  top: 26px;
+  left: 26px;
+}
+
+img.small {
+  width: 16px;
+  height: 16px;
+}
+
+img.medium {
+  width: 24px;
+  height: 24px;
+}
+
+img.large {
+  width: 32px;
+  height: 32px;
 }
 
 .modal.bank > .content > .row > .coin {
@@ -154,7 +187,7 @@ body {
   display: block flex;
 }
 
-.pointValue {
+.ui.card > .content > .header:not(.ui).pointValue, .ui.cards > .card > .content > .header:not(.ui).pointValue {
   font-size: 2rem;
-  font-weight: 800;
+  font-weight: 700;
 }

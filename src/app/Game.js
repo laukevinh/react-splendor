@@ -360,53 +360,55 @@ class Game extends React.Component {
     }
 
     return (
-      <Container className={'large'} style={{ marginTop: '3em' }}>
-        <Grid>
-          <Grid.Column width={4}>
-            {players}
-          </Grid.Column>
-          <Grid.Column width={2}>
-            <Bank
-              coins={this.state.bank.wallet}
-              handleCoinTransaction={this.handleCoinTransaction}
-              finished={finished}
-            />
-            <ReturnCoinsModal
-              coins={this.state.players[currentPlayerIdx].coins}
-              open={this.state.returnCoinsModalOpen}
-              handleCoinTransaction={this.handleCoinTransaction}
-            />
-          </Grid.Column>
-          <Grid.Column width={7}>
-            <Grid.Row>
-              <Noblemen
-                noblemen={nobles}
-                includesList={nobles.map(noble => noble.isDisplayed)}
-              />
-              <ModalNoblemen
-                noblemen={nobles}
-                includesList={selectableNoblemen}
-                onClick={this.handleNoblemenSelection}
-                open={noblemenSelectionOpen}
-              />
-            </Grid.Row>
-            <Grid.Row>
-              <Board
-                cards={board}
-                decks={decks}
-                playerWallet={this.state.players[currentPlayerIdx].coins}
-                playerCards={this.state.players[currentPlayerIdx].cards}
-                handleBuy={this.handleBuy}
-                handleReserve={this.handleReserve}
+      <div className={'background'}>
+        <Container className={'large'}>
+          <Grid>
+            <Grid.Column width={4}>
+              {players}
+            </Grid.Column>
+            <Grid.Column width={2}>
+              <Bank
+                coins={this.state.bank.wallet}
+                handleCoinTransaction={this.handleCoinTransaction}
                 finished={finished}
               />
-            </Grid.Row>
-          </Grid.Column>
-          <Grid.Column width={3}>
-            <History status={status} />
-          </Grid.Column>
-        </Grid>
-      </Container>
+              <ReturnCoinsModal
+                coins={this.state.players[currentPlayerIdx].coins}
+                open={this.state.returnCoinsModalOpen}
+                handleCoinTransaction={this.handleCoinTransaction}
+              />
+            </Grid.Column>
+            <Grid.Column width={7}>
+              <Grid.Row>
+                <Noblemen
+                  noblemen={nobles}
+                  includesList={nobles.map(noble => noble.isDisplayed)}
+                />
+                <ModalNoblemen
+                  noblemen={nobles}
+                  includesList={selectableNoblemen}
+                  onClick={this.handleNoblemenSelection}
+                  open={noblemenSelectionOpen}
+                />
+              </Grid.Row>
+              <Grid.Row>
+                <Board
+                  cards={board}
+                  decks={decks}
+                  playerWallet={this.state.players[currentPlayerIdx].coins}
+                  playerCards={this.state.players[currentPlayerIdx].cards}
+                  handleBuy={this.handleBuy}
+                  handleReserve={this.handleReserve}
+                  finished={finished}
+                />
+              </Grid.Row>
+            </Grid.Column>
+            <Grid.Column width={3}>
+              <History status={status} />
+            </Grid.Column>
+          </Grid>
+        </Container>
+      </div>
     );
   }
 }

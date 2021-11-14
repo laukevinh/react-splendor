@@ -2,6 +2,7 @@ import React from 'react';
 import { Grid, Card, Modal, Button } from 'semantic-ui-react';
 import renderPrice, { BOARD, calculateCharge, RESERVED, DECK } from '../utils';
 import Coin from './Coin';
+import ColorIcon from './ColorIcon';
 
 export default class CardModal extends React.Component {
   constructor(props) {
@@ -45,13 +46,13 @@ export default class CardModal extends React.Component {
         cardComponent = (
           <Card>
             <Card.Content className={color}>
-              <Card.Header>
-                <Grid>
-                  <Grid.Row columns={2}>
-                    <Grid.Column><Coin color={color} /></Grid.Column>
-                    <Grid.Column textAlign="right" className={"pointValue"}>{points}</Grid.Column>
-                  </Grid.Row>
-                </Grid>
+              <ColorIcon
+                color={color}
+                floated={'left'}
+                size={'large'}
+              />
+              <Card.Header textAlign="right" className={"pointValue"}>
+                {points}
               </Card.Header>
               <Card.Description>
                 {prices}
