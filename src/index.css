@@ -65,36 +65,50 @@ body {
   width: 100px;
 }
 
-.white, .ui.cards > .ui.card > .content.white {
+.white,
+.ui.card > .content.white, 
+.ui.cards > .ui.card > .content.white {
   background:rgb(220, 220, 220);
   border-color: #fff;
 }
 
-.blue, .ui.cards > .ui.card > .content.blue {
+.blue,
+.ui.card > .content.blue, 
+.ui.cards > .ui.card > .content.blue {
   background-color: rgb(140, 160, 210);
   border-color: rgb(30, 70, 180)
 }
 
-.green, .ui.cards > .ui.card > .content.green {
+.green,
+.ui.card > .content.green, 
+.ui.cards > .ui.card > .content.green {
   background-color: rgb(130, 200, 170);
   border-color: rgb(10, 130, 80);
 }
 
-.red, .ui.cards > .ui.card > .content.red {
+.red,
+.ui.card > .content.red, 
+.ui.cards > .ui.card > .content.red {
   background-color: rgb(240, 160, 170);
   border-color: rgb(220, 70, 70);
 }
 
-.black, .ui.cards > .ui.card > .content.black {
+.black,
+.ui.card > .content.black, 
+.ui.cards > .ui.card > .content.black {
   background-color: rgb(150, 150, 150);
   border-color: rgb(50, 50, 50);
 }
 
-.wild, .ui.cards > .ui.card > .content.wild {
+.wild,
+.ui.card > .content.wild, 
+.ui.cards > .ui.card > .content.wild {
   background-color: rgb(230, 220, 10);
 }
 
-.beige, .ui.cards > .ui.card > .content.beige {
+.beige,
+.ui.card > .content.beige, 
+.ui.cards > .ui.card > .content.beige {
   background-color: rgb(200, 140, 50);
 }
 
@@ -161,13 +175,13 @@ img.small {
 }
 
 img.medium {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
 }
 
 img.large {
-  width: 32px;
-  height: 32px;
+  width: 64px;
+  height: 64px;
 }
 
 .modal.bank > .content > .row > .coin {
@@ -187,7 +201,18 @@ img.large {
   display: block flex;
 }
 
-.ui.card > .content > .header:not(.ui).pointValue, .ui.cards > .card > .content > .header:not(.ui).pointValue {
-  font-size: 2rem;
+.ui.card > .content > .header:not(.ui).pointValue,
+.ui.cards > .card > .content > .header:not(.ui).pointValue {
+font-size: 2rem;
   font-weight: 700;
+}
+
+.ui.card > .content.medium,
+.ui.cards > .card > .content.medium {
+  min-height: 200px;
+}
+
+.ui.card > .content.large,
+.ui.cards > .card > .content.large {
+  min-height: 300px;
 }

@@ -1,8 +1,35 @@
 import React from 'react';
 import { Grid, Card, Modal, Button } from 'semantic-ui-react';
 import renderPrice, { BOARD, calculateCharge, RESERVED, DECK } from '../utils';
-import Coin from './Coin';
 import ColorIcon from './ColorIcon';
+
+function GameCard(props) {
+  const {
+    card,
+    size
+  } = props;
+  let classNames = [card.color];
+  if (size) {
+    classNames.push(size);
+  }
+  return (
+    <Card {...props}>
+      <Card.Content className={classNames.join(" ")}>
+        <ColorIcon
+          color={card.color}
+          floated={'left'}
+          size={size || 'medium'}
+        />
+        <Card.Header textAlign="right" className={"pointValue"}>
+          {card.points}
+        </Card.Header>
+        <Card.Description>
+          {renderPrice(card.price, "coin")}
+        </Card.Description>
+      </Card.Content>
+    </Card>
+  );
+}
 
 export default class CardModal extends React.Component {
   constructor(props) {
@@ -32,45 +59,16 @@ export default class CardModal extends React.Component {
     let { source, level, column, index, card, playerWallet, playerCards, deck } = this.props;
     let color;
     let cardComponent;
-    let modalHeader;
     let modalContent;
     let buyButton;
     if (source === BOARD || source === RESERVED) {
       if (typeof card === "undefined") {
         cardComponent = <Card />;
       } else {
-        color = card.color;
-        let points = card.points;
-        let price = card.price;
-        const prices = renderPrice(price, "coin");
-        cardComponent = (
-          <Card>
-            <Card.Content className={color}>
-              <ColorIcon
-                color={color}
-                floated={'left'}
-                size={'large'}
-              />
-              <Card.Header textAlign="right" className={"pointValue"}>
-                {points}
-              </Card.Header>
-              <Card.Description>
-                {prices}
-              </Card.Description>
-            </Card.Content>
-          </Card>
-        );
+        cardComponent = <GameCard card={card} size={'medium'} />;
         // TODO: BUG: you can buy another player's reserved card.
-        const insufficientFunds = calculateCharge(price, playerWallet, playerCards).insufficientFunds;
-        modalHeader = (
-          <Grid>
-            <Grid.Row columns={2}>
-              <Grid.Column><Coin color={color} size='mini' /></Grid.Column>
-              <Grid.Column textAlign="right">{points}</Grid.Column>
-            </Grid.Row>
-          </Grid>
-        );
-        modalContent = prices;
+        const insufficientFunds = calculateCharge(card.price, playerWallet, playerCards).insufficientFunds;
+        modalContent = <GameCard card={card} size={'large'} fluid />;
         buyButton = (
           <Button
             content="Buy"
@@ -90,19 +88,20 @@ export default class CardModal extends React.Component {
           <Grid.Row>{deck.length}</Grid.Row>
         </div>
       );
-      modalHeader = `Level ${level}`;
-      modalContent = `Remaining: ${deck.length}`;
+      modalContent = `Level ${level} Remaining: ${deck.length}`;
       column = null;
     }
     return (
       <Modal
+        size={'mini'}
         onClose={() => this.setOpen(false)}
         onOpen={() => this.setOpen(true)}
         open={this.state.open}
         trigger={cardComponent}
       >
-        <Modal.Header>{modalHeader}</Modal.Header>
-        <Modal.Content>{modalContent}</Modal.Content>
+        <Modal.Content>
+          {modalContent}
+        </Modal.Content>
         <Modal.Actions>
           <Button
             color='black'
