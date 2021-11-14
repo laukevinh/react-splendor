@@ -55,6 +55,67 @@ export function DeckModal(props) {
   )
 }
 
+export function GameCardModal(props) {
+  const {
+    level,
+    column,
+    deck,
+    card,
+    handleReserveClick,
+    handleBuyClick,
+    players,
+    currentPlayerIdx,
+    disabled
+  } = props;
+  const [open, setOpen] = useState(false);
+  const currentPlayer = players[currentPlayerIdx];
+  const insufficientFunds = calculateCharge(card.price, currentPlayer.coins, currentPlayer.cards).insufficientFunds;
+
+  const handleBuy = () => {
+    setOpen(false);
+    let index = null;
+    handleBuyClick(BOARD, level, column, index, card);
+  }
+
+  const handleReserve = () => {
+    setOpen(false);
+    handleReserveClick(level, column);
+  }
+
+  return (
+    <Modal
+      size={'mini'}
+      onClose={() => setOpen(false)}
+      onOpen={() => setOpen(true)}
+      open={open && !disabled}
+      trigger={<GameCard card={card} size={'medium'} />}
+    >
+      <Modal.Content>
+        <GameCard card={card} size={'large'} fluid />
+      </Modal.Content>
+      <Modal.Actions>
+        <Button
+          color='black'
+          content="Cancel"
+          onClick={() => setOpen(false)}
+        />
+        <Button
+          color='yellow'
+          content="Reserve"
+          disabled={MAX_PLAYER_RESERVATION <= currentPlayer.reserved.length}
+          onClick={() => handleReserve()}
+        />
+        <Button
+          content="Buy"
+          disabled={insufficientFunds}
+          onClick={() => handleBuy()}
+          positive
+        />
+      </Modal.Actions>
+    </Modal>
+  )
+}
+
 export default class CardModal extends React.Component {
   constructor(props) {
     super(props);

@@ -19,6 +19,7 @@ class Game extends React.Component {
     this.handleBuy = this.handleBuy.bind(this);
     this.handleReserve = this.handleReserve.bind(this);
     this.handleReserveFromDeck = this.handleReserveFromDeck.bind(this);
+    this.handleReserveFromBoard = this.handleReserveFromBoard.bind(this);
     this.handleNoblemenSelection = this.handleNoblemenSelection.bind(this);
 
     this.state = {
@@ -222,6 +223,57 @@ class Game extends React.Component {
       players: newPlayers,
       bank: newBank,
       decks: newDecks,
+      lifecycle: newLifecycle
+    });
+  }
+
+  handleReserveFromBoard(level, column) {
+    const {
+      players,
+      currentPlayerIdx,
+      board,
+      bank,
+      decks,
+      lifecycle
+    } = this.state;
+
+    console.log("current state: ", lifecycle.description, lifecycle);
+    if (lifecycle.reserveFromBoard === undefined) {
+      console.log("Cannot reserve from board in current lifecycle state: ", lifecycle);
+    }
+
+    const currentPlayer = players[currentPlayerIdx];
+    if (MAX_PLAYER_RESERVATION <= currentPlayer.reserved.length) {
+      alert("exceeds max allow reservations");
+      return;
+    }
+
+    let newLifecycle = lifecycle.reserveFromBoard;
+    let newPlayers = players.slice();
+    let newPlayer = Object.assign(new PlayerBase, currentPlayer);
+    let newDecks = decks.slice();
+    let newBoard = board.slice();
+    const card = board[level][column];
+    newPlayer.reserve(card);
+
+    newLifecycle = newLifecycle.replenishBoard;
+    newBoard[level][column] = 0 < decks[level].length ? newDecks[level].pop() : null;
+
+    let newBank = Object.assign(new BankBase, bank);
+    if (0 < bank.wallet[WILD]) {
+      newLifecycle = newLifecycle.collectCoins;
+      newPlayer.coins[WILD]++;
+      newBank.wallet[WILD]--;
+    }
+
+    newPlayers[currentPlayerIdx] = newPlayer;
+    newLifecycle = MAX_PLAYER_COINS < newPlayer.coins.sum() ? newLifecycle.returnCoins : newLifecycle.selectNoble;
+
+    this.setState({
+      players: newPlayers,
+      bank: newBank,
+      decks: newDecks,
+      board: newBoard,
       lifecycle: newLifecycle
     });
   }
@@ -453,6 +505,7 @@ class Game extends React.Component {
                   handleBuy={this.handleBuy}
                   handleReserve={this.handleReserve}
                   handleReserveFromDeck={this.handleReserveFromDeck}
+                  handleReserveFromBoard={this.handleReserveFromBoard}
                   finished={finished}
                 />
               </Grid.Row>

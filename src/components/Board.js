@@ -1,7 +1,6 @@
 import React from 'react';
 import { Grid, Card } from 'semantic-ui-react';
-import CardModal, { DeckModal } from './CardModal';
-import { DECK, BOARD } from '../utils';
+import { DeckModal, GameCardModal } from './CardModal';
 
 export default function Board(props) {
   const {
@@ -10,9 +9,11 @@ export default function Board(props) {
     players,
     currentPlayerIdx,
     handleReserveFromDeck,
+    handleReserveFromBoard,
     finished
   } = props;
-
+  // TODO empty array into a placeholder deck card
+  // TODO turn null into a placeholder game card
   let rows = board.map((row, level) => {
     let deckModal = (
       <DeckModal
@@ -26,16 +27,15 @@ export default function Board(props) {
     );
     let cols = row.map((card, col) => {
       return (
-        <CardModal
-          source={BOARD}
+        <GameCardModal
           level={level}
           column={col}
           card={card}
-          playerWallet={props.playerWallet}
-          playerCards={props.playerCards}
-          handleBuy={props.handleBuy}
-          handleReserve={props.handleReserve}
-          finished={finished}
+          players={players}
+          currentPlayerIdx={currentPlayerIdx}
+          handleBuyClick={props.handleBuy}
+          handleReserveClick={handleReserveFromBoard}
+          disabled={finished}
         />
       );
     });
