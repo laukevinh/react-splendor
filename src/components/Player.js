@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Grid, Modal } from 'semantic-ui-react'
 import CardModal from './CardModal';
+import DeckCard from './DeckCard';
 import renderPrice, { GameCard, RESERVED } from '../utils';
 import Coin from './Coin';
 
@@ -80,14 +81,7 @@ function ModalPlayerDetails(props) {
       onClose={() => setOpen(false)}
       onOpen={() => setOpen(!finished)}
       open={open}
-      trigger={<div className="game-card mini selectable">...</div>}
-    // trigger={<div>...</div>}
-    // using divs, even an empty div, will work as a modal trigger. But the below GameCard component doesn't work.
-    // Semantic-UI calls react.isValidElement() on the trigger. If it isn't a valid element, it returns null and does nothing
-    // that's why using GameCard doesn't work? it's still returning a div... anyway.
-    // https://reactjs.org/docs/react-api.html#isvalidelement
-    // https://github.com/Semantic-Org/Semantic-UI-React/blob/ff703557a3090ea281cb7a263bc486a978fbabdd/src/modules/Modal/Modal.js#L215
-    // trigger={<GameCard color="wild" selectable content="..." />}
+      trigger={<DeckCard size={'small'} />}
     >
       <Modal.Header>
         <Grid columns={2}>
