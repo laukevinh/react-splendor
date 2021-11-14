@@ -1,9 +1,9 @@
 import React from 'react';
-import { Grid, Card, Modal, Button } from 'semantic-ui-react';
+import { Card, Modal, Button } from 'semantic-ui-react';
 import renderPrice, { BOARD, calculateCharge, RESERVED, DECK } from '../utils';
 import ColorIcon from './ColorIcon';
 
-function GameCard(props) {
+export function GameCard(props) {
   const {
     card,
     size
@@ -28,6 +28,35 @@ function GameCard(props) {
         </Card.Description>
       </Card.Content>
     </Card>
+  );
+}
+
+function DeckCard(props) {
+  const {
+    size,
+    fluid,
+    onClick,
+    disabled,
+    children
+  } = props;
+  let classNames = ['deck-card', 'beige'];
+  if (size) {
+    classNames.push(size);
+  }
+  if (fluid) {
+    classNames.push('fluid');
+  }
+  if (onClick) {
+    classNames.push('selectable');
+  }
+  if (disabled) {
+    classNames.push('disabled');
+  }
+  return (
+    <div className={classNames.join(" ")} {...props}>
+      <div>{'...'}</div>
+      <div>{children}</div>
+    </div>
   );
 }
 
@@ -57,18 +86,17 @@ export default class CardModal extends React.Component {
 
   render() {
     let { source, level, column, index, card, playerWallet, playerCards, deck } = this.props;
-    let color;
     let cardComponent;
     let modalContent;
     let buyButton;
     if (source === BOARD || source === RESERVED) {
       if (typeof card === "undefined") {
-        cardComponent = <Card />;
+        cardComponent = <Card content={'...'} />;
       } else {
         cardComponent = <GameCard card={card} size={'medium'} />;
+        modalContent = <GameCard card={card} size={'large'} fluid />;
         // TODO: BUG: you can buy another player's reserved card.
         const insufficientFunds = calculateCharge(card.price, playerWallet, playerCards).insufficientFunds;
-        modalContent = <GameCard card={card} size={'large'} fluid />;
         buyButton = (
           <Button
             content="Buy"
@@ -79,17 +107,10 @@ export default class CardModal extends React.Component {
         );
       }
     } else if (source === DECK) {
-      color = 'beige';
-      card = deck[deck.length - 1];
-      const selectable = 0 < deck.length ? 'selectable' : 'disabled';
-      cardComponent = (
-        <div className={["game-card", "mini", selectable, color].join(" ")}>
-          <Grid.Row>...</Grid.Row>
-          <Grid.Row>{deck.length}</Grid.Row>
-        </div>
-      );
-      modalContent = `Level ${level} Remaining: ${deck.length}`;
+      cardComponent = <DeckCard size={'small'}>{deck.length}</DeckCard>;
+      modalContent = <DeckCard size={'large'} fluid>{deck.length}</DeckCard>;
       column = null;
+      card = deck[deck.length - 1];
     }
     return (
       <Modal
