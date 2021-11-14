@@ -73,8 +73,7 @@ export function GameCardModal(props) {
 
   const handleBuy = () => {
     setOpen(false);
-    let index = null;
-    handleBuyClick(BOARD, level, column, index, card);
+    handleBuyClick(level, column);
   }
 
   const handleReserve = () => {

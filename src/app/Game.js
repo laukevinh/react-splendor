@@ -17,7 +17,7 @@ class Game extends React.Component {
     super(props);
     this.handleCoinTransaction = this.handleCoinTransaction.bind(this);
     this.handleBuy = this.handleBuy.bind(this);
-    this.handleReserve = this.handleReserve.bind(this);
+    this.handleBuyFromBoard = this.handleBuyFromBoard.bind(this);
     this.handleReserveFromDeck = this.handleReserveFromDeck.bind(this);
     this.handleReserveFromBoard = this.handleReserveFromBoard.bind(this);
     this.handleNoblemenSelection = this.handleNoblemenSelection.bind(this);
@@ -127,6 +127,59 @@ class Game extends React.Component {
         returnCoinsModalOpen: false
       });
     }
+  }
+
+  handleBuyFromBoard(level, column) {
+    const {
+      players,
+      currentPlayerIdx,
+      bank,
+      board,
+      decks,
+      lifecycle
+    } = this.state;
+
+    console.log("current state: ", lifecycle.description, lifecycle);
+    if (lifecycle.handleBuyFromBoard === undefined) {
+      console.log("Cannot buy from board in current lifecycle state: ", lifecycle);
+    }
+
+    const currentPlayer = players[currentPlayerIdx];
+    const card = board[level][column];
+    let { insufficientFunds, charge } = calculateCharge(card.price, currentPlayer.coins, currentPlayer.cards);
+
+    if (insufficientFunds) {
+      alert("Insufficient Funds");
+      return;
+    }
+
+    let newLifecycle = lifecycle.buyFromBoard;
+    let newPlayers = players.slice();
+    let newPlayer = Object.assign(new PlayerBase, currentPlayer);
+    let newBank = Object.assign(new BankBase, bank);
+
+    for (let [color, price] of Object.entries(charge)) {
+      newPlayer.coins[color] -= price;
+      newBank.wallet[color] += price;
+    }
+
+    newPlayer.cards[card.color].push(card);
+    newPlayer.addPoints(card.points);
+
+    let newDecks = decks.slice();
+    let newBoard = board.slice();
+    newLifecycle = newLifecycle.replenishBoard;
+    newBoard[level][column] = 0 < decks[level].length ? newDecks[level].pop() : null;
+
+    newPlayers[currentPlayerIdx] = newPlayer;
+
+    this.setState({
+      players: newPlayers,
+      bank: newBank,
+      decks: newDecks,
+      board: newBoard,
+      lifecycle: newLifecycle.selectNoble
+    });
   }
 
   handleBuy(source, level, column, index, card) {
@@ -275,51 +328,6 @@ class Game extends React.Component {
       decks: newDecks,
       board: newBoard,
       lifecycle: newLifecycle
-    });
-  }
-
-  handleReserve(source, level, column, card) {
-    let lifecycle = this.state.lifecycle;
-    console.log("current state: ", lifecycle.description, lifecycle);
-    if (lifecycle.reserveFromBoard === undefined && lifecycle.reserveFromDecks === undefined) {
-      console.log("Cannot reserve in current lifecycle state: ", lifecycle);
-      return;
-    }
-    let players = this.state.players.slice(0, this.state.numPlayers + 1);
-    let player = players[this.state.currentPlayerIdx];
-    let reserved = player.reserved;
-    let bank = new BankBase();
-    Object.assign(bank.wallet, this.state.bank.wallet);
-    if (MAX_PLAYER_RESERVATION <= reserved.length) {
-      alert("exceeds max allow reservations");
-      return;
-    }
-    if (card === null) {
-      return;
-    }
-    player.reserve(card);
-    let decks = this.state.decks.slice();
-    let board = this.state.board.slice();
-    if (source === DECK) {
-      lifecycle = lifecycle.reserveFromDecks;
-      decks[level].pop();
-    } else {
-      lifecycle = lifecycle.reserveFromBoard;
-      lifecycle = lifecycle.replenishBoard;
-      board[level][column] = 0 < decks[level].length ? decks[level].pop() : null;
-    }
-    if (0 < bank.wallet[WILD]) {
-      lifecycle = lifecycle.collectCoins;
-      player.coins[WILD]++;
-      bank.wallet[WILD]--;
-    }
-    lifecycle = MAX_PLAYER_COINS < player.coins.sum() ? lifecycle.returnCoins : lifecycle.selectNoble;
-    this.setState({
-      players: players,
-      bank: bank,
-      board: board,
-      decks: decks,
-      lifecycle: lifecycle
     });
   }
 
@@ -503,7 +511,7 @@ class Game extends React.Component {
                   playerWallet={this.state.players[currentPlayerIdx].coins}
                   playerCards={this.state.players[currentPlayerIdx].cards}
                   handleBuy={this.handleBuy}
-                  handleReserve={this.handleReserve}
+                  handleBuyFromBoard={this.handleBuyFromBoard}
                   handleReserveFromDeck={this.handleReserveFromDeck}
                   handleReserveFromBoard={this.handleReserveFromBoard}
                   finished={finished}

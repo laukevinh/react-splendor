@@ -8,6 +8,7 @@ export default function Board(props) {
     decks,
     players,
     currentPlayerIdx,
+    handleBuyFromBoard,
     handleReserveFromDeck,
     handleReserveFromBoard,
     finished
@@ -33,7 +34,7 @@ export default function Board(props) {
           card={card}
           players={players}
           currentPlayerIdx={currentPlayerIdx}
-          handleBuyClick={props.handleBuy}
+          handleBuyClick={handleBuyFromBoard}
           handleReserveClick={handleReserveFromBoard}
           disabled={finished}
         />
