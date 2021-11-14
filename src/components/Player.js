@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Button, Grid, Modal } from 'semantic-ui-react'
+import { Button, Grid, List, Modal } from 'semantic-ui-react'
 import { GameCardModal } from './CardModal';
-import renderPrice from '../utils';
 import Coin from './Coin';
 import MiniCard from './MiniCard';
 import GameCard from './GameCard';
@@ -55,22 +54,18 @@ function ModalPlayerDetails(props) {
   } = props;
   const [open, setOpen] = useState(false);
 
-  const cards = Object.entries(player.cards).map(([color, cardArray]) => {
-    const cardArrayFormatted = Object.values(cardArray).map(card => {
-      return (
-        <Grid.Row>
+  let cardList = [];
+  Object.values(player.cards).forEach((cardArray) => {
+    Object.values(cardArray).forEach(card => {
+      cardList.push(
+        <List.Item>
           <GameCard
             card={card}
             size="medium"
           />
-        </Grid.Row>
+        </List.Item>
       );
     });
-    return (
-      <Grid.Column>
-        {cardArrayFormatted}
-      </Grid.Column>
-    );
   });
   const reserved = player.reserved.map((card, idx) => {
     return (
@@ -101,9 +96,13 @@ function ModalPlayerDetails(props) {
         </Grid>
       </Modal.Header>
       <Modal.Content>
-        <Grid columns={6}>
-          {cards}
-          <Grid.Column>
+        <Grid celled columns={2}>
+          <Grid.Column width={13}>
+            <List horizontal>
+              {cardList}
+            </List>
+          </Grid.Column>
+          <Grid.Column width={3}>
             {reserved}
           </Grid.Column>
         </Grid>

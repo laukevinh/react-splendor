@@ -12,7 +12,7 @@ export default function GameCard(props) {
     classNames.push(size);
   }
   return (
-    <Card {...props}>
+    <Card className={size} {...props}>
       <Card.Content className={classNames.join(" ")}>
         <ColorIcon
           color={card.color}

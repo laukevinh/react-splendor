@@ -220,8 +220,10 @@ font-size: 2rem;
   font-weight: 700;
 }
 
+.ui.card.medium,
 .ui.card > .content.medium,
 .ui.cards > .card > .content.medium {
+  max-width: 140px;
   min-height: 200px;
 }
 
