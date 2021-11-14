@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Card, Modal, Button } from 'semantic-ui-react';
-import { BOARD, calculateCharge, RESERVED, DECK } from '../utils';
+import { Modal, Button } from 'semantic-ui-react';
+import { calculateCharge } from '../utils';
 import GameCard from './GameCard';
 import DeckCard from './DeckCard';
 import { MAX_PLAYER_RESERVATION } from '../constants/defaults';
@@ -60,6 +60,7 @@ export function GameCardModal(props) {
     level,
     column,
     deck,
+    index,
     card,
     handleReserveClick,
     handleBuyClick,
@@ -73,7 +74,11 @@ export function GameCardModal(props) {
 
   const handleBuy = () => {
     setOpen(false);
-    handleBuyClick(level, column);
+    if (index === undefined) {
+      handleBuyClick(level, column);
+    } else {
+      handleBuyClick(index);
+    }
   }
 
   const handleReserve = () => {
@@ -98,97 +103,25 @@ export function GameCardModal(props) {
           content="Cancel"
           onClick={() => setOpen(false)}
         />
-        <Button
-          color='yellow'
-          content="Reserve"
-          disabled={MAX_PLAYER_RESERVATION <= currentPlayer.reserved.length}
-          onClick={() => handleReserve()}
-        />
-        <Button
-          content="Buy"
-          disabled={insufficientFunds}
-          onClick={() => handleBuy()}
-          positive
-        />
-      </Modal.Actions>
-    </Modal>
-  )
-}
-
-export default class CardModal extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      open: false,
-    };
-  }
-
-  setOpen(open) {
-    if (!this.props.finished) {
-      this.setState({ open: open });
-    }
-  }
-
-  handleReserve(source, level, column, card) {
-    this.setState({ open: false });
-    this.props.handleReserve(source, level, column, card); //assume props is okay, don't need to use state
-  }
-
-  handleConfirm(source, level, column, index, card) {
-    this.setState({ open: false });
-    this.props.handleBuy(source, level, column, index, card); //assume props is okay, don't need to use state
-  }
-
-  render() {
-    let { source, level, column, index, card, playerWallet, playerCards, deck } = this.props;
-    let cardComponent;
-    let modalContent;
-    let buyButton;
-    if (source === BOARD || source === RESERVED) {
-      cardComponent = <GameCard card={card} size={'medium'} />;
-      modalContent = <GameCard card={card} size={'large'} fluid />;
-      // TODO: BUG: you can buy another player's reserved card.
-      const insufficientFunds = calculateCharge(card.price, playerWallet, playerCards).insufficientFunds;
-      buyButton = (
-        <Button
-          content="Buy"
-          disabled={insufficientFunds}
-          onClick={() => this.handleConfirm(source, level, column, index, card)}
-          positive
-        />
-      );
-    } else if (source === DECK) {
-      cardComponent = <DeckCard size={'small'}>{deck.length}</DeckCard>;
-      modalContent = <DeckCard size={'large'} fluid>{deck.length}</DeckCard>;
-      column = null;
-      card = deck[deck.length - 1];
-    }
-    return (
-      <Modal
-        size={'mini'}
-        onClose={() => this.setOpen(false)}
-        onOpen={() => this.setOpen(true)}
-        open={this.state.open}
-        trigger={cardComponent}
-      >
-        <Modal.Content>
-          {modalContent}
-        </Modal.Content>
-        <Modal.Actions>
-          <Button
-            color='black'
-            content="Cancel"
-            onClick={() => this.setOpen(false)}
-          />
+        {
+          handleReserveClick &&
           <Button
             color='yellow'
             content="Reserve"
-            disabled={source === RESERVED}
-            onClick={() => this.handleReserve(source, level, column, card)}
+            disabled={MAX_PLAYER_RESERVATION <= currentPlayer.reserved.length}
+            onClick={() => handleReserve()}
           />
-          {buyButton}
-        </Modal.Actions>
-      </Modal>
-    );
-  }
+        }
+        {
+          currentPlayerIdx === currentPlayer.position &&
+          <Button
+            content="Buy"
+            disabled={insufficientFunds}
+            onClick={() => handleBuy()}
+            positive
+          />
+        }
+      </Modal.Actions>
+    </Modal>
+  )
 }

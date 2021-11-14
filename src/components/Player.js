@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Grid, Modal } from 'semantic-ui-react'
-import CardModal from './CardModal';
+import { GameCardModal } from './CardModal';
 import DeckCard from './DeckCard';
 import renderPrice, { GameCard, RESERVED } from '../utils';
 import Coin from './Coin';
@@ -41,9 +41,12 @@ export default function Player(props) {
 
 function ModalPlayerDetails(props) {
   const {
+    players,
+    currentPlayerIdx,
     player,
     finished,
-    handleBuy
+    handleBuyClick,
+    index
   } = props;
   const [open, setOpen] = useState(false);
 
@@ -64,13 +67,13 @@ function ModalPlayerDetails(props) {
   const reserved = player.reserved.map((card, idx) => {
     return (
       <Grid.Row>
-        <CardModal
-          source={RESERVED}
+        <GameCardModal
           index={idx}
           card={card}
-          playerWallet={player.coins}
-          playerCards={player.cards}
-          handleBuy={handleBuy}
+          players={players}
+          currentPlayerIdx={currentPlayerIdx}
+          handleBuyClick={handleBuyClick}
+          disabled={finished || currentPlayerIdx !== index}
         />
       </Grid.Row>
     )
