@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Grid, List, Modal } from 'semantic-ui-react'
+import { Button, Grid, Header, List, Modal } from 'semantic-ui-react'
 import { GameCardModal } from './CardModal';
 import Coin from './Coin';
 import MiniCard from './MiniCard';
@@ -97,14 +97,20 @@ function ModalPlayerDetails(props) {
       </Modal.Header>
       <Modal.Content>
         <Grid celled columns={2}>
-          <Grid.Column width={13}>
-            <List horizontal>
-              {cardList}
-            </List>
-          </Grid.Column>
-          <Grid.Column width={3}>
-            {reserved}
-          </Grid.Column>
+          <Grid.Row>
+            <Grid.Column width={13}><Header>{'Purchased cards'}</Header></Grid.Column>
+            <Grid.Column width={3}><Header>{'Reserved cards'}</Header></Grid.Column>
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Column width={13}>
+              <List horizontal>
+                {cardList}
+              </List>
+            </Grid.Column>
+            <Grid.Column width={3}>
+              {reserved}
+            </Grid.Column>
+          </Grid.Row>
         </Grid>
       </Modal.Content>
       <Modal.Actions>
