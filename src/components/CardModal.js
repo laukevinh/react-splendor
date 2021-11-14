@@ -64,13 +64,12 @@ export function GameCardModal(props) {
     card,
     handleReserveClick,
     handleBuyClick,
-    players,
+    player,
     currentPlayerIdx,
     disabled
   } = props;
   const [open, setOpen] = useState(false);
-  const currentPlayer = players[currentPlayerIdx];
-  const insufficientFunds = calculateCharge(card.price, currentPlayer.coins, currentPlayer.cards).insufficientFunds;
+  const insufficientFunds = calculateCharge(card.price, player.coins, player.cards).insufficientFunds;
 
   const handleBuy = () => {
     setOpen(false);
@@ -108,12 +107,12 @@ export function GameCardModal(props) {
           <Button
             color='yellow'
             content="Reserve"
-            disabled={MAX_PLAYER_RESERVATION <= currentPlayer.reserved.length}
+            disabled={MAX_PLAYER_RESERVATION <= player.reserved.length}
             onClick={() => handleReserve()}
           />
         }
         {
-          currentPlayerIdx === currentPlayer.position &&
+          currentPlayerIdx === player.position &&
           <Button
             content="Buy"
             disabled={insufficientFunds}

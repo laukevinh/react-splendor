@@ -2,14 +2,15 @@ import React, { useState } from 'react';
 import { Button, Grid, Modal } from 'semantic-ui-react'
 import { GameCardModal } from './CardModal';
 import DeckCard from './DeckCard';
-import renderPrice, { GameCard, RESERVED } from '../utils';
+import renderPrice, { GameCard } from '../utils';
 import Coin from './Coin';
 
 export default function Player(props) {
   const {
     player,
-    activePlayer,
+    currentPlayerIdx,
     finished,
+    handleBuyClick
   } = props;
 
   const coins = Object.entries(player.coins).map(([color, count], idx) => {
@@ -21,7 +22,7 @@ export default function Player(props) {
     return <Grid.Column>{0 < cardArray.length && card}</Grid.Column>;
   });
   return (
-    <Grid className={activePlayer && !finished ? "active-player" : null}>
+    <Grid className={player.position === currentPlayerIdx && !finished ? "active-player" : null}>
       <Grid.Row columns={2}>
         <Grid.Column>{player.points}</Grid.Column>
         <Grid.Column textAlign="right">{player.name}</Grid.Column>
@@ -32,7 +33,12 @@ export default function Player(props) {
       <Grid.Row columns={6}>
         {cards}
         <Grid.Column>
-          <ModalPlayerDetails {...props} />
+          <ModalPlayerDetails
+            player={player}
+            currentPlayerIdx={currentPlayerIdx}
+            finished={finished}
+            handleBuyClick={handleBuyClick}
+          />
         </Grid.Column>
       </Grid.Row>
     </Grid>
@@ -41,12 +47,10 @@ export default function Player(props) {
 
 function ModalPlayerDetails(props) {
   const {
-    players,
-    currentPlayerIdx,
     player,
+    currentPlayerIdx,
     finished,
     handleBuyClick,
-    index
   } = props;
   const [open, setOpen] = useState(false);
 
@@ -70,10 +74,10 @@ function ModalPlayerDetails(props) {
         <GameCardModal
           index={idx}
           card={card}
-          players={players}
+          player={player}
           currentPlayerIdx={currentPlayerIdx}
           handleBuyClick={handleBuyClick}
-          disabled={finished || currentPlayerIdx !== index}
+          disabled={finished || currentPlayerIdx !== player.position}
         />
       </Grid.Row>
     )

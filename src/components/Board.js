@@ -32,7 +32,7 @@ export default function Board(props) {
           level={level}
           column={col}
           card={card}
-          players={players}
+          player={players[currentPlayerIdx]}
           currentPlayerIdx={currentPlayerIdx}
           handleBuyClick={handleBuyFromBoard}
           handleReserveClick={handleReserveFromBoard}
