@@ -6,56 +6,54 @@ import Coin from './Coin';
 export default class ReturnCoinsModal extends React.Component {
   constructor(props) {
     super(props);
-    this.handleCoinTake = this.handleCoinTake.bind(this);
-    this.handleCoinReturn = this.handleCoinReturn.bind(this);
+    this.handleGiveToBank = this.handleGiveToBank.bind(this);
+    this.handleReturnToPlayer = this.handleReturnToPlayer.bind(this);
     this.state = {
-      open: false,
       playerCoins: props.coins,
       numPlayerCoins: props.coins.sum(),
       tempCoins: new CoinWallet(),
-      refreshState: true,
     }
   }
 
-  componentDidUpdate() {
-    if (!this.props.finished && this.props.open && this.state.refreshState) {
+  componentDidUpdate(prevProps) {
+    if (!prevProps.open && this.props.open) {
       this.setState({
         playerCoins: this.props.coins,
         numPlayerCoins: this.props.coins.sum(),
         tempCoins: new CoinWallet(),
-        refreshState: false,
       });
     }
   }
 
-  setAllObjValues(obj, value) {
-    for (let key of Object.keys(obj)) {
-      obj[key] = value;
+  handleCoinMovement(color, isGiveToBank) {
+    const {
+      playerCoins,
+      tempCoins
+    } = this.state;
+
+    let newPlayerCoins = Object.assign(new CoinWallet(), playerCoins);
+    let newTempCoins = Object.assign(new CoinWallet(), tempCoins);
+    if (isGiveToBank) {
+      newPlayerCoins[color]--;
+      newTempCoins[color]++;
+    } else {
+      newPlayerCoins[color]++;
+      newTempCoins[color]--;
     }
-  }
 
-  handleCoinTake(colorToTake) {
-    let playerCoins = Object.assign({}, this.state.playerCoins);
-    let tempCoins = Object.assign({}, this.state.tempCoins);
-    playerCoins[colorToTake]--;
-    tempCoins[colorToTake]++;
     this.setState({
-      playerCoins: playerCoins,
-      tempCoins: tempCoins,
-      numPlayerCoins: this.state.numPlayerCoins - 1,
+      playerCoins: newPlayerCoins,
+      tempCoins: newTempCoins,
+      numPlayerCoins: newPlayerCoins.sum(),
     });
   }
 
-  handleCoinReturn(colorToReturn) {
-    let playerCoins = Object.assign({}, this.state.playerCoins);
-    let tempCoins = Object.assign({}, this.state.tempCoins);
-    playerCoins[colorToReturn]++;
-    tempCoins[colorToReturn]--;
-    this.setState({
-      playerCoins: playerCoins,
-      tempCoins: tempCoins,
-      numPlayerCoins: this.state.numPlayerCoins + 1,
-    });
+  handleGiveToBank(color) {
+    this.handleCoinMovement(color, true);
+  }
+
+  handleReturnToPlayer(color) {
+    this.handleCoinMovement(color, false);
   }
 
   handleConfirm(coins) {
@@ -68,16 +66,39 @@ export default class ReturnCoinsModal extends React.Component {
   }
 
   render() {
-    let open = this.props.open;
+    const { open } = this.props;
+    const {
+      playerCoins,
+      numPlayerCoins,
+      tempCoins
+    } = this.state;
 
-    const coins = Object.entries(this.state.playerCoins).map(([color, count], idx) => {
+    const coins = Object.entries(playerCoins).map(([color, count], idx) => {
       const disabled = count <= 0;
-      const playerCoinButton = <Coin color={color} disabled={disabled} onClick={this.handleCoinTake}>{count}</Coin>;
-      const tempCoinButton = <Coin color={color} onClick={this.handleCoinReturn}>{this.state.tempCoins[color]}</Coin>;
+      const playerCoinButton = (
+        <Coin
+          color={color}
+          disabled={disabled}
+          onClick={this.handleGiveToBank}
+        >
+          {count}
+        </Coin>
+      );
+      const tempCoinButton = (
+        <Coin
+          color={color}
+          onClick={this.handleReturnToPlayer}
+        >
+          {tempCoins[color]}
+        </Coin>
+      );
       return (
         <Grid.Row>
           {playerCoinButton}
-          {this.state.tempCoins[color] > 0 && tempCoinButton}
+          {
+            tempCoins[color] > 0 &&
+            tempCoinButton
+          }
         </Grid.Row>
       );
     });
@@ -85,8 +106,6 @@ export default class ReturnCoinsModal extends React.Component {
     return (
       <Modal
         className="bank"
-        onClose={() => alert("you must return down to 10 coins")}
-        onOpen={() => alert("modal opened")}
         open={open}
         trigger={null}
       >
@@ -95,9 +114,9 @@ export default class ReturnCoinsModal extends React.Component {
         <Modal.Actions>
           <Button
             content="confirm"
-            onClick={() => this.handleConfirm(this.state.tempCoins)}
+            onClick={() => this.handleConfirm(tempCoins)}
             positive
-            disabled={10 < this.state.numPlayerCoins}
+            disabled={numPlayerCoins > 10}
           />
         </Modal.Actions>
       </Modal>
