@@ -90,40 +90,46 @@ class Game extends React.Component {
   }
 
   handleCoinTransaction(transactionAmountWallet, isPlayerCollecting) {
-    let lifecycle = this.state.lifecycle;
+    const {
+      players,
+      currentPlayerIdx,
+      bank,
+      lifecycle
+    } = this.state;
+
     console.log("current state: ", lifecycle.description, lifecycle);
     if (lifecycle.collectCoins === undefined && lifecycle.returnCoins === undefined && lifecycle.description !== 'returnCoins') {
       console.log("Cannot collect or return coins in current lifecycle state: ", lifecycle);
       return;
     }
-    if (isPlayerCollecting) {
-      lifecycle = lifecycle.collectCoins;
-    }
-    let players = this.state.players.slice();
-    let bank = new BankBase();
-    Object.assign(bank.wallet, this.state.bank.wallet);
-    let player = players[this.state.currentPlayerIdx];
+
+    const currentPlayer = players[currentPlayerIdx];
+    let newLifecycle = isPlayerCollecting ? lifecycle.collectCoins : lifecycle.returnCoins;
+    let newPlayers = players.slice();
+    let newPlayer = Object.assign(new PlayerBase(), currentPlayer);
+    let newBank = Object.assign(new BankBase(), bank);
     for (let color of Object.keys(transactionAmountWallet)) {
       if (isPlayerCollecting) {
-        bank.wallet[color] -= transactionAmountWallet[color];
-        player.coins[color] += transactionAmountWallet[color];
+        newBank.wallet[color] -= transactionAmountWallet[color];
+        newPlayer.coins[color] += transactionAmountWallet[color];
       } else {
-        bank.wallet[color] += transactionAmountWallet[color];
-        player.coins[color] -= transactionAmountWallet[color];
+        newBank.wallet[color] += transactionAmountWallet[color];
+        newPlayer.coins[color] -= transactionAmountWallet[color];
       }
     }
 
-    if (MAX_PLAYER_COINS < player.coins.sum()) {
+    newPlayers[currentPlayerIdx] = newPlayer;
+    if (MAX_PLAYER_COINS < newPlayer.coins.sum()) {
       this.setState({
-        players: players,
-        bank: bank,
-        lifecycle: lifecycle.returnCoins,
+        players: newPlayers,
+        bank: newBank,
+        lifecycle: newLifecycle.returnCoins,
       });
     } else {
       this.setState({
-        players: players,
-        bank: bank,
-        lifecycle: lifecycle.selectNoble,
+        players: newPlayers,
+        bank: newBank,
+        lifecycle: newLifecycle.selectNoble,
         returnCoinsModalOpen: false
       });
     }
