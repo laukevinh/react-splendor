@@ -1,4 +1,5 @@
 import Coin from './components/Coin';
+import { COLORS_NO_WILD } from './constants/colors';
 import { CoinWallet } from './objects/Wallet';
 
 export const DECK = 'deck';
@@ -42,30 +43,40 @@ export function GameCard(props) {
   );
 }
 
-export function calculateCharge(price, playerWallet, playerCards) {
-  let charge = new CoinWallet();
-  let response = {
-    insufficientFunds: null,
-    charge: charge,
-  }
-  for (let [color, colorPrice] of Object.entries(price)) {
-    let remainder = colorPrice - playerCards[color].length;
-    if (playerWallet[color] + playerWallet[WILD] < remainder) {
-      response.insufficientFunds = true;
-      return response;
-    } else if (playerWallet[color] < remainder) {
-      charge[color] = playerWallet[color];
-      charge[WILD] += remainder - playerWallet[color];
-    } else {
-      charge[color] = remainder;
+export function isAbleToBuy(card, player) {
+  const price = card.price;
+  const cards = player.cards;
+  let newWallet = new CoinWallet();
+
+  COLORS_NO_WILD.forEach(color => {
+    let remainder = price[color] - cards[color].length;
+    if (newWallet[color] + newWallet[WILD] < remainder) {
+      return false;
+    } else if (remainder - newWallet[color] > 0) {
+      newWallet[WILD] -= remainder - newWallet[color];
     }
-    if (playerWallet[WILD] - charge[WILD] < 0) {
-      response.insufficientFunds = true;
-      return response;
+  })
+  return true;
+}
+
+export function calculateCharge(card, player) {
+  const price = card.price;
+  const cards = player.cards;
+  const wallet = player.coins;
+  let chargeWallet = new CoinWallet();
+
+  COLORS_NO_WILD.forEach(color => {
+    let remainder = price[color] - cards[color].length;
+    if (remainder > 0) {
+      if (wallet[color] >= remainder) {
+        chargeWallet[color] = remainder;
+      } else {
+        chargeWallet[color] = wallet[color];
+        chargeWallet[WILD] = remainder - wallet[color];
+      }
     }
-  }
-  response.insufficientFunds = false;
-  return response;
+  })
+  return chargeWallet;
 }
 
 function randInt(i, j) {

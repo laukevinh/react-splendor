@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Button } from 'semantic-ui-react';
-import { calculateCharge } from '../utils';
+import { isAbleToBuy } from '../utils';
 import GameCard from './GameCard';
 import { MAX_PLAYER_RESERVATION } from '../constants/defaults';
 import MiniCard from './MiniCard';
@@ -77,7 +77,6 @@ export function GameCardModal(props) {
     disabled
   } = props;
   const [open, setOpen] = useState(false);
-  const insufficientFunds = calculateCharge(card.price, player.coins, player.cards).insufficientFunds;
 
   const handleBuy = () => {
     setOpen(false);
@@ -123,7 +122,7 @@ export function GameCardModal(props) {
           currentPlayerIdx === player.position &&
           <Button
             content="Buy"
-            disabled={insufficientFunds}
+            disabled={!isAbleToBuy(card, player)}
             onClick={() => handleBuy()}
             positive
           />

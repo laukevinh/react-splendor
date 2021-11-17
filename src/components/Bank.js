@@ -3,9 +3,17 @@ import { CoinWallet } from '../objects/Wallet';
 import { WILD } from '../utils';
 import { Button, Container, Grid, Modal } from 'semantic-ui-react'
 import Coin from './Coin';
+import { COLORS_NO_WILD } from '../constants/colors';
+import BankBase from '../objects/BankBase';
 
 export default function Bank(props) {
-  const coins = Object.entries(props.coins).map(([color, count], idx) => {
+  const {
+    bank,
+    handleCoinTransaction,
+    disabled
+  } = props;
+
+  const coins = Object.entries(bank.wallet).map(([color, count], idx) => {
     return <Coin color={color}>{count}</Coin>
   });
 
@@ -13,9 +21,10 @@ export default function Bank(props) {
     <Container>
       {coins}
       <ModalPickCoins
+        bank={bank}
         coins={props.coins}
-        handleCoinTransaction={props.handleCoinTransaction}
-        finished={props.finished}
+        handleCoinTransaction={handleCoinTransaction}
+        disabled={disabled}
       />
     </Container>
   );
@@ -28,11 +37,21 @@ class ModalPickCoins extends React.Component {
     this.handleCoinReturn = this.handleCoinReturn.bind(this);
     this.state = {
       open: false,
+      bank: props.bank,
       bankCoins: props.coins,
       tempCoins: new CoinWallet(),
       bankCoinsSelectable: this.initBankCoinsSelectable(props.coins),
-      numTempCoins: 0
     };
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (!prevState.open && this.state.open) {
+      this.setState({
+        bank: this.props.bank,
+        tempCoins: new CoinWallet(),
+        bankCoinsSelectable: this.initBankCoinsSelectable(this.props.coins)
+      });
+    }
   }
 
   initBankCoinsSelectable(coins) {
@@ -45,126 +64,159 @@ class ModalPickCoins extends React.Component {
     return bankCoinsSelectable;
   }
 
-  onOpenModal() {
-    if (!this.props.finished) {
-      this.setState({
-        open: true,
-        bankCoins: this.props.coins,
-        numTempCoins: 0,
-        bankCoinsSelectable: this.initBankCoinsSelectable(this.props.coins),
-      });
-    }
-  }
-
-  setAllObjValues(obj, value) {
-    for (let key of Object.keys(obj)) {
-      obj[key] = value;
-    }
-  }
-
   handleCoinTake(colorToTake) {
-    let bankCoins = Object.assign({}, this.state.bankCoins);
-    let tempCoins = Object.assign({}, this.state.tempCoins);
-    let numTempCoins = this.state.numTempCoins;
-    let bankCoinsSelectable = Object.assign({}, this.state.bankCoinsSelectable);
-    bankCoins[colorToTake]--;
-    tempCoins[colorToTake]++;
-    numTempCoins++;
-    if (numTempCoins === 0) {
-      alert("Why was it negative");
-    } else if (numTempCoins === 1) {
-      if (bankCoins[colorToTake] < 3) {
-        bankCoinsSelectable[colorToTake] = false;
-      } else {
-        bankCoinsSelectable[colorToTake] = 0 < bankCoins[colorToTake];
-      }
-    } else if (numTempCoins === 2) {
-      if (1 < tempCoins[colorToTake]) {
-        this.setAllObjValues(bankCoinsSelectable, false);
-      } else {
-        for (let tempCoinColor of Object.keys(tempCoins)) {
-          if (0 < tempCoins[tempCoinColor]) {
-            bankCoinsSelectable[tempCoinColor] = false;
-          }
-        }
-        bankCoinsSelectable[colorToTake] = false;
-      }
-    } else if (2 < numTempCoins) {
-      this.setAllObjValues(bankCoinsSelectable, false);
+    const {
+      bank,
+      tempCoins,
+      bankCoinsSelectable
+    } = this.state;
+
+    let newBank = Object.assign(new BankBase(), bank);
+    let newBankWallet = Object.assign(new CoinWallet(), bank.wallet);
+    let newTempCoins = Object.assign(new CoinWallet(), tempCoins);
+    let newBankCoinsSelectable = Object.assign({}, bankCoinsSelectable);
+
+    if (bank.wallet[colorToTake] === 0) {
+      console.log("Cannot take any more coins of this color", bank.wallet);
+      return;
     }
+    if (bankCoinsSelectable[colorToTake] === false) {
+      console.log("Cannot take coins because bankCoinsSelectable for this color is false", bankCoinsSelectable);
+      return;
+    }
+
+    newBankWallet[colorToTake]--;
+    newTempCoins[colorToTake]++;
+
+    let sum = newTempCoins.sum();
+
+    if (sum === 1) {
+      newBankCoinsSelectable[colorToTake] = newBankWallet[colorToTake] > 2;
+    } else if (sum === 2) {
+      if (newTempCoins[colorToTake] === 2) {
+        COLORS_NO_WILD.forEach(color => {
+          newBankCoinsSelectable[color] = false;
+        });
+      } else {
+        COLORS_NO_WILD.forEach(color => {
+          newBankCoinsSelectable[color] = newBankWallet[color] > 0 && newTempCoins[color] === 0;
+        });
+      }
+    } else {
+      COLORS_NO_WILD.forEach(color => {
+        newBankCoinsSelectable[color] = false;
+      })
+    }
+
+    newBank.wallet = newBankWallet;
     this.setState({
-      bankCoins: bankCoins,
-      tempCoins: tempCoins,
-      numTempCoins: numTempCoins,
-      bankCoinsSelectable: bankCoinsSelectable,
+      bank: newBank,
+      tempCoins: newTempCoins,
+      bankCoinsSelectable: newBankCoinsSelectable,
     });
   }
 
   handleCoinReturn(colorToReturn) {
-    let bankCoins = Object.assign({}, this.state.bankCoins);
-    let tempCoins = Object.assign({}, this.state.tempCoins);
-    let numTempCoins = this.state.numTempCoins;
-    let bankCoinsSelectable = Object.assign({}, this.state.bankCoinsSelectable);
-    bankCoins[colorToReturn]++;
-    tempCoins[colorToReturn]--;
-    numTempCoins--;
-    if (numTempCoins < 2) {
-      this.setAllObjValues(bankCoinsSelectable, true);
-    } else if (numTempCoins === 2) {
-      for (let color of Object.keys(bankCoinsSelectable)) {
-        bankCoinsSelectable[color] = tempCoins[color] === 0;
-      }
+    const {
+      bank,
+      tempCoins,
+      bankCoinsSelectable
+    } = this.state;
+
+    let newBank = Object.assign(new BankBase(), bank);
+    let newBankWallet = Object.assign(new CoinWallet(), bank.wallet);
+    let newTempCoins = Object.assign(new CoinWallet(), tempCoins);
+    let newBankCoinsSelectable = Object.assign({}, bankCoinsSelectable);
+
+    if (newTempCoins[colorToReturn] === 0) {
+      console.log("Cannot return any more coins of this color", bank.wallet);
+      return;
     }
+
+    newBankWallet[colorToReturn]++;
+    newTempCoins[colorToReturn]--;
+
+    let sum = newTempCoins.sum();
+
+    if (sum === 0) {
+      newBankCoinsSelectable[colorToReturn] = newBankWallet[colorToReturn] > 0;
+    } else if (sum === 1) {
+      COLORS_NO_WILD.forEach(color => {
+        if (newTempCoins[color] > 0) {
+          newBankCoinsSelectable[color] = newBankWallet[color] > 2;
+        } else {
+          newBankCoinsSelectable[color] = newBankWallet[color] > 0;
+        }
+      })
+    } else if (sum === 2) {
+      COLORS_NO_WILD.forEach(color => {
+        newBankCoinsSelectable[color] = newBankWallet[color] > 0 && newTempCoins[color] === 0;
+      });
+    }
+
+    newBank.wallet = newBankWallet;
     this.setState({
-      bankCoins: bankCoins,
-      tempCoins: tempCoins,
-      numTempCoins: numTempCoins,
-      bankCoinsSelectable: bankCoinsSelectable,
+      bank: newBank,
+      tempCoins: newTempCoins,
+      bankCoinsSelectable: newBankCoinsSelectable,
     });
   }
 
   handleConfirm(coins) {
-    this.setState({ tempCoins: new CoinWallet(), open: false });  // reset temp coins
     this.props.handleCoinTransaction(coins, true);
+    this.setState({
+      open: false
+    });
   }
 
   handleCancel() {
-    let bankCoins = Object.assign({}, this.state.bankCoins);
-    let tempCoins = Object.assign({}, this.state.tempCoins);
-    for (let color of Object.keys(tempCoins)) {
-      bankCoins[color] += tempCoins[color];
-      tempCoins[color] = 0;
-    }
     this.setState({
-      bankCoins: bankCoins,
-      tempCoins: tempCoins,
-      numTempCoins: 0,
       open: false,
     });
   }
 
   render() {
-    const open = this.state.open;
-    const coins = Object.entries(this.state.bankCoins).map(([color, count], idx) => {
-      const disabled = !this.state.bankCoinsSelectable[color];
-      const bankCoinButton = <Coin color={color} disabled={disabled} onClick={this.handleCoinTake}>{count}</Coin>;
-      const tempCoinButton = <Coin color={color} onClick={this.handleCoinReturn}>{this.state.tempCoins[color]}</Coin>;
-      return color !== WILD ? (
+    const {
+      open,
+      bank,
+      tempCoins,
+      bankCoinsSelectable
+    } = this.state;
+
+    const coins = COLORS_NO_WILD.map(color => {
+      const bankQty = bank.wallet[color];
+      const tempQty = tempCoins[color];
+      const bankCoinButton = (
+        <Coin
+          color={color}
+          disabled={bankQty === 0 || !bankCoinsSelectable[color]}
+          onClick={this.handleCoinTake}
+        >
+          {bankQty}
+        </Coin>
+      );
+      const tempCoinButton = (
+        <Coin
+          color={color}
+          onClick={this.handleCoinReturn}
+        >
+          {tempQty}
+        </Coin>
+      );
+      return (
         <Grid.Row>
           {bankCoinButton}
-          {this.state.tempCoins[color] > 0 && tempCoinButton}
+          {tempQty > 0 && tempCoinButton}
         </Grid.Row>
-      ) : (
-        <></>
       );
     });
 
     return (
       <Modal
         className="bank"
-        onClose={() => this.handleCancel()}
-        onOpen={() => this.onOpenModal()}
-        open={open}
+        onClose={() => this.setState({ open: false })}
+        onOpen={() => this.setState({ open: true })}
+        open={open && !this.props.disabled}
         trigger={<Button>Collect Coins</Button>}
       >
         <Modal.Header>Select Coins</Modal.Header>
@@ -177,9 +229,9 @@ class ModalPickCoins extends React.Component {
           />
           <Button
             content="confirm"
-            onClick={() => this.handleConfirm(this.state.tempCoins)}
+            onClick={() => this.handleConfirm(tempCoins)}
             positive
-            disabled={this.state.numTempCoins === 0}
+            disabled={tempCoins.sum() === 0}
           />
         </Modal.Actions>
       </Modal>

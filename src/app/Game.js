@@ -4,7 +4,7 @@ import Noblemen, { ModalNoblemen } from '../components/Noblemen';
 import Player from '../components/Player';
 import { Grid, Container, Divider } from 'semantic-ui-react';
 import ReturnCoinsModal from '../components/ReturnCoinsModal';
-import { calculateCharge, WILD, DECK, BOARD, RESERVED, any, rank } from '../utils';
+import { calculateCharge, WILD, any, rank, isAbleToBuy } from '../utils';
 import React from 'react';
 import History from '../components/History';
 import DesktopLayout from '../layouts/desktop';
@@ -104,7 +104,7 @@ class Game extends React.Component {
     }
 
     const currentPlayer = players[currentPlayerIdx];
-    let newLifecycle = isPlayerCollecting ? lifecycle.collectCoins : lifecycle.returnCoins;
+    let newLifecycle = isPlayerCollecting ? lifecycle.collectCoins : lifecycle;
     let newPlayers = players.slice();
     let newPlayer = Object.assign(new PlayerBase(), currentPlayer);
     let newBank = Object.assign(new BankBase(), bank);
@@ -154,9 +154,9 @@ class Game extends React.Component {
 
     const currentPlayer = players[currentPlayerIdx];
     const card = board[level][column];
-    let { insufficientFunds, charge } = calculateCharge(card.price, currentPlayer.coins, currentPlayer.cards);
+    const chargeAmtWallet = calculateCharge(card, currentPlayer);
 
-    if (insufficientFunds) {
+    if (!isAbleToBuy(card, currentPlayer)) {
       alert("Insufficient Funds");
       return;
     }
@@ -166,7 +166,7 @@ class Game extends React.Component {
     let newPlayer = Object.assign(new PlayerBase(), currentPlayer);
     let newBank = Object.assign(new BankBase(), bank);
 
-    for (let [color, price] of Object.entries(charge)) {
+    for (let [color, price] of Object.entries(chargeAmtWallet)) {
       newPlayer.coins[color] -= price;
       newBank.wallet[color] += price;
     }
@@ -207,9 +207,9 @@ class Game extends React.Component {
 
     const currentPlayer = players[currentPlayerIdx];
     const card = currentPlayer.reserved[index];
-    let { insufficientFunds, charge } = calculateCharge(card.price, currentPlayer.coins, currentPlayer.cards);
+    const chargeAmtWallet = calculateCharge(card, currentPlayer);
 
-    if (insufficientFunds) {
+    if (!isAbleToBuy(card, currentPlayer)) {
       alert("Insufficient Funds");
       return;
     }
@@ -219,7 +219,7 @@ class Game extends React.Component {
     let newPlayer = Object.assign(new PlayerBase(), currentPlayer);
     let newBank = Object.assign(new BankBase(), bank);
     // TODO after buying from reserved, close all modals
-    for (let [color, price] of Object.entries(charge)) {
+    for (let [color, price] of Object.entries(chargeAmtWallet)) {
       newPlayer.coins[color] -= price;
       newBank.wallet[color] += price;
     }
@@ -452,7 +452,7 @@ class Game extends React.Component {
   }
 
   render() {
-    const { board, decks, nobles, noblemenSelectionOpen, selectableNoblemen, currentPlayerIdx, numPlayers, finished } = this.state;
+    const { board, decks, nobles, noblemenSelectionOpen, selectableNoblemen, currentPlayerIdx, bank, finished } = this.state;
     const players = this.state.players.map(player => {
       return (
         <>
@@ -483,9 +483,10 @@ class Game extends React.Component {
             </Grid.Column>
             <Grid.Column width={2}>
               <Bank
+                bank={bank}
                 coins={this.state.bank.wallet}
                 handleCoinTransaction={this.handleCoinTransaction}
-                finished={finished}
+                disabled={finished}
               />
               <ReturnCoinsModal
                 coins={this.state.players[currentPlayerIdx].coins}
