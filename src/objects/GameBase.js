@@ -1,7 +1,6 @@
 import { NobleBase } from "./NobleBase";
 import { MAX_BANK_COINS, MAX_BOARD_COLS, MAX_BOARD_ROWS } from "../constants/defaults";
 import { shuffle } from "../utils";
-import Wallet from "./Wallet";
 import Mine from "./Mine";
 import cardData from "../constants/cardData.json";
 import nobleData from "../constants/nobleData.json";
