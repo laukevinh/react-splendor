@@ -1,5 +1,6 @@
 import React from 'react';
 import { Grid, Card } from 'semantic-ui-react';
+import { pricetag } from '../utils';
 import { DeckModal, GameCardModal } from './CardModal';
 
 export default function Board(props) {
@@ -29,6 +30,7 @@ export default function Board(props) {
     let cols = row.map((card, col) => {
       return (
         <GameCardModal
+          key={pricetag(card)}
           level={level}
           column={col}
           card={card}
@@ -41,7 +43,7 @@ export default function Board(props) {
       );
     });
     return (
-      <Grid.Row columns={2}>
+      <Grid.Row columns={2} key={level}>
         <Grid.Column width={1}>
           {deckModal}
         </Grid.Column>

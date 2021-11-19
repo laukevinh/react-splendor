@@ -452,7 +452,7 @@ class Game extends React.Component {
               {
                 players.map(player => {
                   return (
-                    <>
+                    <Grid.Row key={player.name}>
                       <Player
                         player={player}
                         currentPlayerIdx={currentPlayerIdx}
@@ -460,7 +460,7 @@ class Game extends React.Component {
                         handleBuyClick={this.handleBuyFromReservation}
                       />
                       <Divider />
-                    </>
+                    </Grid.Row>
                   );
                 })
               }
