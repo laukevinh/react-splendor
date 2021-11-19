@@ -46,16 +46,16 @@ export function GameCard(props) {
 export function isAbleToBuy(card, player) {
   const price = card.price;
   const cards = player.cards;
-  let newWallet = new CoinWallet();
+  let newWallet = Object.assign(new CoinWallet(), player.coins);
 
-  COLORS_NO_WILD.forEach(color => {
+  for (let color of COLORS_NO_WILD) {
     let remainder = price[color] - cards[color].length;
     if (newWallet[color] + newWallet[WILD] < remainder) {
       return false;
     } else if (remainder - newWallet[color] > 0) {
       newWallet[WILD] -= remainder - newWallet[color];
     }
-  })
+  }
   return true;
 }
 
