@@ -7,16 +7,33 @@
  *
  */
 export default class Wallet {
+  constructor(startingValue) {
+    this.white = startingValue;
+    this.blue = startingValue;
+    this.green = startingValue;
+    this.red = startingValue;
+    this.black = startingValue;
+  }
+}
+
+export class CoinWallet extends Wallet {
   constructor(startingBalance = 0) {
-    this.white = startingBalance;
-    this.blue = startingBalance;
-    this.green = startingBalance;
-    this.red = startingBalance;
-    this.black = startingBalance;
+    super(startingBalance);
     this.wild = 0 < startingBalance ? 5 : 0;  // max 5 wild coins for all games
   }
 
   sum() {
     return this.white + this.blue + this.green + this.red + this.black + this.wild;
+  }
+}
+
+export class CardWallet extends Wallet {
+  constructor() {
+    super();
+    this.white = [];
+    this.blue = [];
+    this.green = [];
+    this.red = [];
+    this.black = [];
   }
 }

@@ -7,11 +7,7 @@ body {
   margin-bottom: 10px;
 }
 
-.game-players {
-  padding-left: 100px;
-}
-
-.active {
+.active-player {
   border: 5px solid #000;
 }
 
@@ -26,7 +22,6 @@ body {
   cursor:pointer;
 }
 .selectable:active {
-  color:red;
   box-shadow: 0 0 5px -1px rgba(0,0,0,0.6);
 }
 .selectable:hover {
@@ -41,19 +36,13 @@ body {
   pointer-events: none;
 }
 
-.card {
-  background: #fff;
-  border: 5px solid #999;
-  float: left;
-  font-size: 24px;
-  font-weight: normal;
-  line-height: 34px;
-  height: 240px;
-  padding: 0;
-  text-align: center;
+.background {
+  background: #715331;
+  padding-top: 3em;
+  margin-top: -1em;
 }
 
-.game-card {
+.game-card, .mini-card {
   display: inline-block;
   text-align: center;
   vertical-align: middle;
@@ -71,36 +60,68 @@ body {
   width: 108px;
 }
 
-.white, .ui.cards > .ui.card > .content.white {
+.mini-card.small {
+  height: 48px;
+  width: 36px;
+}
+
+.mini-card.large {
+  min-height: 300px;
+}
+
+.mini-card.fluid {
+  max-width: 100%;
+  width: 9999px;
+}
+
+.ui.card, .ui.cards > .card.small {
+  width: 100px;
+}
+
+.white,
+.ui.card > .content.white, 
+.ui.cards > .ui.card > .content.white {
   background:rgb(220, 220, 220);
   border-color: #fff;
 }
 
-.blue, .ui.cards > .ui.card > .content.blue {
+.blue,
+.ui.card > .content.blue, 
+.ui.cards > .ui.card > .content.blue {
   background-color: rgb(140, 160, 210);
   border-color: rgb(30, 70, 180)
 }
 
-.green, .ui.cards > .ui.card > .content.green {
+.green,
+.ui.card > .content.green, 
+.ui.cards > .ui.card > .content.green {
   background-color: rgb(130, 200, 170);
   border-color: rgb(10, 130, 80);
 }
 
-.red, .ui.cards > .ui.card > .content.red {
+.red,
+.ui.card > .content.red, 
+.ui.cards > .ui.card > .content.red {
   background-color: rgb(240, 160, 170);
   border-color: rgb(220, 70, 70);
 }
 
-.black, .ui.cards > .ui.card > .content.black {
+.black,
+.ui.card > .content.black, 
+.ui.cards > .ui.card > .content.black {
   background-color: rgb(150, 150, 150);
   border-color: rgb(50, 50, 50);
 }
 
-.wild, .ui.cards > .ui.card > .content.wild {
+.wild,
+.ui.card > .content.wild, 
+.ui.cards > .ui.card > .content.wild {
   background-color: rgb(230, 220, 10);
 }
 
-.beige, .ui.cards > .ui.card > .content.beige {
+.beige,
+.ui.card > .content.beige, 
+.ui.cards > .ui.card > .content.beige {
   background-color: rgb(200, 140, 50);
 }
 
@@ -115,9 +136,32 @@ body {
   padding: 3px;
 }
 
+.circle {
+  border-radius: 50%;
+  height: 36px;
+  width: 36px;
+  text-align: center;
+  font-size: 1.5em;
+  border: 3px solid #eee;
+  margin: 3px;
+  padding: 3px;
+}
+
+.coinContainer.floated, img.floated {
+  display: inline-block;
+}
+
+.coinContainer.floated.left, img.floated.left {
+  float: left
+}
+.coinContainer.floated.right, img.floated.right {
+  float: right
+}
+
 .coinContainer {
   position: relative;
-  display: inline-flex;
+  display: inline flex;
+  margin: 0.25em;
 }
 
 .coinContent {
@@ -132,15 +176,62 @@ body {
   color: #fff;
 }
 
+.circle + .icon {
+  position: absolute;
+  top: 26px;
+  left: 26px;
+}
+
+img.small {
+  width: 16px;
+  height: 16px;
+}
+
+img.medium {
+  width: 32px;
+  height: 32px;
+}
+
+img.large {
+  width: 64px;
+  height: 64px;
+}
+
 .modal.bank > .content > .row > .coin {
   display: inline-block;
 }
 
-.game {
-  display: flex;
-  flex-direction: row;
+.ui.container.large {
+  width: 1500px;
 }
 
-.game-info {
-  margin-left: 20px;
+.ui.container.large.padded {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.ui.container.horizontal {
+  display: block flex;
+}
+
+.ui.card > .content > .header:not(.ui).pointValue,
+.ui.cards > .card > .content > .header:not(.ui).pointValue {
+font-size: 2rem;
+  font-weight: 700;
+}
+
+.ui.card.medium,
+.ui.card > .content.medium,
+.ui.cards > .card > .content.medium {
+  max-width: 140px;
+  min-height: 200px;
+}
+
+.ui.card > .content.large,
+.ui.cards > .card > .content.large {
+  min-height: 300px;
+}
+
+.ui.grid.min-height {
+  min-height: 140px;
 }

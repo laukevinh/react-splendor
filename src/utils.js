@@ -1,13 +1,6 @@
-import React from 'react';
-import 'semantic-ui-css/semantic.min.css';
-import { Image } from 'semantic-ui-react';
-import Wallet from './wallet';
-import whiteCoin from './assets/white-coin.png';
-import blueCoin from './assets/blue-coin.png';
-import greenCoin from './assets/green-coin.png';
-import redCoin from './assets/red-coin.png';
-import blackCoin from './assets/black-coin.png';
-import wildCoin from './assets/wild-coin.png';
+import Coin from './components/Coin';
+import { COLORS_NO_WILD } from './constants/colors';
+import { CoinWallet } from './objects/Wallet';
 
 export const DECK = 'deck';
 export const BOARD = 'board';
@@ -20,56 +13,17 @@ export const BLACK = 'black';
 export const WILD = 'wild';
 
 export default function renderPrice(price, type) {
-  let prices = [];
-  for (let [color, colorPrice] of Object.entries(price)) {
-    if (0 < colorPrice) {
-      let elem;
-      if (type === 'coin') {
-        elem = <Coin color={color} content={colorPrice} />;
-      } else if (type === 'game-card') {
-        elem = <GameCard color={color} content={colorPrice} />;
-      }
-      prices.push(elem);
+  return Object.entries(price).map(([color, amt]) => {
+    if (amt === 0) {
+      return <></>;
     }
-  }
-  return (prices);
-}
-
-export function Coin(props) {
-  let displayClass;
-  if (props.onClick && !props.disabled) {
-    displayClass = "selectable";
-  } else if (props.onClick && props.disabled) {
-    displayClass = "disabled";
-  } else {
-    displayClass = "";
-  }
-  const classNames = ["coinContainer", displayClass].join(" ");
-  let imgSrc;
-  if (props.color === WHITE) {
-    imgSrc = whiteCoin;
-  } else if (props.color === BLUE) {
-    imgSrc = blueCoin;
-  } else if (props.color === GREEN) {
-    imgSrc = greenCoin;
-  } else if (props.color === RED) {
-    imgSrc = redCoin;
-  } else if (props.color === BLACK) {
-    imgSrc = blackCoin;
-  } else if (props.color === WILD) {
-    imgSrc = wildCoin;
-  } else {
-    imgSrc = null;
-  }
-  return (
-    <div
-      className={classNames}
-      onClick={() => {props.onClick && !props.disabled ? props.onClick(props.color) : void(0)}}
-    >
-      <Image src={imgSrc} size='mini' />
-      <div className='coinContent'>{props.content}</div>
-    </div>
-  );
+    if (type === 'coin') {
+      return <Coin color={color}>{amt}</Coin>;
+    }
+    if (type === 'game-card') {
+      return <GameCard color={color}>{amt}</GameCard>;
+    }
+  });
 }
 
 export function GameCard(props) {
@@ -84,35 +38,45 @@ export function GameCard(props) {
     <div
       className={classNames}
     >
-      {props.content}
+      {props.children}
     </div>
   );
 }
 
-export function calculateCharge(price, playerWallet, playerCards) {
-  let charge = new Wallet();
-  let response = {
-    insufficientFunds: null,
-    charge: charge,
-  }
-  for (let [color, colorPrice] of Object.entries(price)) {
-    let remainder = colorPrice - playerCards[color].length;
-    if (playerWallet[color] + playerWallet[WILD] < remainder) {
-      response.insufficientFunds = true;
-      return response;
-    } else if (playerWallet[color] < remainder) {
-      charge[color] = playerWallet[color];
-      charge[WILD] += remainder - playerWallet[color];
-    } else {
-      charge[color] = remainder;
+export function isAbleToBuy(card, player) {
+  const price = card.price;
+  const cards = player.cards;
+  let newWallet = new CoinWallet();
+
+  COLORS_NO_WILD.forEach(color => {
+    let remainder = price[color] - cards[color].length;
+    if (newWallet[color] + newWallet[WILD] < remainder) {
+      return false;
+    } else if (remainder - newWallet[color] > 0) {
+      newWallet[WILD] -= remainder - newWallet[color];
     }
-    if (playerWallet[WILD] - charge[WILD] < 0) {
-      response.insufficientFunds = true;
-      return response;
+  })
+  return true;
+}
+
+export function calculateCharge(card, player) {
+  const price = card.price;
+  const cards = player.cards;
+  const wallet = player.coins;
+  let chargeWallet = new CoinWallet();
+
+  COLORS_NO_WILD.forEach(color => {
+    let remainder = price[color] - cards[color].length;
+    if (remainder > 0) {
+      if (wallet[color] >= remainder) {
+        chargeWallet[color] = remainder;
+      } else {
+        chargeWallet[color] = wallet[color];
+        chargeWallet[WILD] = remainder - wallet[color];
+      }
     }
-  }
-  response.insufficientFunds = false;
-  return response;
+  })
+  return chargeWallet;
 }
 
 function randInt(i, j) {
@@ -131,4 +95,17 @@ export function shuffle(A) {
     swap(A, k, randInt(0, n - 1));
   }
   return A;
+}
+
+export function any(array) {
+  for (let each of array) {
+    if (each === true) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export function rank(array, attribute) {
+  return array.slice().sort((a, b) => b[attribute] - a[attribute]);
 }
