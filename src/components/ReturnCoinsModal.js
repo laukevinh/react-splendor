@@ -91,7 +91,7 @@ export default class ReturnCoinsModal extends React.Component {
         </Coin>
       );
       return (
-        <Grid.Row>
+        <Grid.Row key={color}>
           {playerCoinButton}
           {
             tempCoins[color] > 0 &&

@@ -4,6 +4,7 @@ import { GameCardModal } from './CardModal';
 import Coin from './Coin';
 import MiniCard from './MiniCard';
 import GameCard from './GameCard';
+import { pricetag } from '../utils';
 
 export default function Player(props) {
   const {
@@ -14,12 +15,29 @@ export default function Player(props) {
   } = props;
 
   const coins = Object.entries(player.coins).map(([color, count], idx) => {
-    const coin = <Coin color={color}>{count}</Coin>;
-    return <Grid.Column>{0 < count && coin}</Grid.Column>;
+    return (
+      <Grid.Column key={color}>
+        {
+          0 < count &&
+          <Coin color={color}>{count}</Coin>
+        }
+      </Grid.Column>
+    );
   });
   const cards = Object.entries(player.cards).map(([color, cardArray]) => {
-    const card = <MiniCard size={'small'} color={color}>{cardArray.length}</MiniCard>;
-    return <Grid.Column>{0 < cardArray.length && card}</Grid.Column>;
+    return (
+      <Grid.Column key={color}>
+        {
+          0 < cardArray.length &&
+          <MiniCard
+            size={'small'}
+            color={color}
+          >
+            {cardArray.length}
+          </MiniCard>
+        }
+      </Grid.Column>
+    );
   });
   return (
     <Grid className={player.position === currentPlayerIdx && !finished ? "active-player" : null}>
@@ -58,7 +76,7 @@ function ModalPlayerDetails(props) {
   Object.values(player.cards).forEach((cardArray) => {
     Object.values(cardArray).forEach(card => {
       cardList.push(
-        <List.Item>
+        <List.Item key={pricetag(card)}>
           <GameCard
             card={card}
             size="medium"
@@ -69,7 +87,7 @@ function ModalPlayerDetails(props) {
   });
   const reserved = player.reserved.map((card, idx) => {
     return (
-      <Grid.Row>
+      <Grid.Row key={pricetag(card)}>
         <GameCardModal
           index={idx}
           card={card}

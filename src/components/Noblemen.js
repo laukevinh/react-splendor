@@ -1,9 +1,14 @@
 import React from 'react';
 import { Card, Grid, Modal } from 'semantic-ui-react';
-import renderPrice from '../utils'
+import renderPrice, { pricetag } from '../utils'
 
 function Noble(props) {
-  const { idx, points, price, onClick } = props;
+  const {
+    idx,
+    points,
+    price,
+    onClick
+  } = props;
   const content = (
     <Card.Content>
       <Card.Header textAlign='right' as='h1'>
@@ -24,10 +29,14 @@ function Noble(props) {
 }
 
 export default function Noblemen(props) {
-  const { noblemen, includesList, onClick } = props;
+  const {
+    noblemen,
+    includesList,
+    onClick
+  } = props;
   const nobles = noblemen.map((noble, idx) => {
     return (
-      <Grid.Column>
+      <Grid.Column key={pricetag(noble)}>
         {
           includesList[idx] &&
           <Noble

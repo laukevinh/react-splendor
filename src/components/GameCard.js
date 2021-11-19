@@ -7,25 +7,31 @@ export default function GameCard(props) {
     card,
     size
   } = props;
-  let classNames = [card.color];
+  let classNames = [];
+  if (card) {
+    classNames.push(card.color);
+  }
   if (size) {
     classNames.push(size);
   }
   return (
     <Card className={size} {...props}>
-      <Card.Content className={classNames.join(" ")}>
-        <ColorIcon
-          color={card.color}
-          floated={'left'}
-          size={size || 'medium'}
-        />
-        <Card.Header textAlign="right" className={"pointValue"}>
-          {card.points}
-        </Card.Header>
-        <Card.Description>
-          {renderPrice(card.price, "coin")}
-        </Card.Description>
-      </Card.Content>
+      {
+        card !== null &&
+        <Card.Content className={classNames.join(" ")}>
+          <ColorIcon
+            color={card.color}
+            floated={'left'}
+            size={size || 'medium'}
+          />
+          <Card.Header textAlign="right" className={"pointValue"}>
+            {card.points}
+          </Card.Header>
+          <Card.Description>
+            {renderPrice(card.price, "coin")}
+          </Card.Description>
+        </Card.Content>
+      }
     </Card>
   );
 }

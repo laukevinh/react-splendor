@@ -14,7 +14,14 @@ export default function Bank(props) {
   } = props;
 
   const coins = Object.entries(bank.wallet).map(([color, count], idx) => {
-    return <Coin color={color}>{count}</Coin>
+    return (
+      <Coin
+        key={color}
+        color={color}
+      >
+        {count}
+      </Coin>
+    );
   });
 
   return (
@@ -204,7 +211,7 @@ class ModalPickCoins extends React.Component {
         </Coin>
       );
       return (
-        <Grid.Row>
+        <Grid.Row key={color}>
           {bankCoinButton}
           {tempQty > 0 && tempCoinButton}
         </Grid.Row>
@@ -214,6 +221,7 @@ class ModalPickCoins extends React.Component {
     return (
       <Modal
         className="bank"
+        size={'mini'}
         onClose={() => this.setState({ open: false })}
         onOpen={() => this.setState({ open: true })}
         open={open && !this.props.disabled}

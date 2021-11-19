@@ -13,17 +13,18 @@ export const BLACK = 'black';
 export const WILD = 'wild';
 
 export default function renderPrice(price, type) {
-  return Object.entries(price).map(([color, amt]) => {
-    if (amt === 0) {
-      return <></>;
+  let results = [];
+  for (let [color, amt] of Object.entries(price)) {
+    if (amt > 0) {
+      if (type === 'coin') {
+        results.push(<Coin key={color} color={color}>{amt}</Coin>);
+      }
+      if (type === 'game-card') {
+        results.push(<GameCard key={color} color={color}>{amt}</GameCard>);
+      }
     }
-    if (type === 'coin') {
-      return <Coin color={color}>{amt}</Coin>;
-    }
-    if (type === 'game-card') {
-      return <GameCard color={color}>{amt}</GameCard>;
-    }
-  });
+  }
+  return results;
 }
 
 export function GameCard(props) {
@@ -46,16 +47,16 @@ export function GameCard(props) {
 export function isAbleToBuy(card, player) {
   const price = card.price;
   const cards = player.cards;
-  let newWallet = new CoinWallet();
+  let newWallet = Object.assign(new CoinWallet(), player.coins);
 
-  COLORS_NO_WILD.forEach(color => {
+  for (let color of COLORS_NO_WILD) {
     let remainder = price[color] - cards[color].length;
     if (newWallet[color] + newWallet[WILD] < remainder) {
       return false;
     } else if (remainder - newWallet[color] > 0) {
       newWallet[WILD] -= remainder - newWallet[color];
     }
-  })
+  }
   return true;
 }
 
@@ -108,4 +109,14 @@ export function any(array) {
 
 export function rank(array, attribute) {
   return array.slice().sort((a, b) => b[attribute] - a[attribute]);
+}
+
+export function pricetag(obj) {
+  let name = '';
+  Object.entries(obj.price).map(([color, amount]) => {
+    if (amount > 0) {
+      name += `${amount}${color[0]}`;
+    }
+  });
+  return name;
 }
