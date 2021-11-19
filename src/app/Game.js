@@ -337,23 +337,8 @@ class Game extends React.Component {
     });
   }
 
-  calculateWinner(playersRanked) {
-    return this.state.pointsToWin <= playersRanked[0].points ? playersRanked[0] : null;
-  }
-
-  declareWinner(playersRanked) {
-    let msg = playersRanked.map((player, idx) => {
-      return `\n${idx + 1}. ${player.name} ${player.points}`;
-    })
-    alert("Winner: \n" + msg);
-  }
-
-  displayRank(playersRanked) {
-    return playersRanked.map((player, idx) => `\n${idx + 1}. ${player.name} : ${player.points}`);
-  }
-
   listSelectableNoblemen(player, nobles) {
-    let selectableNoblemen = nobles.map(noble => {
+    return nobles.map(noble => {
       if (!noble.isDisplayed) {
         return false;
       } else {
@@ -365,70 +350,40 @@ class Game extends React.Component {
       }
       return true;
     });
-
-    return selectableNoblemen;
   }
 
   handleNoblemenSelection(nobleIndex) {
-    let lifecycle = this.state.lifecycle;
+    const {
+      lifecycle,
+      currentPlayerIdx,
+      players,
+      nobles,
+    } = this.state;
     console.log("current state: ", lifecycle.description, lifecycle);
     if (lifecycle.description !== 'selectNoble') {
       console.log("Cannot select Noble in current lifecycle state: ", lifecycle);
       return;
     }
-    // player adds noblemen
-    // after picking up noblemen, replace with stub so the placement is still the same
-    const { currentPlayerIdx, numPlayers } = this.state;
-    let players = this.state.players.slice();
-    let player = players[currentPlayerIdx];
-    let nobles = this.state.nobles.slice();
-    let noble = nobles[nobleIndex];
-    noble.isDisplayed = false;
-    player.addNoble(noble);
-    player.addPoints(noble.points);
+    let newPlayers = players.slice();
+    let newPlayer = players[currentPlayerIdx];
+    let newNobles = nobles.slice();
+    let newNoble = nobles[nobleIndex];
+    newNoble.isDisplayed = false;
+    newPlayer.addNoble(newNoble);
+    newPlayer.addPoints(newNoble.points);
     this.setState({
-      players: players,
-      nobles: nobles,
+      players: newPlayers,
+      nobles: newNobles,
       selectableNoblemen: [],
       lifecycle: lifecycle.endOfTurn,
       noblemenSelectionOpen: false,
     });
   }
 
-  handleWinner(players, currentPlayerIdx, numPlayers) {
-    if (currentPlayerIdx + 1 === numPlayers) {  // check for winner at end of round
-      const playersRanked = rank(players, 'points');
-      const winner = this.calculateWinner(playersRanked);
-      if (winner) {
-        this.setState({ finished: true });
-        alert(this.displayRank(playersRanked));
-      }
-    }
-  }
-
   handleNextTurn(currentPlayerIdx, numPlayers) {
     if (!this.state.finished) { // next player if game not finished
       this.setState({ currentPlayerIdx: (currentPlayerIdx + 1) % numPlayers });
     }
-  }
-
-  handleEndGame() {
-    alert(this.displayRank(rank(this.state.players, 'points')));
-    this.setState({ finished: true });
-  }
-
-  handleEndRound() {
-    const { players, lifecycle } = this.state;
-    console.log("current state: ", lifecycle.description, lifecycle);
-    if (lifecycle.description !== 'endOfRound') {
-      console.log("Cannot end round in current lifecycle state: ", lifecycle);
-      return;
-    }
-    const playersRanked = rank(players, 'points');
-    const winner = this.calculateWinner(playersRanked);
-    this.setState({
-      lifecycle: winner ? lifecycle.endOfGame : lifecycle.startOfTurn
-    });
   }
 
   handleEndTurn() {
@@ -451,35 +406,64 @@ class Game extends React.Component {
     });
   }
 
-  render() {
-    const { board, decks, nobles, noblemenSelectionOpen, selectableNoblemen, currentPlayerIdx, bank, finished } = this.state;
-    const players = this.state.players.map(player => {
-      return (
-        <>
-          <Player
-            player={player}
-            currentPlayerIdx={currentPlayerIdx}
-            finished={finished}
-            handleBuyClick={this.handleBuyFromReservation}
-          />
-          <Divider />
-        </>
-      );
-    });
-    let status;
-    if (finished) {  // check for winner at end of round
-      const playersRanked = rank(this.state.players, 'points');
-      status = "Game Over:\n" + this.displayRank(playersRanked);
-    } else {
-      status = "Next player: " + this.state.players[currentPlayerIdx].name;
+  handleEndRound() {
+    const {
+      players,
+      lifecycle,
+      pointsToWin
+    } = this.state;
+    console.log("current state: ", lifecycle.description, lifecycle);
+    if (lifecycle.description !== 'endOfRound') {
+      console.log("Cannot end round in current lifecycle state: ", lifecycle);
+      return;
     }
+    const playerListRanked = rank(players, 'points');
+    const isWinner = playerListRanked[0].points >= pointsToWin;
+    this.setState({
+      lifecycle: isWinner ? lifecycle.endOfGame : lifecycle.startOfTurn
+    });
+  }
+
+  handleEndGame() {
+    const playerListRanked = rank(this.state.players, 'points');
+    alert(playerListRanked.map((player, idx) => `${idx}: ${player.name}`).join("\n"));
+    this.setState({ finished: true });
+  }
+
+  render() {
+    const {
+      board,
+      decks,
+      players,
+      nobles,
+      noblemenSelectionOpen,
+      selectableNoblemen,
+      currentPlayerIdx,
+      returnCoinsModalOpen,
+      bank,
+      finished
+    } = this.state;
 
     return (
       <div className={'background'}>
         <Container className={'large'}>
-          <Grid>
+          <Grid stackable>
             <Grid.Column width={4}>
-              {players}
+              {
+                players.map(player => {
+                  return (
+                    <>
+                      <Player
+                        player={player}
+                        currentPlayerIdx={currentPlayerIdx}
+                        finished={finished}
+                        handleBuyClick={this.handleBuyFromReservation}
+                      />
+                      <Divider />
+                    </>
+                  );
+                })
+              }
             </Grid.Column>
             <Grid.Column width={2}>
               <Bank
@@ -489,8 +473,8 @@ class Game extends React.Component {
                 disabled={finished}
               />
               <ReturnCoinsModal
-                coins={this.state.players[currentPlayerIdx].coins}
-                open={this.state.returnCoinsModalOpen}
+                coins={players[currentPlayerIdx].coins}
+                open={returnCoinsModalOpen}
                 handleCoinTransaction={this.handleCoinTransaction}
               />
             </Grid.Column>
@@ -511,7 +495,7 @@ class Game extends React.Component {
                 <Board
                   board={board}
                   decks={decks}
-                  players={this.state.players}
+                  players={players}
                   currentPlayerIdx={currentPlayerIdx}
                   handleBuyFromBoard={this.handleBuyFromBoard}
                   handleReserveFromDeck={this.handleReserveFromDeck}
@@ -521,7 +505,7 @@ class Game extends React.Component {
               </Grid.Row>
             </Grid.Column>
             <Grid.Column width={3}>
-              <History status={status} />
+              <History status={''} />
             </Grid.Column>
           </Grid>
         </Container>

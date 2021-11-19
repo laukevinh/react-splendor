@@ -42,7 +42,10 @@ export default function Noblemen(props) {
   });
 
   return (
-    <Grid columns={nobles.length}>
+    <Grid
+      columns={nobles.length}
+      className={'min-height'}
+    >
       {nobles}
     </Grid>
   );

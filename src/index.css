@@ -231,3 +231,7 @@ font-size: 2rem;
 .ui.cards > .card > .content.large {
   min-height: 300px;
 }
+
+.ui.grid.min-height {
+  min-height: 140px;
+}
