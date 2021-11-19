@@ -120,6 +120,7 @@ export function GameCardModal(props) {
         }
         {
           currentPlayerIdx === player.position &&
+          card !== null &&
           <Button
             content="Buy"
             disabled={!isAbleToBuy(card, player)}
