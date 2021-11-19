@@ -1,6 +1,7 @@
 import Coin from './components/Coin';
 import { COLORS_NO_WILD } from './constants/colors';
 import { CoinWallet } from './objects/Wallet';
+import MiniCard from './components/MiniCard';
 
 export const DECK = 'deck';
 export const BOARD = 'board';
@@ -19,29 +20,12 @@ export default function renderPrice(price, type) {
       if (type === 'coin') {
         results.push(<Coin key={color} color={color}>{amt}</Coin>);
       }
-      if (type === 'game-card') {
-        results.push(<GameCard key={color} color={color}>{amt}</GameCard>);
+      if (type === 'card') {
+        results.push(<MiniCard key={color} color={color} size={'small'}>{amt}</MiniCard>);
       }
     }
   }
   return results;
-}
-
-export function GameCard(props) {
-  let displayClass;
-  if (props.selectable === true) {
-    displayClass = "selectable";
-  } else {
-    displayClass = "";
-  }
-  const classNames = ["game-card", props.size || "mini", props.color, displayClass].join(" ");
-  return (
-    <div
-      className={classNames}
-    >
-      {props.children}
-    </div>
-  );
 }
 
 export function isAbleToBuy(card, player) {

@@ -14,7 +14,7 @@ function Noble(props) {
       <Card.Header textAlign='right' as='h1'>
         {points}
       </Card.Header>
-      {renderPrice(price, "game-card")}
+      {renderPrice(price, "card")}
     </Card.Content>
   );
   return onClick ? (
